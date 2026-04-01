@@ -104,7 +104,7 @@
       font-size: 10px;
       opacity: 0.7;
     }
-    #titleScreen, #gameOverScreen, #rulesModal, #leaderboardModal, #historyModal, #statsModal {
+    #titleScreen, #gameOverScreen, #rulesModal, #leaderboardModal, #historyModal {
       position: absolute;
       inset: 0;
       z-index: 20;
@@ -115,7 +115,7 @@
       backdrop-filter: blur(4px);
       padding: 20px;
     }
-    #historyModal, #leaderboardModal, #rulesModal, #statsModal { display: none; }
+    #historyModal, #leaderboardModal, #rulesModal { display: none; }
     .panel {
       width: min(92vw, 520px);
       background: #0f0f12;
@@ -310,6 +310,7 @@
       font-weight: bold; animation: pulseCountdown 0.8s ease;
     }
     @keyframes pulseCountdown { 0% { transform: scale(0.65); opacity: 0; } 35% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    /* НОВОЕ: Стили для вкладок магазина (с фиксированной высотой) */
     .shop-tabs {
       display: flex;
       gap: 8px;
@@ -354,7 +355,7 @@
       padding: 12px;
       text-align: center;
       box-shadow: 4px 4px 0 #000;
-      min-height: 180px;
+      min-height: 180px;   /* чтобы карточки не сжимались */
     }
     .shop-card.active { border-color: #3cff8b; box-shadow: 0 0 0 2px #3cff8b inset, 4px 4px 0 #000; }
     .shop-skin-preview { width: 72px; height: 72px; margin: 0 auto 10px; border: 2px solid #000; background: #2a2a2a; position: relative; }
@@ -386,6 +387,19 @@
       padding: 8px 12px;
       border: 1px solid #ffd93b;
       border-radius: 8px;
+    }
+    .volume-sliders label {
+      font-size: 11px;
+      display: block;
+      margin: 6px 0 4px;
+      color: #ffd93b;
+    }
+    .volume-sliders input {
+      width: 100%;
+      margin-bottom: 6px;
+      cursor: pointer;
+      background: #0a0a0a;
+      accent-color: #ffd93b;
     }
     .shop-section-title {
       font-size: 16px;
@@ -447,7 +461,6 @@
         <button class="btn small" id="historyBtnMain">📜 HISTORY</button>
         <button class="btn small" id="rulesBtnMain">📜 RULES</button>
         <button class="btn small" id="leaderboardBtnMain">🏆 LEADERBOARD</button>
-        <button class="btn small" id="statsBtnMain">📊 STATS</button>
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
@@ -471,27 +484,20 @@
   
   <!-- МОДАЛЬНЫЕ ОКНА -->
   <div id="rulesModal" class="hidden"><div class="panel scrollable-panel" style="position: relative;"><h2>📜 GAME RULES</h2><div class="rules-list" id="rulesList"></div><div class="sponsor-line" id="sponsorLine"></div><button class="btn small" id="closeRulesBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
-  <div id="historyModal" class="hidden"><div class="panel scrollable-panel" style="position: relative; max-height: 80vh;"><h2 id="historyTitle">📜 HISTORY</h2><div class="history-text" id="historyText" style="max-height: 55vh; overflow-y: auto; padding-right: 8px;"></div><button class="btn small" id="closeHistoryBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
+  <div id="historyModal" class="hidden"><div class="panel scrollable-panel" style="position: relative;"><h2 id="historyTitle">📜 HISTORY</h2><div class="history-text" id="historyText"></div><button class="btn small" id="closeHistoryBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
   <div id="leaderboardModal"><div class="panel small"><h2>🏆 LEADERBOARD</h2><div id="leaderboardList" class="leaderboard-list"><div>Loading...</div></div><div id="yourRank" style="margin:6px 0; font-size:10px;"></div><div class="online-wrapper" style="margin-top:8px;"><div id="leaderboardOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="leaderboardOnlineCount">0</span><span>online</span></div></div><button class="btn small" id="closeLeaderboardBtn">CLOSE</button></div></div>
-  <div id="statsModal" class="hidden"><div class="panel scrollable-panel" style="position: relative; max-height: 80vh;"><h2>📊 PLAYER STATS</h2><div id="statsContent" style="text-align: left; margin: 16px 0;"></div><button class="btn small" id="closeStatsBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
 
   <div id="gameOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="gameOnlineCount">0</span><span>online</span></div>
   <button id="pauseBtn" class="hidden">⏸ PAUSE</button>
   <div id="countdownOverlay"><div id="countdownText">3</div></div>
   <div id="pauseOverlay"><div class="panel small"><h2>⏸ PAUSED</h2><p>Game is paused</p>
-    <div class="volume-sliders" style="display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <label>🎵 MUSIC</label>
-        <div><button class="btn small" id="toggleMusicBtn" style="padding: 4px 12px; font-size: 12px; min-width: 80px;">ON</button></div>
-      </div>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <label>🔊 SFX</label>
-        <div><button class="btn small" id="toggleSfxBtn" style="padding: 4px 12px; font-size: 12px; min-width: 80px;">ON</button></div>
-      </div>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <label>🌾 AMBIENT</label>
-        <div><button class="btn small" id="toggleAmbientBtn" style="padding: 4px 12px; font-size: 12px; min-width: 80px;">ON</button></div>
-      </div>
+    <div class="volume-sliders">
+      <label>🎵 MUSIC</label>
+      <input type="range" id="volMusic" min="0" max="1" step="0.01" value="0.25">
+      <label>🔊 SFX</label>
+      <input type="range" id="volSfx" min="0" max="1" step="0.01" value="0.35">
+      <label>🌾 AMBIENT</label>
+      <input type="range" id="volAmbient" min="0" max="1" step="0.01" value="0.15">
     </div>
     <div class="button-group">
       <button class="btn small" id="resumeBtn">▶ RESUME</button>
@@ -555,17 +561,6 @@ let localBestScore = Number(localStorage.getItem('pixelFarmBest') || 0);
 let coins = Number(localStorage.getItem('pixelFarmCoins') || 0);
 
 // ============================================================
-// НОВЫЕ ПЕРЕМЕННЫЕ СТАТИСТИКИ
-// ============================================================
-let totalCoins = Number(localStorage.getItem('pixelFarmTotalCoins') || 0);
-let totalGames = Number(localStorage.getItem('pixelFarmTotalGames') || 0);
-let totalTimeSeconds = Number(localStorage.getItem('pixelFarmTotalTime') || 0);
-let totalObstacles = Number(localStorage.getItem('pixelFarmTotalObstacles') || 0);
-let totalHorseshoes = Number(localStorage.getItem('pixelFarmTotalHorseshoes') || 0);
-let totalDoubleJumps = Number(localStorage.getItem('pixelFarmTotalDoubleJumps') || 0);
-let gameTimeInterval = null;
-
-// ============================================================
 // DOM ЭЛЕМЕНТЫ
 // ============================================================
 const canvas = document.getElementById('game');
@@ -600,9 +595,6 @@ const pauseMenuBtn = document.getElementById('pauseMenuBtn');
 const shopModal = document.getElementById('shopModal');
 const shopBtnMain = document.getElementById('shopBtnMain');
 const closeShopBtn = document.getElementById('closeShopBtn');
-const statsModal = document.getElementById('statsModal');
-const statsBtnMain = document.getElementById('statsBtnMain');
-const closeStatsBtn = document.getElementById('closeStatsBtn');
 
 // ============================================================
 // СИСТЕМА СКИНОВ (ЛОШАДИ)
@@ -693,113 +685,12 @@ function showCoinPop(amount, x, y) {
 }
 function addCoins(a, x = typeof W !== 'undefined' && W ? W/2 : window.innerWidth/2, y = typeof H !== 'undefined' && H ? H/2 : window.innerHeight/2) {
   coins += a;
-  totalCoins += a;
   updateCoins();
-  updateTotalStats();
   showCoinPop(a, x, y);
   if (a > 0 && soundEnabled && audioCtx && audioAllowed) { vibrate(40); playSound('coinCollect', 0.25); }
   return coins;
 }
 function vibrate(duration = 50) { if (navigator.vibrate) navigator.vibrate(duration); }
-
-// ============================================================
-// ФУНКЦИИ СТАТИСТИКИ
-// ============================================================
-function updateTotalStats() {
-  localStorage.setItem('pixelFarmTotalCoins', totalCoins);
-  localStorage.setItem('pixelFarmTotalGames', totalGames);
-  localStorage.setItem('pixelFarmTotalTime', totalTimeSeconds);
-  localStorage.setItem('pixelFarmTotalObstacles', totalObstacles);
-  localStorage.setItem('pixelFarmTotalHorseshoes', totalHorseshoes);
-  localStorage.setItem('pixelFarmTotalDoubleJumps', totalDoubleJumps);
-}
-
-function startGameTimer() {
-  if (gameTimeInterval) clearInterval(gameTimeInterval);
-  gameTimeInterval = setInterval(() => {
-    if (gameRunning && !gameOver && !gamePaused) {
-      totalTimeSeconds++;
-      updateTotalStats();
-    }
-  }, 1000);
-}
-
-function stopGameTimer() {
-  if (gameTimeInterval) {
-    clearInterval(gameTimeInterval);
-    gameTimeInterval = null;
-  }
-}
-
-function formatTime(seconds) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  if (hours > 0) return `${hours}ч ${minutes}м`;
-  if (minutes > 0) return `${minutes}м ${secs}с`;
-  return `${secs}с`;
-}
-
-function animateNumber(element, start, end, duration = 800) {
-  if (!element) return;
-  const range = end - start;
-  const startTime = performance.now();
-  function update(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(1, elapsed / duration);
-    const value = Math.floor(start + range * progress);
-    element.textContent = value;
-    if (progress < 1) requestAnimationFrame(update);
-    else element.textContent = end;
-  }
-  requestAnimationFrame(update);
-}
-
-function renderStatsModal() {
-  const container = document.getElementById('statsContent');
-  if (!container) return;
-  
-  const nickname = userNick || 'Guest';
-  const best = Math.max(localBestScore, userFirebaseScore);
-  const currentObs = obsPassed;
-  const currentHs = horseCount;
-  
-  container.innerHTML = `
-    <div style="border: 2px solid #ffd93b; padding: 12px; margin-bottom: 16px; background: #1a1a1a;">
-      <div style="font-size: 18px; color: #ffd93b; margin-bottom: 8px;">👤 ${escapeHtml(nickname)}</div>
-    </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">🪙 COINS</div><div id="statCoins" style="font-size: 20px; font-weight: bold;">0</div></div>
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">💰 TOTAL COINS</div><div id="statTotalCoins" style="font-size: 20px; font-weight: bold;">0</div></div>
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">🏆 BEST SCORE</div><div id="statBest" style="font-size: 20px; font-weight: bold;">0</div></div>
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">🎯 OBSTACLES</div><div id="statObstacles" style="font-size: 20px; font-weight: bold;">0</div></div>
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">⏱️ PLAY TIME</div><div id="statTime" style="font-size: 20px; font-weight: bold;">0</div></div>
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">🎮 GAMES</div><div id="statGames" style="font-size: 20px; font-weight: bold;">0</div></div>
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">🐎 HORSESHOES</div><div id="statHorseshoes" style="font-size: 20px; font-weight: bold;">0</div></div>
-      <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">✨ DOUBLE JUMPS</div><div id="statDoubleJumps" style="font-size: 20px; font-weight: bold;">0</div></div>
-    </div>
-    <div style="border-top: 2px solid #ffd93b; margin: 12px 0; padding-top: 12px;">
-      <div style="font-size: 14px; color: #ffd93b; margin-bottom: 10px;">🏅 ACHIEVEMENTS</div>
-      <div style="margin-bottom: 12px;"><div style="display: flex; justify-content: space-between; font-size: 11px;"><span>10 OBSTACLES</span><span id="achObs10">${currentObs >= 10 ? '✓ +3 🪙' : `${currentObs}/10`}</span></div><div style="height: 6px; background: #2a2a2a; margin-top: 4px;"><div style="width: ${Math.min(100, (currentObs/10)*100)}%; height: 6px; background: #ffd93b;"></div></div></div>
-      <div style="margin-bottom: 12px;"><div style="display: flex; justify-content: space-between; font-size: 11px;"><span>25 OBSTACLES</span><span id="achObs25">${currentObs >= 25 ? '✓ +8 🪙' : `${currentObs}/25`}</span></div><div style="height: 6px; background: #2a2a2a; margin-top: 4px;"><div style="width: ${Math.min(100, (currentObs/25)*100)}%; height: 6px; background: #ffd93b;"></div></div></div>
-      <div style="margin-bottom: 12px;"><div style="display: flex; justify-content: space-between; font-size: 11px;"><span>3 HORSESHOES</span><span id="achHs3">${currentHs >= 3 ? '✓ +5 🪙' : `${currentHs}/3`}</span></div><div style="height: 6px; background: #2a2a2a; margin-top: 4px;"><div style="width: ${Math.min(100, (currentHs/3)*100)}%; height: 6px; background: #ffd93b;"></div></div></div>
-      <div style="margin-bottom: 12px;"><div style="display: flex; justify-content: space-between; font-size: 11px;"><span>10 HORSESHOES</span><span id="achHs10">${currentHs >= 10 ? '✓ +15 🪙' : `${currentHs}/10`}</span></div><div style="height: 6px; background: #2a2a2a; margin-top: 4px;"><div style="width: ${Math.min(100, (currentHs/10)*100)}%; height: 6px; background: #ffd93b;"></div></div></div>
-    </div>
-  `;
-  
-  setTimeout(() => {
-    animateNumber(document.getElementById('statCoins'), 0, coins, 600);
-    animateNumber(document.getElementById('statTotalCoins'), 0, totalCoins, 600);
-    animateNumber(document.getElementById('statBest'), 0, best, 600);
-    animateNumber(document.getElementById('statObstacles'), 0, totalObstacles, 600);
-    const timeStr = formatTime(totalTimeSeconds);
-    const timeElem = document.getElementById('statTime');
-    if (timeElem) timeElem.textContent = timeStr;
-    animateNumber(document.getElementById('statGames'), 0, totalGames, 600);
-    animateNumber(document.getElementById('statHorseshoes'), 0, totalHorseshoes, 600);
-    animateNumber(document.getElementById('statDoubleJumps'), 0, totalDoubleJumps, 600);
-  }, 50);
-}
 
 // ============================================================
 // МАГАЗИН (НОВЫЙ — С ВКЛАДКАМИ)
@@ -948,9 +839,6 @@ let musicPlaying = false;
 let musicInterval = null;
 
 let soundEnabled = localStorage.getItem('pixelFarmSound') !== 'false';
-let musicEnabled = localStorage.getItem('pixelFarmMusicEnabled') !== 'false';
-let sfxEnabled = localStorage.getItem('pixelFarmSfxEnabled') !== 'false';
-let ambientEnabled = localStorage.getItem('pixelFarmAmbientEnabled') !== 'false';
 let musicVolume = parseFloat(localStorage.getItem('pixelFarmMusicVolume')) || 0.25;
 let sfxVolume = parseFloat(localStorage.getItem('pixelFarmSfxVolume')) || 0.35;
 let ambientVolume = parseFloat(localStorage.getItem('pixelFarmAmbientVolume')) || 0.15;
@@ -960,6 +848,32 @@ let musicGain = null;
 // ============================================================
 // UI
 // ============================================================
+function updateVolumeSliders() {
+  const musicSlider = document.getElementById('volMusic');
+  const sfxSlider = document.getElementById('volSfx');
+  const ambientSlider = document.getElementById('volAmbient');
+
+  if (musicSlider) musicSlider.value = musicVolume;
+  if (sfxSlider) sfxSlider.value = sfxVolume;
+  if (ambientSlider) ambientSlider.value = ambientVolume;
+}
+
+function setVolume(type, value) {
+  value = Math.max(0, Math.min(1, parseFloat(value)));
+
+  if (type === 'music') musicVolume = value;
+  else if (type === 'sfx') sfxVolume = value;
+  else if (type === 'ambient') ambientVolume = value;
+
+  localStorage.setItem('pixelFarmMusicVolume', musicVolume);
+  localStorage.setItem('pixelFarmSfxVolume', sfxVolume);
+  localStorage.setItem('pixelFarmAmbientVolume', ambientVolume);
+
+  if (audioCtx && musicGain) {
+    musicGain.gain.value = musicVolume;
+  }
+}
+
 function setSoundIcon() {
   const icon = document.getElementById('muteIcon');
   const text = document.getElementById('muteText');
@@ -973,15 +887,6 @@ function setSoundIcon() {
     icon.classList.add('muted');
     text.textContent = 'SOUND OFF';
   }
-}
-
-function updateSoundButtonsUI() {
-  const musicBtn = document.getElementById('toggleMusicBtn');
-  const sfxBtn = document.getElementById('toggleSfxBtn');
-  const ambientBtn = document.getElementById('toggleAmbientBtn');
-  if (musicBtn) musicBtn.textContent = musicEnabled ? 'ON' : 'OFF';
-  if (sfxBtn) sfxBtn.textContent = sfxEnabled ? 'ON' : 'OFF';
-  if (ambientBtn) ambientBtn.textContent = ambientEnabled ? 'ON' : 'OFF';
 }
 
 // ============================================================
@@ -1012,7 +917,7 @@ async function enableAudio() {
       if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) {
         playMenuMusic();
       }
-      if (gameRunning && !gameOver && ambientEnabled) {
+      if (gameRunning && !gameOver) {
         startAmbientLoop();
       }
     }
@@ -1026,7 +931,6 @@ async function enableAudio() {
 // ============================================================
 function playMenuMusic() {
   if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') return;
-  if (!musicEnabled) return;
   if (musicPlaying) return;
   if (!titleScr || titleScr.classList.contains('hidden')) return;
 
@@ -1082,7 +986,7 @@ function playMenuMusic() {
   musicInterval = setTimeout(() => {
     musicPlaying = false;
 
-    if (titleScr && !titleScr.classList.contains('hidden') && soundEnabled && audioAllowed && musicEnabled) {
+    if (titleScr && !titleScr.classList.contains('hidden') && soundEnabled && audioAllowed) {
       playMenuMusic();
     }
   }, totalDur * 1000);
@@ -1104,7 +1008,6 @@ function stopMenuMusic() {
 // ============================================================
 function playAchieveSound() {
   if (!soundEnabled || !audioCtx || !audioAllowed || audioCtx.state !== 'running') return;
-  if (!sfxEnabled) return;
 
   const now = audioCtx.currentTime;
   const osc = audioCtx.createOscillator();
@@ -1134,7 +1037,7 @@ function playSound(type, volume = 0.2) {
   let oscType = 'sine';
   let baseVol = volume;
   let duration = 0.35;
-  let volumeGroup = 'sfx';
+  let volumeGroup = 'sfx'; // 'sfx' или 'ambient'
 
   if (type === 'jump') { oscType = 'square'; freq = 480 + (Math.random() - 0.5) * 20; baseVol = 0.2; }
   else if (type === 'doubleJump') { oscType = 'sine'; freq = 880 + (Math.random() - 0.5) * 30; baseVol = 0.18; }
@@ -1155,9 +1058,6 @@ function playSound(type, volume = 0.2) {
   else if (type === 'countdownTick') { oscType = 'sine'; freq = 880 + (Math.random() - 0.5) * 20; baseVol = 0.12; duration = 0.1; }
   else if (type === 'countdownGo') { oscType = 'square'; freq = 660 + (Math.random() - 0.5) * 30; baseVol = 0.22; duration = 0.2; }
   else if (type === 'landing') { oscType = 'sine'; freq = 260 + (Math.random() - 0.5) * 30; baseVol = 0.2; }
-
-  if (volumeGroup === 'sfx' && !sfxEnabled) return;
-  if (volumeGroup === 'ambient' && !ambientEnabled) return;
 
   const finalVolume = volumeGroup === 'ambient'
     ? baseVol * ambientVolume
@@ -1184,7 +1084,6 @@ function startAmbientLoop() {
 
   ambientInterval = setInterval(() => {
     if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') return;
-    if (!ambientEnabled) return;
     if (!gameRunning || gameOver) return;
 
     const hour = timeOfDay / 100;
@@ -1221,7 +1120,7 @@ function stopAmbientLoop() {
 }
 
 // ============================================================
-// TOGGLE SOUND
+// TOGGLE SOUND (ИСПРАВЛЕНА ВЕРСИЯ)
 // ============================================================
 async function toggleSound() {
   initAudio();
@@ -1242,6 +1141,7 @@ async function toggleSound() {
 
   await enableAudio();
 
+  // Принудительно возобновляем аудио контекст
   if (audioCtx && audioCtx.state !== 'running') {
     try { await audioCtx.resume(); } catch(e) {}
   }
@@ -1250,52 +1150,16 @@ async function toggleSound() {
     playMenuMusic();
   }
 
-  if (gameRunning && !gameOver && ambientEnabled) {
+  if (gameRunning && !gameOver) {
     startAmbientLoop();
   }
   
+  // Воспроизводим тестовый звук для подтверждения
   setTimeout(() => {
-    if (soundEnabled && audioCtx && audioCtx.state === 'running' && sfxEnabled) {
+    if (soundEnabled && audioCtx && audioCtx.state === 'running') {
       playSound('buttonClick', 0.15);
     }
   }, 50);
-}
-
-function toggleMusic() {
-  musicEnabled = !musicEnabled;
-  localStorage.setItem('pixelFarmMusicEnabled', musicEnabled);
-  const btn = document.getElementById('toggleMusicBtn');
-  if (btn) btn.textContent = musicEnabled ? 'ON' : 'OFF';
-  if (musicGain) {
-    musicGain.gain.value = musicEnabled ? musicVolume : 0;
-  }
-  if (!musicEnabled && musicPlaying) {
-    stopMenuMusic();
-  } else if (musicEnabled && !musicPlaying && titleScr && !titleScr.classList.contains('hidden') && audioAllowed && soundEnabled) {
-    playMenuMusic();
-  }
-}
-
-function toggleSfx() {
-  sfxEnabled = !sfxEnabled;
-  localStorage.setItem('pixelFarmSfxEnabled', sfxEnabled);
-  const btn = document.getElementById('toggleSfxBtn');
-  if (btn) btn.textContent = sfxEnabled ? 'ON' : 'OFF';
-  if (sfxEnabled && soundEnabled && audioCtx && audioCtx.state === 'running') {
-    playSound('buttonClick', 0.15);
-  }
-}
-
-function toggleAmbient() {
-  ambientEnabled = !ambientEnabled;
-  localStorage.setItem('pixelFarmAmbientEnabled', ambientEnabled);
-  const btn = document.getElementById('toggleAmbientBtn');
-  if (btn) btn.textContent = ambientEnabled ? 'ON' : 'OFF';
-  if (!ambientEnabled) {
-    stopAmbientLoop();
-  } else if (ambientEnabled && gameRunning && !gameOver && audioAllowed && soundEnabled) {
-    startAmbientLoop();
-  }
 }
 
 // ============================================================
@@ -1310,7 +1174,8 @@ document.addEventListener('touchstart', enableAudio, { passive: true });
 // ============================================================
 initAudio();
 setSoundIcon();
-updateSoundButtonsUI();
+updateVolumeSliders();
+
 
 // ============================================================
 // ОНЛАЙН-СИСТЕМА
@@ -1391,10 +1256,10 @@ function applyTranslations() {
   updateDailyUI();
   updateMenuCoins();
 }
-applyTranslations(); updateCoins(); checkDaily(); setSoundIcon(); updateSoundButtonsUI(); applySelectedBackground();
+applyTranslations(); updateCoins(); checkDaily(); setSoundIcon(); updateVolumeSliders(); applySelectedBackground();
 
 // ============================================================
-// ИГРОВАЯ ЛОГИКА (ФИЗИКА, ПРЕПЯТСТВИЯ, БОНУСЫ)
+// ИГРОВАЯ ЛОГИКА (ФИЗИКА, ПРЕПЯТСТВИЯ, БОНУСЫ) — С ИСПРАВЛЕНИЯМИ
 // ============================================================
 let W, H, dpr = Math.max(1, Math.min(devicePixelRatio||1,2));
 function resize() { W = innerWidth; H = innerHeight; canvas.width = Math.floor(W*dpr); canvas.height = Math.floor(H*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); }
@@ -1419,26 +1284,33 @@ let obsTimer = 0, powTimer = 0, goldTimer = 0;
 // НОВАЯ ФУНКЦИЯ ДЛЯ ЕГИПЕТСКИХ БЛОКОВ
 // ============================================================
 function drawEgyptianBlock(x, y, size = 1) {
+  // Основной блок (каменный)
   px(x + 0, y + 0, 32 * size, 28 * size, '#c9b68b');
   px(x + 2*size, y + 2*size, 28*size, 24*size, '#b89f6a');
   px(x + 4*size, y + 4*size, 24*size, 20*size, '#a88952');
+  
+  // Иероглифы (пиксельные символы)
   px(x + 8*size, y + 8*size, 4*size, 4*size, '#7a5a3a');
   px(x + 12*size, y + 8*size, 3*size, 4*size, '#7a5a3a');
   px(x + 16*size, y + 8*size, 4*size, 4*size, '#7a5a3a');
   px(x + 20*size, y + 8*size, 3*size, 4*size, '#7a5a3a');
+  
   px(x + 8*size, y + 14*size, 3*size, 5*size, '#7a5a3a');
   px(x + 12*size, y + 14*size, 4*size, 5*size, '#7a5a3a');
   px(x + 17*size, y + 14*size, 3*size, 5*size, '#7a5a3a');
   px(x + 21*size, y + 14*size, 4*size, 5*size, '#7a5a3a');
+  
   px(x + 10*size, y + 20*size, 4*size, 3*size, '#7a5a3a');
   px(x + 15*size, y + 20*size, 4*size, 3*size, '#7a5a3a');
   px(x + 20*size, y + 20*size, 4*size, 3*size, '#7a5a3a');
+  
+  // Трещины и текстура
   px(x + 6*size, y + 12*size, 2*size, 8*size, '#6a4a2a');
   px(x + 24*size, y + 16*size, 2*size, 6*size, '#6a4a2a');
 }
 
 // ============================================================
-// ДЕКОРАТИВНЫЕ ОБЪЕКТЫ
+// ДЕКОРАТИВНЫЕ ОБЪЕКТЫ (ДОМА, ДЕРЕВЬЯ, МЕЛЬНИЦЫ)
 // ============================================================
 function drawCactus(x, y, size = 1) {
   px(x + 4*size, y + 20*size, 6*size, 28*size, '#5a8f4c');
@@ -1452,6 +1324,7 @@ function drawRock(x, y, size = 1) {
   px(x + 2*size, y + 4*size, 8*size, 6*size, '#9b6a3a');
   px(x + 4*size, y, 4*size, 6*size, '#7c5a3a');
 }
+// ПУСТЫННЫЙ ДОМ
 function drawDesertHouse(x, y, s, hasLaundry = false) {
   px(x + 0*s, y + 20*s, 60*s, 40*s, '#c9945e');
   px(x + 5*s, y + 12*s, 50*s, 10*s, '#b87a4a');
@@ -1467,6 +1340,7 @@ function drawDesertHouse(x, y, s, hasLaundry = false) {
     px(x + 34*s, y - 8*s, 8*s, 8*s, '#f3b33d');
   }
 }
+// ПУСТЫННАЯ МЕЛЬНИЦА
 function drawDesertWindmill(x, y, angle, s=1) {
   px(x + 15*s, y + 40*s, 30*s, 60*s, '#b87a4a');
   px(x + 18*s, y + 35*s, 24*s, 8*s, '#9b6a3a');
@@ -1566,7 +1440,7 @@ function updateWorldObjects() {
 }
 
 // ============================================================
-// ЭФФЕКТЫ
+// ЭФФЕКТЫ (ПЫЛЬЦА, СВЕТЛЯЧКИ, НЕБО)
 // ============================================================
 function startPollen() {
   if (pollenInterval) clearInterval(pollenInterval);
@@ -1627,7 +1501,7 @@ function setupWorld() {
 setupWorld(); createFireflyCont(); startPollen();
 
 // ============================================================
-// ПРЕПЯТСТВИЯ
+// ПРЕПЯТСТВИЯ (КАКТУСЫ, ЗАБОРЫ, ЕГИПЕТСКИЕ БЛОКИ)
 // ============================================================
 function drawCactusObstacle(x, y, size=1) {
   px(x+10*size, y+8*size, 10*size, 32*size, '#3a7a2a');
@@ -1664,6 +1538,7 @@ function drawFenceObstacle(x, y) {
 function spawnObstacle() {
   const currentMap = getCurrentMap();
   if(currentMap.theme === 'desert') {
+    // Пустынные препятствия: кактусы, заборы, египетские блоки
     const types = ['cactus_small','cactus_medium','cactus_large','fence','egyptian_block'];
     const type = types[Math.floor(Math.random()*types.length)];
     let w, h, y;
@@ -1676,6 +1551,7 @@ function spawnObstacle() {
       h = 48;
       y = ground.y - 48;
     } else {
+      // Египетский блок
       w = 36;
       h = 32;
       y = ground.y - h + 4;
@@ -1703,7 +1579,7 @@ function spawnObstacle() {
 }
 
 // ============================================================
-// ИГРОВОЙ ЦИКЛ
+// ИГРОВОЙ ЦИКЛ (ОСНОВНАЯ ЛОГИКА) — ОСТАЁТСЯ БЕЗ ИЗМЕНЕНИЙ
 // ============================================================
 function startCountdown() {
   countdownOverlay.style.display = 'flex';
@@ -1728,24 +1604,20 @@ function togglePause(force=null) {
     stopAmbientLoop();
   } else {
     gamePaused=false; gameRunning=true; pauseOverlay.style.display='none'; pauseBtn.textContent='⏸ PAUSE';
-    if(ambientEnabled) startAmbientLoop();
+    startAmbientLoop();
   }
 }
-function performJump() { if(!gameRunning || gameOver || gamePaused) return; if(player.grounded) { player.vy=player.jumpPower; player.grounded=false; player.doubleJumpAvailable=true; player.doubleJumpUsed=false; createDust(player.x+10, ground.y-8,6); playSound('jump'); } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { player.vy=player.jumpPower*0.85; player.doubleJumpUsed=true; player.doubleJumpAvailable=false; player.doubleJumpAnim=6; createDust(player.x+20, player.y+20,8); playSound('doubleJump'); totalDoubleJumps++; updateTotalStats(); } }
+function performJump() { if(!gameRunning || gameOver || gamePaused) return; if(player.grounded) { player.vy=player.jumpPower; player.grounded=false; player.doubleJumpAvailable=true; player.doubleJumpUsed=false; createDust(player.x+10, ground.y-8,6); playSound('jump'); } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { player.vy=player.jumpPower*0.85; player.doubleJumpUsed=true; player.doubleJumpAvailable=false; player.doubleJumpAnim=6; createDust(player.x+20, player.y+20,8); playSound('doubleJump'); } }
 function startGame() {
   titleScr.classList.add('hidden'); gameOverScr.classList.add('hidden'); rulesModal.classList.add('hidden'); historyModal.style.display='none';
-  pauseOverlay.style.display='none'; shopModal.style.display='none'; if(statsModal) statsModal.style.display='none';
+  pauseOverlay.style.display='none'; shopModal.style.display='none';
   gameRunning=false; gamePaused=false; gameOver=false; score=0; speed=6; frame=0; recBonus=false;
   scoreEl.textContent=`${t.scoreLabel} 0`; setupWorld(); flash.style.background='rgba(255,0,0,0)'; timeOfDay=800; updateSky();
   pauseBtn.classList.remove('hidden'); stopMenuMusic(); startCountdown();
   enableAudio();
-  stopGameTimer();
-  startGameTimer();
 }
 function endGame() {
   gameOver=true; gameRunning=false; timeOfDay=1800; updateSky();
-  totalGames++; updateTotalStats();
-  stopGameTimer();
   if(score>bestScore) { bestScore=score; localStorage.setItem('pixelFarmBest',bestScore); bestEl.textContent=`${t.bestLabel} ${bestScore}`; if(!recBonus) { addCoins(15,W/2,H/2); showAchievementQueued(`🏆 NEW RECORD! +15 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins 🏆`,true); recBonus=true; } }
   if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic();
 }
@@ -1754,10 +1626,8 @@ restartBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGa
 menuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); gameOverScr.classList.add('hidden'); titleScr.classList.remove('hidden'); timeOfDay=800; updateSky(); pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic(); });
 rulesBtn.addEventListener('click',()=>{ 
   playSound('buttonClick',0.25); 
-  rulesModal.classList.remove('hidden');
+  rulesModal.classList.remove('hidden'); 
   rulesModal.style.display = 'flex';
-  rulesModal.style.alignItems = 'center';
-  rulesModal.style.justifyContent = 'center';
 });
 closeRules.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesModal.classList.add('hidden'); });
 leaderBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); loadLeaderboard("leaderboardList",true); leaderModal.style.display='flex'; });
@@ -1774,23 +1644,8 @@ historyBtnMain.addEventListener('click',()=>{
   historyModal.style.display='flex';
 });
 closeHistoryBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); historyModal.style.display='none'; });
-statsBtnMain.addEventListener('click', () => {
-  playSound('buttonClick', 0.25);
-  renderStatsModal();
-  statsModal.style.display = 'flex';
-});
-closeStatsBtn.addEventListener('click', () => {
-  playSound('buttonClick', 0.25);
-  statsModal.style.display = 'none';
-});
 
-const toggleMusicBtn = document.getElementById('toggleMusicBtn');
-const toggleSfxBtn = document.getElementById('toggleSfxBtn');
-const toggleAmbientBtn = document.getElementById('toggleAmbientBtn');
-if (toggleMusicBtn) toggleMusicBtn.addEventListener('click', () => { playSound('buttonClick', 0.15); toggleMusic(); });
-if (toggleSfxBtn) toggleSfxBtn.addEventListener('click', () => { playSound('buttonClick', 0.15); toggleSfx(); });
-if (toggleAmbientBtn) toggleAmbientBtn.addEventListener('click', () => { playSound('buttonClick', 0.15); toggleAmbient(); });
-
+// Функция скрытия подсказки скролла при первом тапе
 function initShopScrollHint() {
   const shopGrids = ['shopSkinsGrid', 'shopMapsGrid', 'shopBackgroundsGrid'];
   const scrollHint = document.querySelector('#shopModal .scroll-hint');
@@ -1798,29 +1653,12 @@ function initShopScrollHint() {
   if (!scrollHint) return;
   
   let hintHidden = false;
-  let globalTouchHandler = null;
   
   const hideHint = () => {
     if (!hintHidden) {
       scrollHint.classList.add('hidden');
       hintHidden = true;
-      shopGrids.forEach(gridId => {
-        const grid = document.getElementById(gridId);
-        if (grid) {
-          grid.removeEventListener('scroll', hideHint);
-          grid.removeEventListener('touchstart', hideHint);
-          grid.removeEventListener('wheel', hideHint);
-        }
-      });
-      const shopModalElem = document.getElementById('shopModal');
-      if (shopModalElem && globalTouchHandler) {
-        shopModalElem.removeEventListener('touchstart', globalTouchHandler);
-      }
     }
-  };
-  
-  globalTouchHandler = (e) => {
-    if (e.target.closest('.shop-grid')) hideHint();
   };
   
   shopGrids.forEach(gridId => {
@@ -1832,9 +1670,12 @@ function initShopScrollHint() {
     }
   });
   
+  // Также скрываем при любом тапе внутри модального окна магазина
   const shopModalElem = document.getElementById('shopModal');
   if (shopModalElem) {
-    shopModalElem.addEventListener('touchstart', globalTouchHandler);
+    shopModalElem.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.shop-grid')) hideHint();
+    });
   }
 }
 
@@ -1847,10 +1688,6 @@ shopBtnMain.addEventListener('click',()=>{
 });
 closeShopBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); shopModal.style.display='none'; });
 document.querySelectorAll('.shop-tab').forEach(tab=>{ tab.addEventListener('click',()=>switchShopTab(tab.dataset.tab)); });
-muteBtn.addEventListener('click', () => {
-  playSound('buttonClick', 0.2);
-  toggleSound();
-});
 
 window.addEventListener('keydown',e=>{
   if(e.code==='KeyP'||e.code==='Escape'){ e.preventDefault(); if(!titleScr.classList.contains('hidden')&&!gameOver){ playSound('buttonClick',0.2); togglePause(); } return; }
@@ -1861,7 +1698,7 @@ window.addEventListener('pointerdown',()=>{ if(gameRunning&&!gameOver&&!gamePaus
 function rand(a,b){ return Math.random()*(b-a)+a; }
 function rectsCollide(a,b){ return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
 function createDust(x,y,c=5){ for(let i=0;i<c;i++) particles.push({x,y,vx:rand(-2,2),vy:rand(-2,-0.4),size:rand(3,5),life:rand(20,30),color:['#f2c879','#c98a3d'][Math.floor(Math.random()*2)]}); }
-function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); addCoins(2,player.x+player.w/2,player.y+player.h/2); createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; totalHorseshoes++; updateTotalStats(); if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } }
+function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); addCoins(2,player.x+player.w/2,player.y+player.h/2); createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } }
 function applyGoldenCoin(x,y) { addCoins(25,x,y); showAchievementQueued(`🪙 GOLDEN COIN! +25 BelkaCoins 🪙`,true); createDust(x,y,15); playSound('horseshoe'); }
 function splashEffect(x,y) { for(let i=0;i<8;i++) particles.push({x:x+rand(-10,30), y:y+rand(-5,15), vx:rand(-2,2), vy:rand(-1,3), size:rand(2,4), life:rand(15,25), color:'#7ac4ff'}); playSound('horseshoe'); }
 
@@ -1901,7 +1738,7 @@ function update() {
       if(!invincible) { createDust(player.x+player.w/2,player.y+player.h/2,12); endGame(); break; }
     }
   }
-  for(let i=0;i<obstacles.length;i++) { if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { obstacles[i].counted=true; obsPassed++; totalObstacles++; updateTotalStats(); if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } } }
+  for(let i=0;i<obstacles.length;i++) { if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { obstacles[i].counted=true; obsPassed++; if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } } }
   cloudTimer++; if(cloudTimer>=200) { cloudTimer=0; cloudHue=(cloudHue+20)%360; }
 }
 
@@ -1992,22 +1829,27 @@ function drawParticles(){ particles.forEach(p=>px(p.x,p.y,p.size,p.size,p.color)
 function render() {
   ctx.clearRect(0,0,W,H);
   
+  // 1. НЕБО — заливка на всю высоту до земли
   const skyGrad=getSkyGrad();
   ctx.fillStyle=skyGrad;
   ctx.fillRect(0,0,W,ground.y);
   
+  // 2. ГОРЫ И ЛЕС
   drawMountainsAndForest();
   
+  // 3. ОБЛАКА, ПТИЦЫ, САМОЛЁТ
   clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
   birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
   drawPlane(plane.x,plane.y);
   
+  // 4. СОЛНЦЕ / ЛУНА (только для пустыни)
   const currentMapSun = getCurrentMap();
   if (currentMapSun.theme === 'desert') {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     const celestialX = 80, celestialY = 70;
     
     if (!isNight) {
+      // ДЕНЬ: СОЛНЦЕ
       const pulse = 0.85 + Math.sin(Date.now() / 700) * 0.1;
       const alphaPulse = 0.25 + Math.sin(Date.now() / 600) * 0.12;
       
@@ -2044,6 +1886,7 @@ function render() {
       }
       
     } else {
+      // НОЧЬ: ЛУНА
       const moonPulse = 0.88 + Math.sin(Date.now() / 900) * 0.08;
       const moonAlphaPulse = 0.2 + Math.sin(Date.now() / 800) * 0.1;
       
@@ -2081,6 +1924,7 @@ function render() {
     }
   }
   
+  // ===== СЛОИ РАСТИТЕЛЬНОСТИ (ПОД ДОМАМИ И ДЕРЕВЬЯМИ) =====
   const currentMapLayer = getCurrentMap();
   let layerColor1, layerColor2;
   if (currentMapLayer.theme === 'desert') {
@@ -2095,15 +1939,19 @@ function render() {
   ctx.fillStyle = layerColor2;
   ctx.fillRect(0, ground.y - 110, W, 70);
   
+  // 5. ДЕКОРАТИВНЫЕ ОБЪЕКТЫ (ДОМА, ДЕРЕВЬЯ, КАКТУСЫ, МЕЛЬНИЦЫ) — ПОВЕРХ СЛОЁВ
   worldObjects.forEach(obj=>drawWorldObject(obj));
   
+  // 6. ЗЕМЛЯ
   drawGround();
   
+  // 7. ПРЕПЯТСТВИЯ, БОНУСЫ, ИГРОК, ЧАСТИЦЫ
   obstacles.forEach(drawObstacle);
   drawPowerups();
   drawPlayer();
   drawParticles();
   
+  // 8. ЭФФЕКТЫ
   ctx.fillStyle='rgba(0,0,0,0.05)';
   for(let y=0;y<H;y+=6) ctx.fillRect(0,y,W,1);
   let grd=ctx.createRadialGradient(W/2,H/2,H*0.15,W/2,H/2,H*0.8);
