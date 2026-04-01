@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Pixel Farm Runner — Aurelia v.4.1</title>
+  <title>Pixel Farm Runner — v.4.1</title>
   <style>
     * {
       box-sizing: border-box;
@@ -522,18 +522,20 @@
         <div id="menuOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="menuOnlineCount">0</span><span id="onlineLabel">online</span></div>
       </div>
       <div class="logo-banner"><img src="https://static.tildacdn.com/tild3765-3965-4262-b936-633832306661/D20207C3-EB3E-4239-B.PNG" class="game-logo" alt="Pixel Farm Runner"></div>
-      <div id="userStatusMain" class="register-hint" style="order: 1; margin: 10px 0 5px 0;"></div>
-      <div class="menu-coins" id="menuCoinsDisplay" style="order: 2;"><div class="coin-icon"></div><span id="menuCoinsValue">0</span> BelkaCoins</div>
-      <button class="btn" id="startBtn" style="order: 3;">START GAME</button>
-      <div class="daily-bonus-area" style="order: 4;"><button class="btn daily small" id="dailyBonusBtn">✨ DAILY BONUS ✨</button><div id="dailyBonusInfo" class="small"></div></div>
-      <div class="button-group" style="order: 5;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin: 10px 0 15px 0; flex-wrap: wrap; order: 1;">
+        <div id="userStatusMain" class="register-hint" style="margin: 0; flex: 1;"></div>
+        <div class="menu-coins" id="menuCoinsDisplay" style="margin: 0;"><div class="coin-icon"></div><span id="menuCoinsValue">0</span> BelkaCoins</div>
+      </div>
+      <button class="btn" id="startBtn" style="order: 2;">START GAME</button>
+      <div class="daily-bonus-area" style="order: 3;"><button class="btn daily small" id="dailyBonusBtn">✨ DAILY BONUS ✨</button><div id="dailyBonusInfo" class="small"></div></div>
+      <div class="button-group" style="order: 4;">
         <button class="btn small" id="historyBtnMain">📜 HISTORY</button>
         <button class="btn small" id="rulesBtnMain">📜 RULES</button>
         <button class="btn small" id="leaderboardBtnMain">🏆 LEADERBOARD</button>
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
-      <div class="version" style="order: 6;">✨ v.4.1 — Уменьшенные окна, зелёный Wild West, улучшенная статистика ✨</div>
+      <div class="version" style="order: 5;">✨ v.4.1 — Уменьшенные окна, зелёный Wild West, улучшенная статистика ✨</div>
     </div>
   </div>
 
@@ -592,10 +594,13 @@
   </div></div>
   
   <!-- МАГАЗИН С ВКЛАДКАМИ -->
-  <div id="shopModal"><div class="panel scrollable-panel" style="position: relative;">
-    <h2>🛒 SHOP</h2>
-    <div class="menu-coins"><div class="coin-icon"></div><span id="shopCoinsValue">0</span> BelkaCoins</div>
-    <div class="shop-tabs">
+  <div id="shopModal"><div class="panel scrollable-panel" style="position: relative; display: flex; flex-direction: column;">
+    <div style="position: relative; flex-shrink: 0;">
+      <h2>🛒 SHOP</h2>
+      <div class="menu-coins"><div class="coin-icon"></div><span id="shopCoinsValue">0</span> BelkaCoins</div>
+      <div class="button-group" style="margin-bottom: 15px;"><button class="btn small" id="closeShopBtn">CLOSE</button></div>
+    </div>
+    <div class="shop-tabs" style="margin-bottom: 15px;">
       <button class="shop-tab active" data-tab="skins">🎨 SKINS</button>
       <button class="shop-tab" data-tab="maps">🗺️ MAPS</button>
       <button class="shop-tab" data-tab="backgrounds">🌄 BACKGROUNDS</button>
@@ -603,7 +608,6 @@
     <div id="shopSkinsGrid" class="shop-grid"></div>
     <div id="shopMapsGrid" class="shop-grid shop-section-hidden"></div>
     <div id="shopBackgroundsGrid" class="shop-grid shop-section-hidden"></div>
-    <div class="button-group"><button class="btn small" id="closeShopBtn">CLOSE</button></div>
     <div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div>
   </div></div>
 
@@ -611,13 +615,14 @@
   <div id="flashOverlay"></div>
 </div>
 
-<script type="importmap">{ "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js" } }</script>
+<script type="importmap">{ "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js", "firebase/auth": "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js" } }</script>
 <script type="module">
 // ============================================================
 // ИМПОРТЫ FIREBASE
 // ============================================================
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, query, where, getDocs, doc, setDoc, orderBy, limit, serverTimestamp, runTransaction, onSnapshot } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // ============================================================
 // МУЛЬТИЯЗЫЧНОСТЬ (6 языков)
@@ -641,10 +646,47 @@ function makeLinks() { document.querySelectorAll('.register-link').forEach(el =>
 const firebaseConfig = { apiKey: "AIzaSyDO9AiYoK6Z-g9nIEgHYNEafncZxoavkFg", authDomain: "project-1-ca48c.firebaseapp.com", projectId: "project-1-ca48c", storageBucket: "project-1-ca48c.firebasestorage.app", messagingSenderId: "876847434492", appId: "1:876847434492:web:64fe3871c87dcbf838e579" };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+let authUser = null;
+let authInitialized = false;
+let authPromise = null;
 let userNick = localStorage.getItem("userNick");
 let isUserRegistered = false, userDocId = null, userFirebaseScore = 0;
 let localBestScore = Number(localStorage.getItem('pixelFarmBest') || 0);
 let coins = Number(localStorage.getItem('pixelFarmCoins') || 0);
+
+// ============================================================
+// ФУНКЦИЯ ОЖИДАНИЯ АВТОРИЗАЦИИ
+// ============================================================
+function waitForAuth() {
+  if (authPromise) return authPromise;
+  
+  authPromise = new Promise((resolve) => {
+    if (auth.currentUser) {
+      authUser = auth.currentUser;
+      authInitialized = true;
+      resolve(authUser);
+      return;
+    }
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      authUser = user;
+      authInitialized = true;
+      unsubscribe();
+      resolve(user);
+    });
+    
+    setTimeout(() => {
+      if (!authInitialized) {
+        authInitialized = true;
+        unsubscribe();
+        resolve(null);
+      }
+    }, 3000);
+  });
+  
+  return authPromise;
+}
 
 // ============================================================
 // DOM ЭЛЕМЕНТЫ
@@ -912,6 +954,11 @@ window.handleBackgroundAction = function(bgId) {
 // ============================================================
 // ЕЖЕДНЕВНЫЙ БОНУС
 // ============================================================
+let dailyStreak = Number(localStorage.getItem('pixelFarmDailyStreak') || 0);
+let lastDailyDate = localStorage.getItem('pixelFarmLastDailyDate') || '';
+let weeklyRewardGiven = localStorage.getItem('pixelFarmWeeklyRewardGiven') === 'true';
+let twoWeekRewardGiven = localStorage.getItem('pixelFarmTwoWeekRewardGiven') === 'true';
+
 function claimDaily() {
   const today = new Date().toDateString();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
@@ -929,8 +976,8 @@ function claimDaily() {
   }
   
   let coinsReward = 0;
-  let isWeekComplete = false;      // награда за 7 дней: фон Night
-  let isTwoWeekComplete = false;   // награда за 14 дней: скин Aurora
+  let isWeekComplete = false;
+  let isTwoWeekComplete = false;
   
   if (dailyStreak === 1) coinsReward = 5;
   else if (dailyStreak >= 2 && dailyStreak <= 6) coinsReward = 3;
@@ -942,7 +989,6 @@ function claimDaily() {
   addCoins(coinsReward);
   showAchievementQueued(`✨ Daily Bonus Day ${dailyStreak}! +${coinsReward} 🪙 ✨`, true);
   
-  // Награда за 7 дней подряд (фон Night)
   if (isWeekComplete && !weeklyRewardGiven) {
     weeklyRewardGiven = true;
     if (!ownedBackgrounds.includes('night')) {
@@ -953,7 +999,6 @@ function claimDaily() {
     }
   }
   
-  // Награда за 14 дней подряд (эксклюзивный скин Aurora)
   if (isTwoWeekComplete && !twoWeekRewardGiven) {
     twoWeekRewardGiven = true;
     if (!ownedSkins.includes('aurora')) {
@@ -971,11 +1016,6 @@ function claimDaily() {
   localStorage.setItem('pixelFarmTwoWeekRewardGiven', twoWeekRewardGiven);
   updateDailyUI();
 }
-
-let dailyStreak = Number(localStorage.getItem('pixelFarmDailyStreak') || 0);
-let lastDailyDate = localStorage.getItem('pixelFarmLastDailyDate') || '';
-let weeklyRewardGiven = localStorage.getItem('pixelFarmWeeklyRewardGiven') === 'true';
-let twoWeekRewardGiven = localStorage.getItem('pixelFarmTwoWeekRewardGiven') === 'true';
 
 function updateDailyUI() {
   const info = document.getElementById('dailyBonusInfo');
@@ -1288,7 +1328,6 @@ function startGamePresence() {
   }, 30000);
 }
 
-// Глобальный слушатель онлайн
 const presenceQueryGlobal = query(collection(db, "presence"), where("isActive", "==", true));
 let globalPresenceUnsubscribe = onSnapshot(presenceQueryGlobal, (snapshot) => {
   const now = Date.now();
@@ -1312,10 +1351,46 @@ window.addEventListener('beforeunload', () => {
 });
 
 // ============================================================
-// ПОЛЬЗОВАТЕЛЬСКАЯ РЕГИСТРАЦИЯ И ЛИДЕРЫ (ОРИГИНАЛ)
+// ПОЛЬЗОВАТЕЛЬСКАЯ РЕГИСТРАЦИЯ И ЛИДЕРЫ
 // ============================================================
 async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
-async function checkReg() { const status = document.getElementById("userStatusMain"); const nameSpan = document.getElementById("userName"); const statsSpan = document.getElementById("userStats"); if (!userNick) { status.innerHTML = t.register; nameSpan.innerHTML = "👤 Guest"; statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; isUserRegistered = false; makeLinks(); return false; } const ok = await ensureUser(); if (ok && isUserRegistered) { const best = Math.max(localBestScore, userFirebaseScore); status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; nameSpan.innerHTML = `👤 ${userNick}`; statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; makeLinks(); return true; } return false; }
+async function checkReg() { 
+  const status = document.getElementById("userStatusMain"); 
+  const nameSpan = document.getElementById("userName"); 
+  const statsSpan = document.getElementById("userStats"); 
+  
+  await waitForAuth();
+  
+  if (authUser && authUser.displayName) {
+    userNick = authUser.displayName;
+    localStorage.setItem('userNick', userNick);
+  } else if (authUser && authUser.email) {
+    userNick = authUser.email.split('@')[0];
+    localStorage.setItem('userNick', userNick);
+  } else if (!userNick) {
+    userNick = localStorage.getItem('userNick');
+  }
+  
+  if (!userNick) { 
+    status.innerHTML = t.register; 
+    nameSpan.innerHTML = "👤 Guest"; 
+    statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; 
+    isUserRegistered = false; 
+    makeLinks(); 
+    return false; 
+  } 
+  
+  const ok = await ensureUser(); 
+  if (ok && isUserRegistered) { 
+    const best = Math.max(localBestScore, userFirebaseScore); 
+    status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; 
+    nameSpan.innerHTML = `👤 ${userNick}`; 
+    statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; 
+    makeLinks(); 
+    return true; 
+  } 
+  return false; 
+}
 async function saveBest(score) { if (!isUserRegistered || !userDocId) return false; const ref = doc(db, "userbellariofilms", userDocId); try { await runTransaction(db, async (t) => { const docSnap = await t.get(ref); if (!docSnap.exists()) return; const cur = docSnap.data().bestScore || 0; if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); else t.update(ref, { lastPlayed: serverTimestamp() }); }); return true; } catch (e) { return false; } }
 async function loadLeaderboard(contId, showRank = true) { const cont = document.getElementById(contId); if (!cont) return; try { const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"), limit(10)); const snap = await getDocs(q); let html = '', rank = 1, userRank = null; for (const docSnap of snap.docs) { const data = docSnap.data(); const sc = data.bestScore || 0; if (sc === 0) continue; const isYou = data.nickname === userNick && isUserRegistered; if (isYou) userRank = rank; html += `<div class="leaderboard-item ${isYou ? 'you' : ''}"><span class="rank">${rank}</span><span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span><span class="score">${sc} pts</span></div>`; rank++; } if (!html) html = '<div style="text-align:center;">No results yet</div>'; cont.innerHTML = html; if (showRank && contId === "leaderboardList") { const rankDiv = document.getElementById("yourRank"); if (rankDiv) { if (isUserRegistered) { if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-10 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; } else rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; makeLinks(); } } } catch (e) { cont.innerHTML = '<div style="text-align:center;">Load error</div>'; } }
 function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]||m)) : s; }
@@ -1413,7 +1488,7 @@ function drawPixelWell(x, y, size = 1) {
     let yOff = 20 + Math.cos(i)*3;
     px(pxX + Math.round(xOff * s), pxY + Math.round(yOff * s), 1*s, 1*s, stoneColors[i % 3]);
   }
-  for (let yOff = 16; yOff < 20; yOff++) {
+  for (let yOff = 16; yOff < 22; yOff++) {
     for (let xOff = 10; xOff < 22; xOff++) {
       px(pxX + xOff * s, pxY + yOff * s, 1*s, 1*s, "#1a1a1a");
     }
@@ -1427,20 +1502,38 @@ function drawPixelWell(x, y, size = 1) {
   for (let xOff = 8; xOff < 24; xOff++) {
     px(pxX + xOff * s, pxY + 3 * s, 1*s, 1*s, "#ff4d4d");
     px(pxX + xOff * s, pxY + 2 * s, 1*s, 1*s, "#cc3333");
-    if (xOff % 2 === 0) px(pxX + xOff * s, pxY + 1 * s, 1*s, 1*s, "#aa2222");
+    if (xOff === 15 || xOff === 16) {
+      px(pxX + xOff * s, pxY + 1 * s, 1*s, 1*s, "#ff6666");
+    } else if (xOff % 2 === 0) {
+      px(pxX + xOff * s, pxY + 1 * s, 1*s, 1*s, "#aa2222");
+    }
+    if (xOff % 3 === 0) {
+      px(pxX + xOff * s, pxY + 2 * s, 1*s, 1*s, "#ff8888");
+    }
   }
   for (let xOff = 11; xOff < 21; xOff++) {
     px(pxX + xOff * s, pxY + 6 * s, 1*s, 1*s, "#8b5a2b");
+    px(pxX + xOff * s, pxY + 7 * s, 1*s, 1*s, "#6b3a1a");
   }
-  for (let yOff = 7; yOff < 12; yOff++) {
+  for (let yOff = 7; yOff < 14; yOff++) {
     px(pxX + 16 * s, pxY + yOff * s, 1*s, 1*s, "#e8b870");
+    if (yOff % 2 === 0) px(pxX + 15 * s, pxY + yOff * s, 1*s, 1*s, "#c8a060");
+    if (yOff % 2 === 0) px(pxX + 17 * s, pxY + yOff * s, 1*s, 1*s, "#c8a060");
   }
   px(pxX + 15 * s, pxY + 12 * s, 1*s, 1*s, "#ccaa77");
   px(pxX + 16 * s, pxY + 12 * s, 1*s, 1*s, "#aa8866");
   px(pxX + 17 * s, pxY + 12 * s, 1*s, 1*s, "#ccaa77");
+  px(pxX + 14 * s, pxY + 13 * s, 1*s, 1*s, "#aa8866");
   px(pxX + 15 * s, pxY + 13 * s, 1*s, 1*s, "#886644");
   px(pxX + 16 * s, pxY + 13 * s, 1*s, 1*s, "#775533");
   px(pxX + 17 * s, pxY + 13 * s, 1*s, 1*s, "#886644");
+  px(pxX + 18 * s, pxY + 13 * s, 1*s, 1*s, "#aa8866");
+  px(pxX + 15 * s, pxY + 14 * s, 1*s, 1*s, "#664422");
+  px(pxX + 16 * s, pxY + 14 * s, 1*s, 1*s, "#553311");
+  px(pxX + 17 * s, pxY + 14 * s, 1*s, 1*s, "#664422");
+  for (let xOff = 15; xOff < 18; xOff++) {
+    px(pxX + xOff * s, pxY + 15 * s, 1*s, 1*s, "#442200");
+  }
 }
 
 function drawCactus(x, y, size = 1) {
@@ -2201,7 +2294,13 @@ function render() {
 }
 function loop(){ update(); render(); requestAnimationFrame(loop); }
 
-checkReg().then(()=>{ loadLeaderboard("gameOverLeaderboard",false); loadLeaderboard("leaderboardList",true); renderShop(); });
+waitForAuth().then(() => {
+  checkReg().then(() => { 
+    loadLeaderboard("gameOverLeaderboard",false); 
+    loadLeaderboard("leaderboardList",true); 
+    renderShop(); 
+  });
+});
 loop();
 </script>
 </body>
