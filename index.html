@@ -3,11 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Pixel Farm Runner — Aurelia</title>
+  <title>Pixel Farm Runner — Aurelia v.4.1</title>
   <style>
-    /* ============================================================
-       ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ)
-       ============================================================ */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -15,6 +12,8 @@
       -webkit-tap-highlight-color: transparent;
     }
     html, body {
+      margin: 0;
+      padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -31,10 +30,12 @@
     }
     canvas {
       display: block;
+      margin: 0 auto;
       width: 100%;
       height: 100%;
       image-rendering: crisp-edges;
       image-rendering: pixelated;
+      touch-action: none;
     }
     #ui {
       position: absolute;
@@ -55,6 +56,7 @@
       font-family: 'Courier New', monospace;
       font-size: 18px;
       letter-spacing: 2px;
+      display: none;
     }
     #score, #best { display: inline-block; }
     #score { font-size: 34px; }
@@ -118,6 +120,7 @@
     #historyModal, #leaderboardModal, #rulesModal { display: none; }
     .panel {
       width: min(92vw, 520px);
+      max-height: 85vh;
       background: #0f0f12;
       border: 4px solid #ffd93b;
       padding: 20px 24px 28px;
@@ -125,8 +128,20 @@
       color: white;
       font-family: 'Courier New', monospace;
       position: relative;
-      overflow: visible;
+      overflow-y: auto;
+      overflow-x: hidden;
       box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+    }
+    .panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .panel::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 3px;
+    }
+    .panel::-webkit-scrollbar-thumb {
+      background: #ffd93b;
+      border-radius: 3px;
     }
     .scrollable-panel {
       max-height: 85vh;
@@ -150,6 +165,12 @@
       pointer-events: none;
       z-index: 35;
       animation: bounceHint 1.2s infinite ease;
+      transition: opacity 0.3s ease;
+    }
+    .scroll-hint.hidden {
+      opacity: 0;
+      pointer-events: none;
+      animation: none;
     }
     .pixel-arrow {
       width: 24px;
@@ -207,7 +228,19 @@
       0%, 100% { opacity: 0.6; transform: scale(0.9); }
       50% { opacity: 1; transform: scale(1.1); }
     }
-    #gameOnlineIndicator { position: absolute; bottom: 20px; left: 20px; z-index: 10; }
+    #gameOnlineIndicator {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+      background: #1a1a1a;
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid #ffd93b;
+    }
     .btn {
       border: 3px solid #000;
       background: #ffd93b;
@@ -304,7 +337,6 @@
       font-weight: bold; animation: pulseCountdown 0.8s ease;
     }
     @keyframes pulseCountdown { 0% { transform: scale(0.65); opacity: 0; } 35% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-    /* НОВОЕ: Стили для вкладок магазина (с фиксированной высотой) */
     .shop-tabs {
       display: flex;
       gap: 8px;
@@ -337,7 +369,11 @@
       gap: 12px;
       margin-top: 14px;
       margin-bottom: 16px;
-      min-height: 320px;  /* фиксированная высота, чтобы окно не прыгало */
+      min-height: 380px;
+      max-height: 380px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
     }
     .shop-card {
       background: #151515;
@@ -345,9 +381,51 @@
       padding: 12px;
       text-align: center;
       box-shadow: 4px 4px 0 #000;
-      min-height: 180px;   /* чтобы карточки не сжимались */
+      min-height: 180px;
     }
     .shop-card.active { border-color: #3cff8b; box-shadow: 0 0 0 2px #3cff8b inset, 4px 4px 0 #000; }
+    @keyframes legendaryPulse {
+      0% { border-color: #9b59b6; box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.4); }
+      25% { border-color: #e84393; box-shadow: 0 0 20px 8px rgba(232, 67, 147, 0.7); }
+      50% { border-color: #c39bd3; box-shadow: 0 0 25px 12px rgba(195, 155, 211, 0.8); }
+      75% { border-color: #e84393; box-shadow: 0 0 20px 8px rgba(232, 67, 147, 0.7); }
+      100% { border-color: #9b59b6; box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.4); }
+    }
+    .shop-card.legendary {
+      background: linear-gradient(135deg, #2a1a2a, #1a0a1a);
+      border-width: 3px;
+      animation: legendaryPulse 2s infinite;
+    }
+    .shop-card.legendary .shop-skin-name {
+      color: #e84393;
+      text-shadow: 0 0 5px #9b59b6;
+      font-size: 14px;
+    }
+    .legendary-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #9b59b6, #e84393);
+      color: #fff;
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+      animation: badgeGlow 1.5s infinite ease;
+    }
+    @keyframes badgeGlow {
+      0% { box-shadow: 0 0 2px #9b59b6; }
+      50% { box-shadow: 0 0 8px #e84393; }
+      100% { box-shadow: 0 0 2px #9b59b6; }
+    }
+    @keyframes newsPulse {
+      0% { opacity: 0.7; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); background: #6fbf5f; }
+      100% { opacity: 0.7; transform: scale(0.95); }
+    }
+    .shop-card .shop-skin-name span {
+      display: inline-block;
+      animation: newsPulse 1.2s infinite ease;
+    }
     .shop-skin-preview { width: 72px; height: 72px; margin: 0 auto 10px; border: 2px solid #000; background: #2a2a2a; position: relative; }
     .shop-skin-name { font-size: 12px; color: #ffd93b; margin-bottom: 6px; font-weight: bold; }
     .shop-skin-price { font-size: 11px; margin-bottom: 8px; }
@@ -378,25 +456,25 @@
       border: 1px solid #ffd93b;
       border-radius: 8px;
     }
-    .volume-sliders label {
-      font-size: 11px;
-      display: block;
-      margin: 6px 0 4px;
-      color: #ffd93b;
-    }
-    .volume-sliders input {
-      width: 100%;
-      margin-bottom: 6px;
-      cursor: pointer;
-      background: #0a0a0a;
-      accent-color: #ffd93b;
-    }
     .shop-section-title {
       font-size: 16px;
       margin: 20px 0 8px;
       color: #ffd93b;
       border-top: 2px solid #ffd93b;
       padding-top: 12px;
+    }
+    .pixel-name {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffd93b;
+      text-shadow: 2px 2px 0 #000;
+      letter-spacing: 2px;
+      display: inline-block;
+      background: #1a1a1a;
+      padding: 4px 12px;
+      border: 2px solid #ffd93b;
+      margin-bottom: 8px;
     }
     @media (max-width: 640px) {
       #ui { padding: 4px 12px; font-size: 12px; bottom: 65px; }
@@ -414,7 +492,7 @@
       .pixel-note { width: 16px; height: 16px; margin-right: 6px; }
       .pixel-note .note-head { width: 6px; height: 6px; left: 3px; top: 3px; }
       .pixel-note .note-stem { width: 2px; height: 10px; left: 8px; top: -1px; }
-      .shop-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; min-height: 280px; }
+      .shop-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; min-height: 280px; max-height: 280px; }
       .shop-skin-preview { width: 60px; height: 60px; }
       .shop-skin-name { font-size: 10px; }
       .scroll-hint span { font-size: 8px; }
@@ -424,6 +502,7 @@
       .volume-sliders { padding: 6px 8px; }
       .shop-section-title { font-size: 14px; margin: 15px 0 5px; }
       .shop-tab { padding: 5px 10px; font-size: 11px; }
+      #gameOnlineIndicator { padding: 4px 10px; gap: 6px; }
     }
   </style>
 </head>
@@ -438,23 +517,23 @@
 
   <!-- ГЛАВНОЕ МЕНЮ -->
   <div id="titleScreen">
-    <div class="panel" style="position: relative;">
+    <div class="panel" style="position: relative; display: flex; flex-direction: column;">
       <div class="online-corner">
         <div id="menuOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="menuOnlineCount">0</span><span id="onlineLabel">online</span></div>
       </div>
       <div class="logo-banner"><img src="https://static.tildacdn.com/tild3765-3965-4262-b936-633832306661/D20207C3-EB3E-4239-B.PNG" class="game-logo" alt="Pixel Farm Runner"></div>
-      <div class="menu-coins" id="menuCoinsDisplay"><div class="coin-icon"></div><span id="menuCoinsValue">0</span> BelkaCoins</div>
-      <button class="btn" id="startBtn">START GAME</button>
-      <div class="daily-bonus-area"><button class="btn daily small" id="dailyBonusBtn">✨ DAILY BONUS ✨</button><div id="dailyBonusInfo" class="small"></div></div>
-      <div class="button-group">
+      <div id="userStatusMain" class="register-hint" style="order: 1; margin: 10px 0 5px 0;"></div>
+      <div class="menu-coins" id="menuCoinsDisplay" style="order: 2;"><div class="coin-icon"></div><span id="menuCoinsValue">0</span> BelkaCoins</div>
+      <button class="btn" id="startBtn" style="order: 3;">START GAME</button>
+      <div class="daily-bonus-area" style="order: 4;"><button class="btn daily small" id="dailyBonusBtn">✨ DAILY BONUS ✨</button><div id="dailyBonusInfo" class="small"></div></div>
+      <div class="button-group" style="order: 5;">
         <button class="btn small" id="historyBtnMain">📜 HISTORY</button>
         <button class="btn small" id="rulesBtnMain">📜 RULES</button>
         <button class="btn small" id="leaderboardBtnMain">🏆 LEADERBOARD</button>
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
-      <div id="userStatusMain" class="register-hint"></div>
-      <div class="version">✨ v.3.9 — Дикий Запад: египетские блоки, заборы, солнце/луна ✨</div>
+      <div class="version" style="order: 6;">✨ v.4.1 — Уменьшенные окна, зелёный Wild West, улучшенная статистика ✨</div>
     </div>
   </div>
 
@@ -474,20 +553,37 @@
   
   <!-- МОДАЛЬНЫЕ ОКНА -->
   <div id="rulesModal" class="hidden"><div class="panel scrollable-panel" style="position: relative;"><h2>📜 GAME RULES</h2><div class="rules-list" id="rulesList"></div><div class="sponsor-line" id="sponsorLine"></div><button class="btn small" id="closeRulesBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
-  <div id="historyModal" class="hidden"><div class="panel scrollable-panel" style="position: relative;"><h2 id="historyTitle">📜 HISTORY</h2><div class="history-text" id="historyText"></div><button class="btn small" id="closeHistoryBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
+  <div id="historyModal" class="hidden"><div class="panel scrollable-panel" style="position: relative; max-height: 80vh;"><h2 id="historyTitle">📜 HISTORY</h2><div class="history-text" id="historyText" style="max-height: 55vh; overflow-y: auto; padding-right: 8px;"></div><button class="btn small" id="closeHistoryBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
   <div id="leaderboardModal"><div class="panel small"><h2>🏆 LEADERBOARD</h2><div id="leaderboardList" class="leaderboard-list"><div>Loading...</div></div><div id="yourRank" style="margin:6px 0; font-size:10px;"></div><div class="online-wrapper" style="margin-top:8px;"><div id="leaderboardOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="leaderboardOnlineCount">0</span><span>online</span></div></div><button class="btn small" id="closeLeaderboardBtn">CLOSE</button></div></div>
 
-  <div id="gameOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="gameOnlineCount">0</span><span>online</span></div>
+  <div id="gameOnlineIndicator" class="online-pixel-box">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <div class="pixel-dot" style="width: 10px; height: 10px;"></div>
+      <span id="gameOnlineCount">0</span>
+      <span>online</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #ffd93b; padding-left: 12px;">
+      <div class="coin-icon-real" style="width: 14px; height: 14px;"></div>
+      <span id="gameCoinsIndicator">0</span>
+      <span>BelkaCoins</span>
+    </div>
+  </div>
   <button id="pauseBtn" class="hidden">⏸ PAUSE</button>
   <div id="countdownOverlay"><div id="countdownText">3</div></div>
   <div id="pauseOverlay"><div class="panel small"><h2>⏸ PAUSED</h2><p>Game is paused</p>
-    <div class="volume-sliders">
-      <label>🎵 MUSIC</label>
-      <input type="range" id="volMusic" min="0" max="1" step="0.01" value="0.25">
-      <label>🔊 SFX</label>
-      <input type="range" id="volSfx" min="0" max="1" step="0.01" value="0.35">
-      <label>🌾 AMBIENT</label>
-      <input type="range" id="volAmbient" min="0" max="1" step="0.01" value="0.15">
+    <div class="volume-sliders" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label>🎵 MUSIC</label>
+        <div><button class="btn small" id="toggleMusicBtn" style="padding: 4px 12px; font-size: 12px; min-width: 80px;">ON</button></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label>🔊 SFX</label>
+        <div><button class="btn small" id="toggleSfxBtn" style="padding: 4px 12px; font-size: 12px; min-width: 80px;">ON</button></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <label>🌾 AMBIENT</label>
+        <div><button class="btn small" id="toggleAmbientBtn" style="padding: 4px 12px; font-size: 12px; min-width: 80px;">ON</button></div>
+      </div>
     </div>
     <div class="button-group">
       <button class="btn small" id="resumeBtn">▶ RESUME</button>
@@ -518,13 +614,13 @@
 <script type="importmap">{ "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js" } }</script>
 <script type="module">
 // ============================================================
-// ВАШИ ИМПОРТЫ, ПЕРЕВОДЫ, НАСТРОЙКА FIREBASE (ПОЛНОСТЬЮ)
+// ИМПОРТЫ FIREBASE
 // ============================================================
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, query, where, getDocs, doc, setDoc, orderBy, limit, serverTimestamp, runTransaction, onSnapshot } from "firebase/firestore";
 
 // ============================================================
-// МУЛЬТИЯЗЫЧНОСТЬ (6 языков) — ПОЛНЫЙ ОБЪЕКТ
+// МУЛЬТИЯЗЫЧНОСТЬ (6 языков)
 // ============================================================
 const translations = {
   en: { startGame: "START GAME", rules: "RULES", leaderboard: "LEADERBOARD", register: "✨ Register at <span class='register-link'>bellariofilms.com</span> to compete! ✨", registerSave: "✨ Register at <span class='register-link'>bellariofilms.com</span> to save your score! ✨", gameOver: "GAME OVER", yourScore: "Your score:", topPlayers: "🏆 TOP PLAYERS 🏆", restart: "RESTART", menu: "MENU", rulesTitle: "📜 GAME RULES", scoreLabel: "SCORE:", bestLabel: "BEST:", rulesSponsor: "🏆 Your results at bellariofilms.com\nThanks to Dzioniso Bellario 🙏", dailyBonus: "✨ DAILY BONUS ✨", dailyBonusClaimed: "✓ Already claimed!", dailyBonusAvailable: "🎁 +10 BelkaCoins available!", coinsInfo: "Earn: 100 pts → +3, 500 pts → +8, bucket +1, horseshoe +2 + invinc, golden coin +25, new record +15", newObstacles: "Sheep by well, Well+pond (restores double jump), Bucket well (+1 coin)", historyTitle: "📜 GAME HISTORY", closeBtn: "CLOSE", onlineLabel: "online", shop: "SHOP", historyBtn: "HISTORY" },
@@ -587,17 +683,18 @@ const shopBtnMain = document.getElementById('shopBtnMain');
 const closeShopBtn = document.getElementById('closeShopBtn');
 
 // ============================================================
-// СИСТЕМА СКИНОВ (ЛОШАДИ)
+// СИСТЕМА СКИНОВ
 // ============================================================
 const skins = {
   aurelia: { id: 'aurelia', name: 'Aurelia', price: 0, owned: true, palette: { body: '#b86a22', body2: '#d17c2d', mane: '#5b2d15', leg: '#7a3c17', face: '#f1d09a' } },
-  nocturna: { id: 'nocturna', name: 'Nocturna', price: 35, owned: false, palette: { body: '#2b2b2b', body2: '#3a3a3a', mane: '#0d0d0d', leg: '#1c1c1c', face: '#cfcfcf' } },
-  azurea: { id: 'azurea', name: 'Azurea', price: 50, owned: false, palette: { body: '#6f4dff', body2: '#8a6bff', mane: '#2d145b', leg: '#41218b', face: '#f2d8ff' } },
-  aurea: { id: 'aurea', name: 'Aurea', price: 80, owned: false, palette: { body: '#d4a017', body2: '#ffd966', mane: '#8a5f00', leg: '#9c7300', face: '#fff0b0' } },
-  viridia: { id: 'viridia', name: 'Viridia', price: 110, owned: false, palette: { body: '#3cb371', body2: '#2e8b57', mane: '#1e5a3a', leg: '#267c4a', face: '#c6ffb0' } },
-  rosalia: { id: 'rosalia', name: 'Rosalia', price: 140, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#b34e6e', leg: '#d96f8a', face: '#ffe0e6' } },
-  amethysta: { id: 'amethysta', name: 'Amethysta', price: 180, owned: false, palette: { body: '#aa6ff9', body2: '#8b4ee5', mane: '#4a1a8a', leg: '#6a32c2', face: '#e5ccff' } },
-  alisa: { id: 'alisa', name: 'Alisa', price: 250, owned: false, palette: { body: '#c084fc', body2: '#f9a8d4', mane: '#7e22ce', leg: '#c2410c', face: '#ffe6f0' } }
+  nocturna: { id: 'nocturna', name: 'Nocturna', price: 50, owned: false, palette: { body: '#2b2b2b', body2: '#3a3a3a', mane: '#0d0d0d', leg: '#1c1c1c', face: '#cfcfcf' } },
+  azurea: { id: 'azurea', name: 'Azurea', price: 75, owned: false, palette: { body: '#6f4dff', body2: '#8a6bff', mane: '#2d145b', leg: '#41218b', face: '#f2d8ff' } },
+  aurea: { id: 'aurea', name: 'Aurea', price: 120, owned: false, palette: { body: '#d4a017', body2: '#ffd966', mane: '#8a5f00', leg: '#9c7300', face: '#fff0b0' } },
+  viridia: { id: 'viridia', name: 'Viridia', price: 165, owned: false, palette: { body: '#3cb371', body2: '#2e8b57', mane: '#1e5a3a', leg: '#267c4a', face: '#c6ffb0' } },
+  rosalia: { id: 'rosalia', name: 'Rosalia', price: 210, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#b34e6e', leg: '#d96f8a', face: '#ffe0e6' } },
+  amethysta: { id: 'amethysta', name: 'Amethysta', price: 270, owned: false, palette: { body: '#aa6ff9', body2: '#8b4ee5', mane: '#4a1a8a', leg: '#6a32c2', face: '#e5ccff' } },
+  alisa: { id: 'alisa', name: '👑 ALISA ✨', price: 750, owned: false, legendary: true, palette: { body: '#9b59b6', body2: '#c39bd3', mane: '#e84393', leg: '#8e44ad', face: '#f5eef8' } },
+  aurora: { id: 'aurora', name: 'Aurora ✨', price: 0, owned: false, exclusive: true, hidden: true, palette: { body: '#c0a0ff', body2: '#d8b8ff', mane: '#8050c0', leg: '#a070e0', face: '#ffe0ff' } }
 };
 let ownedSkins = JSON.parse(localStorage.getItem('pixelFarmOwnedSkins') || '["aurelia"]');
 let selectedSkin = localStorage.getItem('pixelFarmSelectedSkin') || 'aurelia';
@@ -610,9 +707,11 @@ function getCurrentSkin() { return skins[selectedSkin] || skins.aurelia; }
 // ============================================================
 const backgrounds = {
   day: { id: 'day', name: '🌞 Day', price: 0, owned: true, style: 'linear-gradient(135deg, #4a77ff, #6fa7ff)' },
-  dawn: { id: 'dawn', name: '🌅 Dawn', price: 50, owned: false, style: 'linear-gradient(135deg, #ffb87a, #ff9a6e)' },
-  sunset: { id: 'sunset', name: '🌇 Sunset', price: 80, owned: false, style: 'linear-gradient(135deg, #ff6fb5, #9b4dff)' },
-  night: { id: 'night', name: '🌙 Night', price: 120, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' }
+  dawn: { id: 'dawn', name: '🌅 Dawn', price: 75, owned: false, style: 'linear-gradient(135deg, #ffb87a, #ff9a6e)' },
+  sunset: { id: 'sunset', name: '🌇 Sunset', price: 120, owned: false, style: 'linear-gradient(135deg, #ff6fb5, #9b4dff)' },
+  night: { id: 'night', name: '🌙 Night', price: 180, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' },
+  black: { id: 'black', name: '🖤 Black', price: 300, owned: false, style: 'linear-gradient(135deg, #0a0a0a, #1a1a1a)' },
+  goldenDawn: { id: 'goldenDawn', name: '🌟 Golden Dawn', price: 500, owned: false, exclusive: true, style: 'linear-gradient(135deg, #ffd966, #ffaa33)' }
 };
 let ownedBackgrounds = JSON.parse(localStorage.getItem('pixelFarmOwnedBackgrounds') || '["day"]');
 let selectedBackground = localStorage.getItem('pixelFarmSelectedBackground') || 'day';
@@ -626,7 +725,7 @@ function applySelectedBackground() {
 }
 
 // ============================================================
-// СИСТЕМА КАРТ (MAPS) — ДИКИЙ ЗАПАД
+// СИСТЕМА КАРТ
 // ============================================================
 const maps = {
   farm: { 
@@ -638,7 +737,7 @@ const maps = {
     decoColor: '#c3f267'
   },
   wildWest: { 
-    id: 'wildWest', name: '🤠 Wild West', price: 150, owned: false, theme: 'desert',
+    id: 'wildWest', name: '🤠 Wild West', price: 225, owned: false, theme: 'desert', news: true,
     groundColor: '#d4a373', groundDetail1: '#c9945e', groundDetail2: '#b87a4a', groundShadow: '#9b6a3a',
     skyGradient: { day: ['#e9c46a', '#f4a261'], dawn: ['#e76f51', '#f4a261'], sunset: ['#e63946', '#d4a373'], night: ['#2b2d42', '#3a3e5a'] },
     mountainColors: { day: ['#b87a5a', '#d49c7a'], dawn: ['#c47a5a', '#e4aa8a'], sunset: ['#9a5a4a', '#ba7a6a'], night: ['#4a3a3a', '#6a5a5a'] },
@@ -653,15 +752,17 @@ function saveMaps() { localStorage.setItem('pixelFarmOwnedMaps', JSON.stringify(
 function getCurrentMap() { return maps[selectedMap] || maps.farm; }
 
 // ============================================================
-// ЭКОНОМИКА (МОНЕТЫ)
+// ЭКОНОМИКА
 // ============================================================
 function updateCoins() {
   const val = document.getElementById('coinsValue');
   const menu = document.getElementById('menuCoinsValue');
   const shop = document.getElementById('shopCoinsValue');
+  const bottomCoins = document.getElementById('gameCoinsIndicator');
   if (val) val.textContent = coins;
   if (menu) menu.textContent = coins;
   if (shop) shop.textContent = coins;
+  if (bottomCoins) bottomCoins.textContent = coins;
   localStorage.setItem('pixelFarmCoins', coins);
 }
 function showCoinPop(amount, x, y) {
@@ -683,7 +784,7 @@ function addCoins(a, x = typeof W !== 'undefined' && W ? W/2 : window.innerWidth
 function vibrate(duration = 50) { if (navigator.vibrate) navigator.vibrate(duration); }
 
 // ============================================================
-// МАГАЗИН (НОВЫЙ — С ВКЛАДКАМИ)
+// МАГАЗИН
 // ============================================================
 function renderShop() { renderSkinsGrid(); renderMapsGrid(); renderBackgroundsGrid(); updateCoins(); }
 function renderSkinsGrid() {
@@ -691,9 +792,14 @@ function renderSkinsGrid() {
   if (!grid) return;
   let html = '';
   Object.values(skins).forEach(skin => {
+    if (skin.hidden && !ownedSkins.includes(skin.id)) return;
     const owned = ownedSkins.includes(skin.id);
     const active = selectedSkin === skin.id;
-    html += `<div class="shop-card ${active ? 'active' : ''}"><div class="shop-skin-preview" style="background:#222;"><div style="position:absolute; left:18px; top:22px; width:36px; height:20px; background:${skin.palette.body};"></div><div style="position:absolute; left:22px; top:16px; width:28px; height:10px; background:${skin.palette.body2};"></div><div style="position:absolute; left:46px; top:12px; width:10px; height:10px; background:${skin.palette.body};"></div><div style="position:absolute; left:50px; top:9px; width:10px; height:12px; background:${skin.palette.body};"></div><div style="position:absolute; left:52px; top:15px; width:6px; height:4px; background:${skin.palette.face};"></div><div style="position:absolute; left:9px; top:28px; width:5px; height:8px; background:${skin.palette.mane};"></div></div><div class="shop-skin-name">${skin.name}</div><div class="shop-skin-price">${owned ? 'Owned' : `${skin.price} <div class="coin-icon-real" style="display:inline-block; width:14px; height:14px; margin:0 2px -2px 0;"></div>`}</div><button class="shop-btn" onclick="window.handleSkinAction('${skin.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
+    let cardClass = `shop-card ${active ? 'active' : ''}`;
+    if (skin.id === 'alisa' && !owned) cardClass += ' legendary';
+    if (skin.id === 'alisa' && owned) cardClass += ' legendary owned';
+    const legendaryBadge = skin.id === 'alisa' ? '<span class="legendary-badge">⭐ LEGENDARY</span>' : '';
+    html += `<div class="${cardClass}"><div class="shop-skin-preview" style="background:#222;"><div style="position:absolute; left:18px; top:22px; width:36px; height:20px; background:${skin.palette.body};"></div><div style="position:absolute; left:22px; top:16px; width:28px; height:10px; background:${skin.palette.body2};"></div><div style="position:absolute; left:46px; top:12px; width:10px; height:10px; background:${skin.palette.body};"></div><div style="position:absolute; left:50px; top:9px; width:10px; height:12px; background:${skin.palette.body};"></div><div style="position:absolute; left:52px; top:15px; width:6px; height:4px; background:${skin.palette.face};"></div><div style="position:absolute; left:9px; top:28px; width:5px; height:8px; background:${skin.palette.mane};"></div></div><div class="shop-skin-name">${skin.name} ${legendaryBadge}</div><div class="shop-skin-price">${owned ? 'Owned' : `${skin.price} <div class="coin-icon-real" style="display:inline-block; width:14px; height:14px; margin:0 2px -2px 0;"></div>`}</div><button class="shop-btn" onclick="window.handleSkinAction('${skin.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
   });
   grid.innerHTML = html;
 }
@@ -705,7 +811,8 @@ function renderMapsGrid() {
     const owned = ownedMaps.includes(map.id);
     const active = selectedMap === map.id;
     let previewStyle = map.theme === 'desert' ? 'background: linear-gradient(135deg, #e9c46a, #f4a261);' : 'background: linear-gradient(135deg, #4a77ff, #6fa7ff);';
-    html += `<div class="shop-card ${active ? 'active' : ''}" style="${previewStyle}"><div class="shop-skin-name" style="color:#fff; text-shadow:1px 1px 0 #000;">${map.name}</div><div class="shop-skin-price">${owned ? 'Owned' : `${map.price} 🪙`}</div><button class="shop-btn" onclick="window.handleMapAction('${map.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
+    const newsBadge = map.news ? '<span style="background: #4caf50; color: #fff; font-size: 8px; padding: 2px 6px; border-radius: 10px; margin-left: 6px; vertical-align: middle; animation: newsPulse 1.2s infinite ease;">NEW</span>' : '';
+    html += `<div class="shop-card ${active ? 'active' : ''}" style="${previewStyle}"><div class="shop-skin-name" style="color:#fff; text-shadow:1px 1px 0 #000;">${map.name} ${newsBadge}</div><div class="shop-skin-price">${owned ? 'Owned' : `${map.price} 🪙`}</div><button class="shop-btn" onclick="window.handleMapAction('${map.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
   });
   grid.innerHTML = html;
 }
@@ -803,12 +910,98 @@ window.handleBackgroundAction = function(bgId) {
 };
 
 // ============================================================
-// ЕЖЕДНЕВНЫЙ БОНУС И ДОСТИЖЕНИЯ
+// ЕЖЕДНЕВНЫЙ БОНУС
 // ============================================================
-let dailyClaimed = false;
-function checkDaily() { const last = localStorage.getItem('dailyBonusClaim'); const today = new Date().toDateString(); dailyClaimed = (last === today); updateDailyUI(); }
-function updateDailyUI() { const info = document.getElementById('dailyBonusInfo'); if (info) info.innerHTML = dailyClaimed ? t.dailyBonusClaimed : t.dailyBonusAvailable; }
-function claimDaily() { if (!dailyClaimed) { addCoins(10); dailyClaimed = true; localStorage.setItem('dailyBonusClaim', new Date().toDateString()); showAchievementQueued(`✨ Daily Bonus +10 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins ✨`, true); updateDailyUI(); } }
+function claimDaily() {
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  
+  if (lastDailyDate === today) {
+    showAchievementQueued(`❌ Daily bonus already claimed today!`, true);
+    updateDailyUI();
+    return;
+  }
+  
+  if (lastDailyDate === yesterday) {
+    dailyStreak = Math.min(dailyStreak + 1, 14);
+  } else {
+    dailyStreak = 1;
+  }
+  
+  let coinsReward = 0;
+  let isWeekComplete = false;      // награда за 7 дней: фон Night
+  let isTwoWeekComplete = false;   // награда за 14 дней: скин Aurora
+  
+  if (dailyStreak === 1) coinsReward = 5;
+  else if (dailyStreak >= 2 && dailyStreak <= 6) coinsReward = 3;
+  else if (dailyStreak === 7) { coinsReward = 3; isWeekComplete = true; }
+  else if (dailyStreak >= 8 && dailyStreak <= 13) coinsReward = 3;
+  else if (dailyStreak === 14) { coinsReward = 3; isTwoWeekComplete = true; }
+  else coinsReward = 3;
+  
+  addCoins(coinsReward);
+  showAchievementQueued(`✨ Daily Bonus Day ${dailyStreak}! +${coinsReward} 🪙 ✨`, true);
+  
+  // Награда за 7 дней подряд (фон Night)
+  if (isWeekComplete && !weeklyRewardGiven) {
+    weeklyRewardGiven = true;
+    if (!ownedBackgrounds.includes('night')) {
+      ownedBackgrounds.push('night');
+      backgrounds.night.owned = true;
+      saveBackgrounds();
+      showAchievementQueued(`🌙 WEEKLY REWARD! You got background: NIGHT! 🌙\n+3 🪙`, true);
+    }
+  }
+  
+  // Награда за 14 дней подряд (эксклюзивный скин Aurora)
+  if (isTwoWeekComplete && !twoWeekRewardGiven) {
+    twoWeekRewardGiven = true;
+    if (!ownedSkins.includes('aurora')) {
+      ownedSkins.push('aurora');
+      skins.aurora.owned = true;
+      saveSkins();
+      showAchievementQueued(`🎁⭐ 2-WEEK REWARD! ⭐🎁\nYou got EXCLUSIVE skin: AURORA ✨!\nNow visible in your inventory!`, true);
+    }
+  }
+  
+  lastDailyDate = today;
+  localStorage.setItem('pixelFarmDailyStreak', dailyStreak);
+  localStorage.setItem('pixelFarmLastDailyDate', lastDailyDate);
+  localStorage.setItem('pixelFarmWeeklyRewardGiven', weeklyRewardGiven);
+  localStorage.setItem('pixelFarmTwoWeekRewardGiven', twoWeekRewardGiven);
+  updateDailyUI();
+}
+
+let dailyStreak = Number(localStorage.getItem('pixelFarmDailyStreak') || 0);
+let lastDailyDate = localStorage.getItem('pixelFarmLastDailyDate') || '';
+let weeklyRewardGiven = localStorage.getItem('pixelFarmWeeklyRewardGiven') === 'true';
+let twoWeekRewardGiven = localStorage.getItem('pixelFarmTwoWeekRewardGiven') === 'true';
+
+function updateDailyUI() {
+  const info = document.getElementById('dailyBonusInfo');
+  if (!info) return;
+  
+  const today = new Date().toDateString();
+  const claimed = (lastDailyDate === today);
+  
+  if (claimed) {
+    let streakText = dailyStreak > 0 ? ` Streak: ${dailyStreak} days 🔥` : '';
+    info.innerHTML = `✓ Already claimed today!${streakText}`;
+  } else {
+    let nextReward = '';
+    
+    if (dailyStreak === 0 || dailyStreak === 1) nextReward = 'Day 2: +3 🪙';
+    else if (dailyStreak >= 2 && dailyStreak <= 5) nextReward = `Day ${dailyStreak + 1}: +3 🪙`;
+    else if (dailyStreak === 6) nextReward = 'Day 7: +3 🪙 + 🌙 BACKGROUND NIGHT!';
+    else if (dailyStreak >= 7 && dailyStreak <= 12) nextReward = `Day ${dailyStreak + 1}: +3 🪙`;
+    else if (dailyStreak === 13) nextReward = 'Day 14: +3 🪙 + 🎁⭐ SKIN AURORA!';
+    else if (dailyStreak >= 14) nextReward = 'Day 1: +5 🪙 (streak reset)';
+    else nextReward = 'Day 1: +5 🪙';
+    
+    let rewardText = (dailyStreak === 0 || dailyStreak === 1) ? '+5 🪙' : '+3 🪙';
+    info.innerHTML = `🎁 ${rewardText} available! Streak: ${dailyStreak} days 🔥<br><small>Next: ${nextReward}</small>`;
+  }
+}
 
 let achQueue = [], achShowing = false;
 function showAchievementQueued(text, sound = true) {
@@ -819,57 +1012,26 @@ function showAchievementQueued(text, sound = true) {
 function processQueue() { if (achShowing || achQueue.length === 0) return; const { text, sound } = achQueue.shift(); achShowing = true; if (sound) playAchieveSound(); const div = document.createElement('div'); div.className = 'achievement'; div.innerHTML = text; document.body.appendChild(div); setTimeout(() => { div.remove(); achShowing = false; setTimeout(processQueue, 150); }, 2000); }
 
 // ============================================================
-// PRO AUDIO SYSTEM — STABLE VERSION
+// AUDIO SYSTEM
 // ============================================================
 let audioCtx = null;
 let audioAllowed = false;
-
 let ambientInterval = null;
 let musicPlaying = false;
 let musicInterval = null;
-
 let soundEnabled = localStorage.getItem('pixelFarmSound') !== 'false';
+let musicEnabled = localStorage.getItem('pixelFarmMusicEnabled') !== 'false';
+let sfxEnabled = localStorage.getItem('pixelFarmSfxEnabled') !== 'false';
+let ambientEnabled = localStorage.getItem('pixelFarmAmbientEnabled') !== 'false';
 let musicVolume = parseFloat(localStorage.getItem('pixelFarmMusicVolume')) || 0.25;
 let sfxVolume = parseFloat(localStorage.getItem('pixelFarmSfxVolume')) || 0.35;
 let ambientVolume = parseFloat(localStorage.getItem('pixelFarmAmbientVolume')) || 0.15;
-
 let musicGain = null;
-
-// ============================================================
-// UI
-// ============================================================
-function updateVolumeSliders() {
-  const musicSlider = document.getElementById('volMusic');
-  const sfxSlider = document.getElementById('volSfx');
-  const ambientSlider = document.getElementById('volAmbient');
-
-  if (musicSlider) musicSlider.value = musicVolume;
-  if (sfxSlider) sfxSlider.value = sfxVolume;
-  if (ambientSlider) ambientSlider.value = ambientVolume;
-}
-
-function setVolume(type, value) {
-  value = Math.max(0, Math.min(1, parseFloat(value)));
-
-  if (type === 'music') musicVolume = value;
-  else if (type === 'sfx') sfxVolume = value;
-  else if (type === 'ambient') ambientVolume = value;
-
-  localStorage.setItem('pixelFarmMusicVolume', musicVolume);
-  localStorage.setItem('pixelFarmSfxVolume', sfxVolume);
-  localStorage.setItem('pixelFarmAmbientVolume', ambientVolume);
-
-  if (audioCtx && musicGain) {
-    musicGain.gain.value = musicVolume;
-  }
-}
 
 function setSoundIcon() {
   const icon = document.getElementById('muteIcon');
   const text = document.getElementById('muteText');
-
   if (!icon || !text) return;
-
   if (soundEnabled) {
     icon.classList.remove('muted');
     text.textContent = 'SOUND ON';
@@ -879,61 +1041,43 @@ function setSoundIcon() {
   }
 }
 
-// ============================================================
-// AUDIO INIT
-// ============================================================
+function updateSoundButtonsUI() {
+  const musicBtn = document.getElementById('toggleMusicBtn');
+  const sfxBtn = document.getElementById('toggleSfxBtn');
+  const ambientBtn = document.getElementById('toggleAmbientBtn');
+  if (musicBtn) musicBtn.textContent = musicEnabled ? 'ON' : 'OFF';
+  if (sfxBtn) sfxBtn.textContent = sfxEnabled ? 'ON' : 'OFF';
+  if (ambientBtn) ambientBtn.textContent = ambientEnabled ? 'ON' : 'OFF';
+}
+
 function initAudio() {
   if (audioCtx) return;
-
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  } catch (e) {
-    console.warn('Audio init error:', e);
-  }
+  try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { console.warn('Audio init error:', e); }
 }
 
 async function enableAudio() {
   initAudio();
   if (!audioCtx) return;
-
   try {
-    if (audioCtx.state !== 'running') {
-      await audioCtx.resume();
-    }
-
+    if (audioCtx.state !== 'running') await audioCtx.resume();
     audioAllowed = true;
-
     if (soundEnabled) {
-      if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) {
-        playMenuMusic();
-      }
-      if (gameRunning && !gameOver) {
-        startAmbientLoop();
-      }
+      if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) playMenuMusic();
+      if (gameRunning && !gameOver && ambientEnabled) startAmbientLoop();
     }
-  } catch (e) {
-    console.warn('Audio resume error:', e);
-  }
+  } catch (e) { console.warn('Audio resume error:', e); }
 }
 
-// ============================================================
-// MENU MUSIC
-// ============================================================
 function playMenuMusic() {
   if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') return;
+  if (!musicEnabled) return;
   if (musicPlaying) return;
   if (!titleScr || titleScr.classList.contains('hidden')) return;
-
   if (musicInterval) clearTimeout(musicInterval);
-
-  if (musicGain) {
-    try { musicGain.disconnect(); } catch(e) {}
-  }
-
+  if (musicGain) { try { musicGain.disconnect(); } catch(e) {} }
   musicGain = audioCtx.createGain();
   musicGain.gain.value = musicVolume;
   musicGain.connect(audioCtx.destination);
-
   const melody = [
     {freq: 261.63, dur: 0.45}, {freq: 329.63, dur: 0.45}, {freq: 392.00, dur: 0.45}, {freq: 523.25, dur: 0.55},
     {freq: 392.00, dur: 0.45}, {freq: 329.63, dur: 0.45}, {freq: 261.63, dur: 0.7},
@@ -944,41 +1088,25 @@ function playMenuMusic() {
     {freq: 523.25, dur: 0.45}, {freq: 659.25, dur: 0.45}, {freq: 783.99, dur: 0.45}, {freq: 1046.50, dur: 0.55},
     {freq: 783.99, dur: 0.45}, {freq: 659.25, dur: 0.45}, {freq: 523.25, dur: 0.9}
   ];
-
   function playNote(freq, dur, startTime) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
     osc.type = 'triangle';
     osc.frequency.value = freq;
-
     gain.gain.setValueAtTime(0.22, startTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, startTime + dur);
-
     osc.connect(gain);
     gain.connect(musicGain);
-
     osc.start(startTime);
     osc.stop(startTime + dur);
   }
-
   let currentTime = audioCtx.currentTime;
-
-  melody.forEach(note => {
-    playNote(note.freq, note.dur, currentTime);
-    currentTime += note.dur;
-  });
-
+  melody.forEach(note => { playNote(note.freq, note.dur, currentTime); currentTime += note.dur; });
   const totalDur = currentTime - audioCtx.currentTime;
-
   musicPlaying = true;
-
   musicInterval = setTimeout(() => {
     musicPlaying = false;
-
-    if (titleScr && !titleScr.classList.contains('hidden') && soundEnabled && audioAllowed) {
-      playMenuMusic();
-    }
+    if (titleScr && !titleScr.classList.contains('hidden') && soundEnabled && audioAllowed && musicEnabled) playMenuMusic();
   }, totalDur * 1000);
 }
 
@@ -986,49 +1114,35 @@ function stopMenuMusic() {
   if (musicInterval) clearTimeout(musicInterval);
   musicInterval = null;
   musicPlaying = false;
-
-  if (musicGain) {
-    try { musicGain.disconnect(); } catch(e) {}
-    musicGain = null;
-  }
+  if (musicGain) { try { musicGain.disconnect(); } catch(e) {} musicGain = null; }
 }
 
-// ============================================================
-// SFX
-// ============================================================
 function playAchieveSound() {
   if (!soundEnabled || !audioCtx || !audioAllowed || audioCtx.state !== 'running') return;
-
+  if (!sfxEnabled) return;
   const now = audioCtx.currentTime;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   osc.type = 'sine';
   osc.frequency.value = 880;
-
   gain.gain.setValueAtTime(0.12 * sfxVolume, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-
   osc.start(now);
   osc.stop(now + 0.25);
 }
 
 function playSound(type, volume = 0.2) {
   if (!soundEnabled || !audioCtx || !audioAllowed || audioCtx.state !== 'running') return;
-
   const now = audioCtx.currentTime;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   let freq = 440;
   let oscType = 'sine';
   let baseVol = volume;
   let duration = 0.35;
-  let volumeGroup = 'sfx'; // 'sfx' или 'ambient'
-
+  let volumeGroup = 'sfx';
   if (type === 'jump') { oscType = 'square'; freq = 480 + (Math.random() - 0.5) * 20; baseVol = 0.2; }
   else if (type === 'doubleJump') { oscType = 'sine'; freq = 880 + (Math.random() - 0.5) * 30; baseVol = 0.18; }
   else if (type === 'crash') { oscType = 'sawtooth'; freq = 220; baseVol = 0.45; }
@@ -1048,38 +1162,28 @@ function playSound(type, volume = 0.2) {
   else if (type === 'countdownTick') { oscType = 'sine'; freq = 880 + (Math.random() - 0.5) * 20; baseVol = 0.12; duration = 0.1; }
   else if (type === 'countdownGo') { oscType = 'square'; freq = 660 + (Math.random() - 0.5) * 30; baseVol = 0.22; duration = 0.2; }
   else if (type === 'landing') { oscType = 'sine'; freq = 260 + (Math.random() - 0.5) * 30; baseVol = 0.2; }
-
-  const finalVolume = volumeGroup === 'ambient'
-    ? baseVol * ambientVolume
-    : baseVol * sfxVolume;
-
+  if (volumeGroup === 'sfx' && !sfxEnabled) return;
+  if (volumeGroup === 'ambient' && !ambientEnabled) return;
+  const finalVolume = volumeGroup === 'ambient' ? baseVol * ambientVolume : baseVol * sfxVolume;
   gain.gain.setValueAtTime(finalVolume, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
   if (type !== 'wind') osc.frequency.value = freq;
   osc.type = oscType;
-
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-
   osc.start(now);
   osc.stop(now + duration);
 }
 
-// ============================================================
-// AMBIENT LOOP
-// ============================================================
 function startAmbientLoop() {
   stopAmbientLoop();
-
   ambientInterval = setInterval(() => {
     if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') return;
+    if (!ambientEnabled) return;
     if (!gameRunning || gameOver) return;
-
     const hour = timeOfDay / 100;
     const rand = Math.random();
     const currentMap = getCurrentMap();
-
     if (currentMap.theme === 'desert') {
       if (rand < 0.12) playSound('wind');
       else if (rand < 0.18 && hour >= 6 && hour < 19) playSound('bird');
@@ -1096,48 +1200,58 @@ function startAmbientLoop() {
         if (rand < 0.15) playSound('cricket');
         else if (rand < 0.25) playSound('bird');
       }
-
       if (rand < 0.1) playSound('wind');
     }
   }, 3800);
 }
 
 function stopAmbientLoop() {
-  if (ambientInterval) {
-    clearInterval(ambientInterval);
-    ambientInterval = null;
-  }
+  if (ambientInterval) { clearInterval(ambientInterval); ambientInterval = null; }
 }
 
-// ============================================================
-// TOGGLE SOUND
-// ============================================================
 async function toggleSound() {
   initAudio();
-
   soundEnabled = !soundEnabled;
   localStorage.setItem('pixelFarmSound', soundEnabled);
   setSoundIcon();
-
   if (!soundEnabled) {
     stopAmbientLoop();
     stopMenuMusic();
-
-    if (audioCtx && audioCtx.state === 'running') {
-      try { await audioCtx.suspend(); } catch(e) {}
-    }
+    if (audioCtx && audioCtx.state === 'running') { try { await audioCtx.suspend(); } catch(e) {} }
     return;
   }
-
   await enableAudio();
+  if (audioCtx && audioCtx.state !== 'running') { try { await audioCtx.resume(); } catch(e) {} }
+  if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) playMenuMusic();
+  if (gameRunning && !gameOver && ambientEnabled) startAmbientLoop();
+  setTimeout(() => { if (soundEnabled && audioCtx && audioCtx.state === 'running' && sfxEnabled) playSound('buttonClick', 0.15); }, 50);
+}
 
-  if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) {
-    playMenuMusic();
-  }
+function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  localStorage.setItem('pixelFarmMusicEnabled', musicEnabled);
+  const btn = document.getElementById('toggleMusicBtn');
+  if (btn) btn.textContent = musicEnabled ? 'ON' : 'OFF';
+  if (musicGain) musicGain.gain.value = musicEnabled ? musicVolume : 0;
+  if (!musicEnabled && musicPlaying) stopMenuMusic();
+  else if (musicEnabled && !musicPlaying && titleScr && !titleScr.classList.contains('hidden') && audioAllowed && soundEnabled) playMenuMusic();
+}
 
-  if (gameRunning && !gameOver) {
-    startAmbientLoop();
-  }
+function toggleSfx() {
+  sfxEnabled = !sfxEnabled;
+  localStorage.setItem('pixelFarmSfxEnabled', sfxEnabled);
+  const btn = document.getElementById('toggleSfxBtn');
+  if (btn) btn.textContent = sfxEnabled ? 'ON' : 'OFF';
+  if (sfxEnabled && soundEnabled && audioCtx && audioCtx.state === 'running') playSound('buttonClick', 0.15);
+}
+
+function toggleAmbient() {
+  ambientEnabled = !ambientEnabled;
+  localStorage.setItem('pixelFarmAmbientEnabled', ambientEnabled);
+  const btn = document.getElementById('toggleAmbientBtn');
+  if (btn) btn.textContent = ambientEnabled ? 'ON' : 'OFF';
+  if (!ambientEnabled) stopAmbientLoop();
+  else if (ambientEnabled && gameRunning && !gameOver && audioAllowed && soundEnabled) startAmbientLoop();
 }
 
 // ============================================================
@@ -1147,13 +1261,9 @@ window.addEventListener('pointerdown', enableAudio);
 document.addEventListener('keydown', enableAudio);
 document.addEventListener('touchstart', enableAudio, { passive: true });
 
-// ============================================================
-// INIT
-// ============================================================
 initAudio();
 setSoundIcon();
-updateVolumeSliders();
-
+updateSoundButtonsUI();
 
 // ============================================================
 // ОНЛАЙН-СИСТЕМА
@@ -1161,10 +1271,13 @@ updateVolumeSliders();
 let onlineUsersCount = 0, presenceUnsubscribe = null;
 let gameUserId = localStorage.getItem('gameUserId') || ('game_' + Date.now() + '_' + Math.random().toString(36).substr(2,6));
 localStorage.setItem('gameUserId', gameUserId);
+
 function updateAllOnlineIndicators(count) {
   ['menuOnlineCount', 'gameOnlineCount', 'gameOverOnlineCount', 'leaderboardOnlineCount'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = count; });
-  ['onlineLabel', 'gameOnlineLabel', 'gameOverOnlineLabel', 'leaderboardOnlineLabel'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = t.onlineLabel; });
+  const bottomOnline = document.getElementById('gameOnlineCount');
+  if (bottomOnline) bottomOnline.textContent = count;
 }
+
 function startGamePresence() {
   if (!userNick || !isUserRegistered) return;
   const presenceRef = doc(db, "presence", gameUserId);
@@ -1173,26 +1286,33 @@ function startGamePresence() {
       setDoc(presenceRef, { userId: gameUserId, nickname: userNick, lastSeen: serverTimestamp(), isActive: true, type: 'game' }, { merge: true }).catch(console.warn);
     }
   }, 30000);
-  const presenceQuery = query(collection(db, "presence"), where("isActive", "==", true));
-  presenceUnsubscribe = onSnapshot(presenceQuery, (snapshot) => {
-    const now = Date.now();
-    let count = 0;
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const lastSeen = data.lastSeen?.toMillis?.() || 0;
-      if (data.isActive && (now - lastSeen) < 60000 && data.nickname) count++;
-    });
-    onlineUsersCount = count;
-    updateAllOnlineIndicators(count);
-  });
 }
+
+// Глобальный слушатель онлайн
+const presenceQueryGlobal = query(collection(db, "presence"), where("isActive", "==", true));
+let globalPresenceUnsubscribe = onSnapshot(presenceQueryGlobal, (snapshot) => {
+  const now = Date.now();
+  let count = 0;
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const lastSeen = data.lastSeen?.toMillis?.() || 0;
+    if (data.isActive && (now - lastSeen) < 60000 && data.nickname) {
+      count++;
+    }
+  });
+  onlineUsersCount = count;
+  updateAllOnlineIndicators(count);
+}, (error) => {
+  console.warn("Online presence listener error:", error);
+});
+
 window.addEventListener('beforeunload', () => {
-  if (presenceUnsubscribe) presenceUnsubscribe();
+  if (globalPresenceUnsubscribe) globalPresenceUnsubscribe();
   if (gameUserId) setDoc(doc(db, "presence", gameUserId), { isActive: false, lastSeen: serverTimestamp() }, { merge: true });
 });
 
 // ============================================================
-// ПОЛЬЗОВАТЕЛЬСКАЯ РЕГИСТРАЦИЯ И ЛИДЕРЫ
+// ПОЛЬЗОВАТЕЛЬСКАЯ РЕГИСТРАЦИЯ И ЛИДЕРЫ (ОРИГИНАЛ)
 // ============================================================
 async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
 async function checkReg() { const status = document.getElementById("userStatusMain"); const nameSpan = document.getElementById("userName"); const statsSpan = document.getElementById("userStats"); if (!userNick) { status.innerHTML = t.register; nameSpan.innerHTML = "👤 Guest"; statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; isUserRegistered = false; makeLinks(); return false; } const ok = await ensureUser(); if (ok && isUserRegistered) { const best = Math.max(localBestScore, userFirebaseScore); status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; nameSpan.innerHTML = `👤 ${userNick}`; statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; makeLinks(); return true; } return false; }
@@ -1227,17 +1347,17 @@ function applyTranslations() {
   const historyDiv = document.getElementById('historyText');
   if (historyDiv) historyDiv.innerHTML = `<p>Welcome to Pixel Farm Runner! Collect BelkaCoins, buy skins, backgrounds and maps, and set new records. Good luck!</p>`;
   const rulesDiv = document.getElementById('rulesList');
-  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 4 backgrounds!</li></ul>`;
+  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> Day1:+5, Day2-6:+3, Day7:+3 +🌙 Night, Day14:+3 +🎁 Aurora!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 6 backgrounds!</li></ul>`;
   const sponsor = document.getElementById('sponsorLine');
   if (sponsor) sponsor.innerHTML = t.rulesSponsor.replace(/\n/g, '<br>').replace(/bellariofilms\.com/g, '<strong class="register-link">bellariofilms.com</strong>');
   makeLinks();
   updateDailyUI();
   updateMenuCoins();
 }
-applyTranslations(); updateCoins(); checkDaily(); setSoundIcon(); updateVolumeSliders(); applySelectedBackground();
+applyTranslations(); updateCoins(); updateDailyUI(); setSoundIcon(); updateSoundButtonsUI(); applySelectedBackground();
 
 // ============================================================
-// ИГРОВАЯ ЛОГИКА (ФИЗИКА, ПРЕПЯТСТВИЯ, БОНУСЫ) — С ИСПРАВЛЕНИЯМИ
+// ИГРОВАЯ ЛОГИКА
 // ============================================================
 let W, H, dpr = Math.max(1, Math.min(devicePixelRatio||1,2));
 function resize() { W = innerWidth; H = innerHeight; canvas.width = Math.floor(W*dpr); canvas.height = Math.floor(H*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); }
@@ -1258,38 +1378,71 @@ let last100Reward = 0, last500Reward = 0;
 let worldObjects = [];
 let obsTimer = 0, powTimer = 0, goldTimer = 0;
 
-// ============================================================
-// НОВАЯ ФУНКЦИЯ ДЛЯ ЕГИПЕТСКИХ БЛОКОВ
-// ============================================================
 function drawEgyptianBlock(x, y, size = 1) {
-  // Основной блок (каменный)
   px(x + 0, y + 0, 32 * size, 28 * size, '#c9b68b');
   px(x + 2*size, y + 2*size, 28*size, 24*size, '#b89f6a');
   px(x + 4*size, y + 4*size, 24*size, 20*size, '#a88952');
-  
-  // Иероглифы (пиксельные символы)
   px(x + 8*size, y + 8*size, 4*size, 4*size, '#7a5a3a');
   px(x + 12*size, y + 8*size, 3*size, 4*size, '#7a5a3a');
   px(x + 16*size, y + 8*size, 4*size, 4*size, '#7a5a3a');
   px(x + 20*size, y + 8*size, 3*size, 4*size, '#7a5a3a');
-  
   px(x + 8*size, y + 14*size, 3*size, 5*size, '#7a5a3a');
   px(x + 12*size, y + 14*size, 4*size, 5*size, '#7a5a3a');
   px(x + 17*size, y + 14*size, 3*size, 5*size, '#7a5a3a');
   px(x + 21*size, y + 14*size, 4*size, 5*size, '#7a5a3a');
-  
   px(x + 10*size, y + 20*size, 4*size, 3*size, '#7a5a3a');
   px(x + 15*size, y + 20*size, 4*size, 3*size, '#7a5a3a');
   px(x + 20*size, y + 20*size, 4*size, 3*size, '#7a5a3a');
-  
-  // Трещины и текстура
   px(x + 6*size, y + 12*size, 2*size, 8*size, '#6a4a2a');
   px(x + 24*size, y + 16*size, 2*size, 6*size, '#6a4a2a');
 }
 
-// ============================================================
-// ДЕКОРАТИВНЫЕ ОБЪЕКТЫ (ДОМА, ДЕРЕВЬЯ, МЕЛЬНИЦЫ)
-// ============================================================
+function drawPixelWell(x, y, size = 1) {
+  const pxX = Math.round(x);
+  const pxY = Math.round(y);
+  const s = size;
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if (i === 0 && j === 0) continue;
+      px(pxX + i, pxY + j, 1*s, 1*s, '#ffd93b');
+    }
+  }
+  const stoneColors = ["#e0e0e0", "#cfcfcf", "#bdbdbd"];
+  for (let i = 0; i < 32; i++) {
+    let xOff = 16 + Math.sin(i)*6;
+    let yOff = 20 + Math.cos(i)*3;
+    px(pxX + Math.round(xOff * s), pxY + Math.round(yOff * s), 1*s, 1*s, stoneColors[i % 3]);
+  }
+  for (let yOff = 16; yOff < 20; yOff++) {
+    for (let xOff = 10; xOff < 22; xOff++) {
+      px(pxX + xOff * s, pxY + yOff * s, 1*s, 1*s, "#1a1a1a");
+    }
+  }
+  for (let yOff = 4; yOff < 20; yOff++) {
+    px(pxX + 10 * s, pxY + yOff * s, 1*s, 1*s, "#7a3f1a");
+    px(pxX + 21 * s, pxY + yOff * s, 1*s, 1*s, "#7a3f1a");
+    px(pxX + 10 * s, pxY + (yOff+1) * s, 1*s, 1*s, "#5c2f14");
+    px(pxX + 21 * s, pxY + (yOff+1) * s, 1*s, 1*s, "#5c2f14");
+  }
+  for (let xOff = 8; xOff < 24; xOff++) {
+    px(pxX + xOff * s, pxY + 3 * s, 1*s, 1*s, "#ff4d4d");
+    px(pxX + xOff * s, pxY + 2 * s, 1*s, 1*s, "#cc3333");
+    if (xOff % 2 === 0) px(pxX + xOff * s, pxY + 1 * s, 1*s, 1*s, "#aa2222");
+  }
+  for (let xOff = 11; xOff < 21; xOff++) {
+    px(pxX + xOff * s, pxY + 6 * s, 1*s, 1*s, "#8b5a2b");
+  }
+  for (let yOff = 7; yOff < 12; yOff++) {
+    px(pxX + 16 * s, pxY + yOff * s, 1*s, 1*s, "#e8b870");
+  }
+  px(pxX + 15 * s, pxY + 12 * s, 1*s, 1*s, "#ccaa77");
+  px(pxX + 16 * s, pxY + 12 * s, 1*s, 1*s, "#aa8866");
+  px(pxX + 17 * s, pxY + 12 * s, 1*s, 1*s, "#ccaa77");
+  px(pxX + 15 * s, pxY + 13 * s, 1*s, 1*s, "#886644");
+  px(pxX + 16 * s, pxY + 13 * s, 1*s, 1*s, "#775533");
+  px(pxX + 17 * s, pxY + 13 * s, 1*s, 1*s, "#886644");
+}
+
 function drawCactus(x, y, size = 1) {
   px(x + 4*size, y + 20*size, 6*size, 28*size, '#5a8f4c');
   px(x + 2*size, y + 16*size, 4*size, 8*size, '#6aa35a');
@@ -1302,7 +1455,6 @@ function drawRock(x, y, size = 1) {
   px(x + 2*size, y + 4*size, 8*size, 6*size, '#9b6a3a');
   px(x + 4*size, y, 4*size, 6*size, '#7c5a3a');
 }
-// ПУСТЫННЫЙ ДОМ
 function drawDesertHouse(x, y, s, hasLaundry = false) {
   px(x + 0*s, y + 20*s, 60*s, 40*s, '#c9945e');
   px(x + 5*s, y + 12*s, 50*s, 10*s, '#b87a4a');
@@ -1318,7 +1470,6 @@ function drawDesertHouse(x, y, s, hasLaundry = false) {
     px(x + 34*s, y - 8*s, 8*s, 8*s, '#f3b33d');
   }
 }
-// ПУСТЫННАЯ МЕЛЬНИЦА
 function drawDesertWindmill(x, y, angle, s=1) {
   px(x + 15*s, y + 40*s, 30*s, 60*s, '#b87a4a');
   px(x + 18*s, y + 35*s, 24*s, 8*s, '#9b6a3a');
@@ -1417,9 +1568,6 @@ function updateWorldObjects() {
   }
 }
 
-// ============================================================
-// ЭФФЕКТЫ (ПЫЛЬЦА, СВЕТЛЯЧКИ, НЕБО)
-// ============================================================
 function startPollen() {
   if (pollenInterval) clearInterval(pollenInterval);
   pollenInterval = setInterval(() => {
@@ -1478,9 +1626,6 @@ function setupWorld() {
 }
 setupWorld(); createFireflyCont(); startPollen();
 
-// ============================================================
-// ПРЕПЯТСТВИЯ (КАКТУСЫ, ЗАБОРЫ, ЕГИПЕТСКИЕ БЛОКИ)
-// ============================================================
 function drawCactusObstacle(x, y, size=1) {
   px(x+10*size, y+8*size, 10*size, 32*size, '#3a7a2a');
   px(x+8*size, y+12*size, 4*size, 12*size, '#4a8f3a');
@@ -1516,7 +1661,6 @@ function drawFenceObstacle(x, y) {
 function spawnObstacle() {
   const currentMap = getCurrentMap();
   if(currentMap.theme === 'desert') {
-    // Пустынные препятствия: кактусы, заборы, египетские блоки
     const types = ['cactus_small','cactus_medium','cactus_large','fence','egyptian_block'];
     const type = types[Math.floor(Math.random()*types.length)];
     let w, h, y;
@@ -1529,7 +1673,6 @@ function spawnObstacle() {
       h = 48;
       y = ground.y - 48;
     } else {
-      // Египетский блок
       w = 36;
       h = 32;
       y = ground.y - h + 4;
@@ -1538,7 +1681,7 @@ function spawnObstacle() {
   } else {
     const types = ['hay','fence','sheep','cart','well','pond','stone','sheep_well','well_pond','bucket_well'];
     let r=Math.random(), type;
-    if(r<0.28) type='hay'; else if(r<0.42) type='fence'; else if(r<0.52) type='sheep'; else if(r<0.62) type='cart'; else if(r<0.71) type='well'; else if(r<0.78) type='pond'; else if(r<0.84) type='stone'; else if(r<0.9) type='sheep_well'; else if(r<0.96) type='well_pond'; else type='bucket_well';
+    if(r<0.28) type='hay'; else if(r<0.42) type='fence'; else if(r<0.52) type='sheep'; else if(r<0.62) type='cart'; else if(r<0.65) type='well'; else if(r<0.72) type='pond'; else if(r<0.78) type='stone'; else if(r<0.84) type='sheep_well'; else if(r<0.9) type='well_pond'; else type='bucket_well';
     let ob;
     switch(type){
       case 'hay': ob={type, x:W+60, y:ground.y-38, w:38, h:38, counted:false}; break;
@@ -1556,9 +1699,6 @@ function spawnObstacle() {
   }
 }
 
-// ============================================================
-// ИГРОВОЙ ЦИКЛ (ОСНОВНАЯ ЛОГИКА) — ОСТАЁТСЯ БЕЗ ИЗМЕНЕНИЙ
-// ============================================================
 function startCountdown() {
   countdownOverlay.style.display = 'flex';
   const steps = ['3','2','1','GO!'];
@@ -1582,10 +1722,53 @@ function togglePause(force=null) {
     stopAmbientLoop();
   } else {
     gamePaused=false; gameRunning=true; pauseOverlay.style.display='none'; pauseBtn.textContent='⏸ PAUSE';
-    startAmbientLoop();
+    if(ambientEnabled) startAmbientLoop();
   }
 }
-function performJump() { if(!gameRunning || gameOver || gamePaused) return; if(player.grounded) { player.vy=player.jumpPower; player.grounded=false; player.doubleJumpAvailable=true; player.doubleJumpUsed=false; createDust(player.x+10, ground.y-8,6); playSound('jump'); } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { player.vy=player.jumpPower*0.85; player.doubleJumpUsed=true; player.doubleJumpAvailable=false; player.doubleJumpAnim=6; createDust(player.x+20, player.y+20,8); playSound('doubleJump'); } }
+function performJump() { 
+  if(!gameRunning || gameOver || gamePaused) return; 
+  if(player.grounded) { 
+    player.vy=player.jumpPower; 
+    player.grounded=false; 
+    player.doubleJumpAvailable=true; 
+    player.doubleJumpUsed=false; 
+    createDust(player.x+10, ground.y-8,6); 
+    playSound('jump'); 
+    if (selectedSkin === 'alisa') {
+      for (let i = 0; i < 8; i++) {
+        particles.push({
+          x: player.x + player.w/2,
+          y: player.y + player.h - 10,
+          vx: rand(-2, 2),
+          vy: rand(-3, -1),
+          size: rand(2, 4),
+          life: rand(15, 25),
+          color: ['#9b59b6', '#e84393', '#c39bd3', '#d291bc'][Math.floor(Math.random()*4)]
+        });
+      }
+    }
+  } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { 
+    player.vy=player.jumpPower*0.85; 
+    player.doubleJumpUsed=true; 
+    player.doubleJumpAvailable=false; 
+    player.doubleJumpAnim=6; 
+    createDust(player.x+20, player.y+20,8); 
+    playSound('doubleJump'); 
+    if (selectedSkin === 'alisa') {
+      for (let i = 0; i < 12; i++) {
+        particles.push({
+          x: player.x + player.w/2,
+          y: player.y + player.h/2,
+          vx: rand(-3, 3),
+          vy: rand(-4, -1),
+          size: rand(2, 5),
+          life: rand(20, 30),
+          color: ['#9b59b6', '#e84393', '#c39bd3', '#d291bc'][Math.floor(Math.random()*4)]
+        });
+      }
+    }
+  } 
+}
 function startGame() {
   titleScr.classList.add('hidden'); gameOverScr.classList.add('hidden'); rulesModal.classList.add('hidden'); historyModal.style.display='none';
   pauseOverlay.style.display='none'; shopModal.style.display='none';
@@ -1599,19 +1782,103 @@ function endGame() {
   if(score>bestScore) { bestScore=score; localStorage.setItem('pixelFarmBest',bestScore); bestEl.textContent=`${t.bestLabel} ${bestScore}`; if(!recBonus) { addCoins(15,W/2,H/2); showAchievementQueued(`🏆 NEW RECORD! +15 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins 🏆`,true); recBonus=true; } }
   if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic();
 }
+
 startBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
 restartBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
 menuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); gameOverScr.classList.add('hidden'); titleScr.classList.remove('hidden'); timeOfDay=800; updateSky(); pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic(); });
-rulesBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesModal.classList.remove('hidden'); });
+rulesBtn.addEventListener('click',()=>{ 
+  playSound('buttonClick',0.25); 
+  rulesModal.classList.remove('hidden');
+  rulesModal.style.display = 'flex';
+  rulesModal.style.alignItems = 'center';
+  rulesModal.style.justifyContent = 'center';
+});
 closeRules.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesModal.classList.add('hidden'); });
 leaderBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); loadLeaderboard("leaderboardList",true); leaderModal.style.display='flex'; });
 closeLeader.addEventListener('click',()=>{ playSound('buttonClick',0.25); leaderModal.style.display='none'; });
 resumeBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); });
 pauseMenuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); gameOverScr.classList.remove('hidden'); titleScr.classList.add('hidden'); gameRunning=false; gameOver=true; pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic(); });
 pauseBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(); });
-shopBtnMain.addEventListener('click',()=>{ playSound('buttonClick',0.25); renderShop(); switchShopTab('skins'); shopModal.style.display='flex'; });
+historyBtnMain.addEventListener('click',()=>{ 
+  playSound('buttonClick',0.25); 
+  const historyTextDiv = document.getElementById('historyText');
+  if (historyTextDiv) {
+    historyTextDiv.innerHTML = '<p>📜 Здесь будет История игры. Скоро здесь появятся ваши достижения и игровая статистика!</p>';
+  }
+  historyModal.style.display = 'flex';
+  historyModal.style.alignItems = 'center';
+  historyModal.style.justifyContent = 'center';
+});
+closeHistoryBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); historyModal.style.display='none'; });
+
+const toggleMusicBtn = document.getElementById('toggleMusicBtn');
+const toggleSfxBtn = document.getElementById('toggleSfxBtn');
+const toggleAmbientBtn = document.getElementById('toggleAmbientBtn');
+if (toggleMusicBtn) toggleMusicBtn.addEventListener('click', () => { playSound('buttonClick', 0.15); toggleMusic(); });
+if (toggleSfxBtn) toggleSfxBtn.addEventListener('click', () => { playSound('buttonClick', 0.15); toggleSfx(); });
+if (toggleAmbientBtn) toggleAmbientBtn.addEventListener('click', () => { playSound('buttonClick', 0.15); toggleAmbient(); });
+
+function initShopScrollHint() {
+  const shopGrids = ['shopSkinsGrid', 'shopMapsGrid', 'shopBackgroundsGrid'];
+  const scrollHint = document.querySelector('#shopModal .scroll-hint');
+  if (!scrollHint) return;
+  let hintHidden = false;
+  let globalTouchHandler = null;
+  const hideHint = () => {
+    if (!hintHidden) {
+      scrollHint.classList.add('hidden');
+      hintHidden = true;
+      shopGrids.forEach(gridId => {
+        const grid = document.getElementById(gridId);
+        if (grid) {
+          grid.removeEventListener('scroll', hideHint);
+          grid.removeEventListener('touchstart', hideHint);
+          grid.removeEventListener('wheel', hideHint);
+        }
+      });
+      const shopModalElem = document.getElementById('shopModal');
+      if (shopModalElem && globalTouchHandler) {
+        shopModalElem.removeEventListener('touchstart', globalTouchHandler);
+      }
+    }
+  };
+  globalTouchHandler = (e) => {
+    if (e.target.closest('.shop-grid')) hideHint();
+  };
+  shopGrids.forEach(gridId => {
+    const grid = document.getElementById(gridId);
+    if (grid) {
+      grid.addEventListener('scroll', hideHint);
+      grid.addEventListener('touchstart', hideHint);
+      grid.addEventListener('wheel', hideHint);
+    }
+  });
+  const shopModalElem = document.getElementById('shopModal');
+  if (shopModalElem) {
+    shopModalElem.addEventListener('touchstart', globalTouchHandler);
+  }
+}
+
+shopBtnMain.addEventListener('click',()=>{ 
+  playSound('buttonClick',0.25); 
+  renderShop(); 
+  switchShopTab('skins'); 
+  shopModal.style.display='flex';
+  setTimeout(initShopScrollHint, 100);
+});
 closeShopBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); shopModal.style.display='none'; });
 document.querySelectorAll('.shop-tab').forEach(tab=>{ tab.addEventListener('click',()=>switchShopTab(tab.dataset.tab)); });
+muteBtn.addEventListener('click', () => {
+  playSound('buttonClick', 0.2);
+  toggleSound();
+});
+
+if (dailyBtn) {
+  dailyBtn.addEventListener('click', () => {
+    playSound('buttonClick', 0.25);
+    claimDaily();
+  });
+}
 
 window.addEventListener('keydown',e=>{
   if(e.code==='KeyP'||e.code==='Escape'){ e.preventDefault(); if(!titleScr.classList.contains('hidden')&&!gameOver){ playSound('buttonClick',0.2); togglePause(); } return; }
@@ -1622,7 +1889,27 @@ window.addEventListener('pointerdown',()=>{ if(gameRunning&&!gameOver&&!gamePaus
 function rand(a,b){ return Math.random()*(b-a)+a; }
 function rectsCollide(a,b){ return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
 function createDust(x,y,c=5){ for(let i=0;i<c;i++) particles.push({x,y,vx:rand(-2,2),vy:rand(-2,-0.4),size:rand(3,5),life:rand(20,30),color:['#f2c879','#c98a3d'][Math.floor(Math.random()*2)]}); }
-function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); addCoins(2,player.x+player.w/2,player.y+player.h/2); createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } }
+function applyHorseshoe() { 
+  invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); 
+  addCoins(2,player.x+player.w/2,player.y+player.h/2); 
+  createDust(player.x+player.w/2,player.y+player.h/2,10); 
+  horseCount++; 
+  if (selectedSkin === 'alisa') {
+    for (let i = 0; i < 15; i++) {
+      particles.push({
+        x: player.x + player.w/2,
+        y: player.y + player.h/2,
+        vx: rand(-3, 3),
+        vy: rand(-4, -1),
+        size: rand(2, 5),
+        life: rand(20, 35),
+        color: ['#9b59b6', '#e84393', '#c39bd3'][Math.floor(Math.random()*3)]
+      });
+    }
+  }
+  if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } 
+  if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } 
+}
 function applyGoldenCoin(x,y) { addCoins(25,x,y); showAchievementQueued(`🪙 GOLDEN COIN! +25 BelkaCoins 🪙`,true); createDust(x,y,15); playSound('horseshoe'); }
 function splashEffect(x,y) { for(let i=0;i<8;i++) particles.push({x:x+rand(-10,30), y:y+rand(-5,15), vx:rand(-2,2), vy:rand(-1,3), size:rand(2,4), life:rand(15,25), color:'#7ac4ff'}); playSound('horseshoe'); }
 
@@ -1662,13 +1949,17 @@ function update() {
       if(!invincible) { createDust(player.x+player.w/2,player.y+player.h/2,12); endGame(); break; }
     }
   }
-  for(let i=0;i<obstacles.length;i++) { if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { obstacles[i].counted=true; obsPassed++; if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } } }
+  for(let i=0;i<obstacles.length;i++) { 
+    if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { 
+      obstacles[i].counted=true; 
+      obsPassed++; 
+      if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } 
+      if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } 
+    } 
+  }
   cloudTimer++; if(cloudTimer>=200) { cloudTimer=0; cloudHue=(cloudHue+20)%360; }
 }
 
-// ============================================================
-// ОТРИСОВКА (RENDER)
-// ============================================================
 function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
 
 function drawMountainsAndForest() {
@@ -1723,7 +2014,53 @@ function drawGround() {
   if(ground.y+ground.h<H) px(0, ground.y+ground.h, W, H-(ground.y+ground.h), currentMap.groundShadow);
 }
 
-function drawPlayer() { const skin=getCurrentSkin(); const x=player.x, y=player.y, bounce=player.grounded?Math.sin(frame*0.3)*1:0; if(invincible && (Math.floor(Date.now()/80)%2===0)){ ctx.fillStyle='rgba(255,215,0,0.4)'; ctx.fillRect(x-4,y-4,player.w+8,player.h+8); } if(player.doubleJumpAnim>0){ ctx.fillStyle='rgba(255,255,200,0.5)'; ctx.fillRect(x-2,y+36,player.w+4,10); } if(invincible && invBar>0){ const barX=x+player.w/2-invBar/2, barY=y-10; ctx.fillStyle='#ffd966'; ctx.fillRect(barX,barY,invBar,3); ctx.strokeStyle='#b8860b'; ctx.strokeRect(barX,barY,invBar,3); } px(x+16, y+22+bounce, 38,22, skin.palette.body); px(x+20, y+16+bounce, 30,10, skin.palette.body2); px(x+48, y+12+bounce, 14,12, skin.palette.body); px(x+56, y+8+bounce, 14,16, skin.palette.body); px(x+62, y+14+bounce, 8,6, skin.palette.face); px(x+50, y+6+bounce, 6,10, skin.palette.mane); px(x+44, y+8+bounce, 6,8, skin.palette.mane); px(x+40, y+10+bounce, 5,8, skin.palette.mane); px(x+54, y+4+bounce, 5,10, skin.palette.mane); px(x+62, y+2+bounce, 3,6, skin.palette.leg); px(x+66, y+3+bounce, 3,6, skin.palette.leg); px(x+62, y+14+bounce, 3,3, '#111'); px(x+5, y+28+bounce, 6,10, skin.palette.mane); px(x+1, y+32+bounce, 5,8, skin.palette.leg); px(x+6, y+36+bounce, 5,6, skin.palette.mane); if(player.legFrame===0){ px(x+20, y+42+bounce, 6,14, skin.palette.leg); px(x+32, y+44+bounce, 6,12, skin.palette.leg); px(x+44, y+42+bounce, 6,14, skin.palette.leg); px(x+52, y+44+bounce, 6,12, skin.palette.leg); }else{ px(x+20, y+44+bounce, 6,12, skin.palette.leg); px(x+32, y+42+bounce, 6,14, skin.palette.leg); px(x+44, y+44+bounce, 6,12, skin.palette.leg); px(x+52, y+42+bounce, 6,14, skin.palette.leg); } px(x+20, y+54+bounce, 6,3, '#f1e7d2'); px(x+32, y+54+bounce, 6,3, '#f1e7d2'); px(x+44, y+54+bounce, 6,3, '#f1e7d2'); px(x+52, y+54+bounce, 6,3, '#f1e7d2'); }
+function drawPlayer() { 
+  const skin = getCurrentSkin(); 
+  const x = player.x, y = player.y, bounce = player.grounded?Math.sin(frame*0.3)*1:0; 
+  if(invincible && (Math.floor(Date.now()/80)%2===0)){ ctx.fillStyle='rgba(255,215,0,0.4)'; ctx.fillRect(x-4,y-4,player.w+8,player.h+8); } 
+  if(player.doubleJumpAnim>0){ ctx.fillStyle='rgba(255,255,200,0.5)'; ctx.fillRect(x-2,y+36,player.w+4,10); } 
+  if(invincible && invBar>0){ const barX=x+player.w/2-invBar/2, barY=y-10; ctx.fillStyle='#ffd966'; ctx.fillRect(barX,barY,invBar,3); ctx.strokeStyle='#b8860b'; ctx.strokeRect(barX,barY,invBar,3); } 
+  if (selectedSkin === 'alisa') {
+    const glowIntensity = (Math.sin(Date.now() / 200) + 1) / 2 * 0.6 + 0.3;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = `rgba(233, 67, 147, ${glowIntensity * 0.8})`;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  }
+  px(x+16, y+22+bounce, 38,22, skin.palette.body); 
+  px(x+20, y+16+bounce, 30,10, skin.palette.body2); 
+  px(x+48, y+12+bounce, 14,12, skin.palette.body); 
+  px(x+56, y+8+bounce, 14,16, skin.palette.body); 
+  px(x+62, y+14+bounce, 8,6, skin.palette.face); 
+  px(x+50, y+6+bounce, 6,10, skin.palette.mane); 
+  px(x+44, y+8+bounce, 6,8, skin.palette.mane); 
+  px(x+40, y+10+bounce, 5,8, skin.palette.mane); 
+  px(x+54, y+4+bounce, 5,10, skin.palette.mane); 
+  px(x+62, y+2+bounce, 3,6, skin.palette.leg); 
+  px(x+66, y+3+bounce, 3,6, skin.palette.leg); 
+  px(x+62, y+14+bounce, 3,3, '#111'); 
+  px(x+5, y+28+bounce, 6,10, skin.palette.mane); 
+  px(x+1, y+32+bounce, 5,8, skin.palette.leg); 
+  px(x+6, y+36+bounce, 5,6, skin.palette.mane); 
+  if(player.legFrame===0){ 
+    px(x+20, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+32, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+44, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+52, y+44+bounce, 6,12, skin.palette.leg); 
+  }else{ 
+    px(x+20, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+32, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+44, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+52, y+42+bounce, 6,14, skin.palette.leg); 
+  } 
+  px(x+20, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+32, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+44, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+52, y+54+bounce, 6,3, '#f1e7d2');
+  if (selectedSkin === 'alisa') {
+    ctx.shadowBlur = 0;
+  }
+}
 
 function drawObstacle(ob){
   ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(ob.x+3, ob.y+ob.h-3, ob.w-6,4);
@@ -1739,7 +2076,13 @@ function drawObstacle(ob){
     else if(ob.type==='fence'){ px(ob.x+3, ob.y+6,6,38,'#8a5526'); px(ob.x+19, ob.y+0,6,44,'#8a5526'); px(ob.x+35, ob.y+8,6,36,'#8a5526'); px(ob.x+0, ob.y+14,50,6,'#b77935'); px(ob.x+0, ob.y+26,50,6,'#b77935'); }
     else if(ob.type==='sheep'){ px(ob.x+8, ob.y+6,30,18,'#f5f1ea'); px(ob.x+0, ob.y+12,12,10,'#2f2f2f'); px(ob.x+3, ob.y+6,6,6,'#2f2f2f'); px(ob.x+10, ob.y+24,3,8,'#2f2f2f'); px(ob.x+20, ob.y+24,3,8,'#2f2f2f'); px(ob.x+30, ob.y+24,3,8,'#2f2f2f'); }
     else if(ob.type==='cart'){ px(ob.x, ob.y+10, ob.w,24,'#b87c3a'); px(ob.x+6, ob.y,46,14,'#d49b5c'); px(ob.x+16, ob.y+24,10,26,'#8b5a2b'); px(ob.x+42, ob.y+24,10,26,'#8b5a2b'); px(ob.x+3, ob.y+38,54,12,'#6b3e1a'); }
-    else if(ob.type==='well'){ px(ob.x+10, ob.y+6,20,28,'#7c5e3a'); px(ob.x+6, ob.y+24,28,10,'#9b7a4a'); px(ob.x+16, ob.y,6,10,'#5a3e1a'); px(ob.x+24, ob.y+10,3,18,'#3a2a12'); }
+    else if(ob.type==='well'){ 
+      if (currentMap.id === 'farm') {
+        drawPixelWell(ob.x, ob.y - 8, 0.55);
+      } else {
+        px(ob.x+10, ob.y+6,20,28,'#7c5e3a'); px(ob.x+6, ob.y+24,28,10,'#9b7a4a'); px(ob.x+16, ob.y,6,10,'#5a3e1a'); px(ob.x+24, ob.y+10,3,18,'#3a2a12');
+      }
+    }
     else if(ob.type==='pond'){ px(ob.x-4, ob.y+4, ob.w+8,6,'#7c5e3a'); px(ob.x, ob.y+4, ob.w,6,'#5aa9dd'); for(let i=0;i<4;i++) px(ob.x+6+i*12, ob.y+8,3,3,'#7ac4ff'); px(ob.x+10, ob.y+6,5,2,'#6b8c3a'); px(ob.x+32, ob.y+6,4,2,'#6b8c3a'); }
     else if(ob.type==='stone'){ px(ob.x, ob.y, ob.w, ob.h, '#6b5a4a'); px(ob.x+3, ob.y+3, ob.w-6, ob.h-6, '#8c7a64'); }
     else if(ob.type==='sheep_well'){ px(ob.x+8, ob.y+12,32,20,'#f5f1ea'); px(ob.x+28, ob.y+8,12,12,'#f5f1ea'); px(ob.x+34, ob.y+12,4,4,'#2f2f2f'); px(ob.x+12, ob.y+28,4,6,'#2f2f2f'); px(ob.x+20, ob.y+28,4,6,'#2f2f2f'); px(ob.x+28, ob.y+28,4,6,'#2f2f2f'); px(ob.x+36, ob.y+28,4,6,'#2f2f2f'); px(ob.x+46, ob.y+18,16,24,'#7c5e3a'); px(ob.x+50, ob.y+12,8,6,'#9b7a4a'); px(ob.x+54, ob.y+32,4,8,'#5a3e1a'); }
@@ -1752,46 +2095,33 @@ function drawParticles(){ particles.forEach(p=>px(p.x,p.y,p.size,p.size,p.color)
 
 function render() {
   ctx.clearRect(0,0,W,H);
-  
-  // 1. НЕБО — заливка на всю высоту до земли
   const skyGrad=getSkyGrad();
   ctx.fillStyle=skyGrad;
   ctx.fillRect(0,0,W,ground.y);
-  
-  // 2. ГОРЫ И ЛЕС
   drawMountainsAndForest();
-  
-  // 3. ОБЛАКА, ПТИЦЫ, САМОЛЁТ
   clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
   birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
   drawPlane(plane.x,plane.y);
   
-  // 4. СОЛНЦЕ / ЛУНА (только для пустыни)
   const currentMapSun = getCurrentMap();
   if (currentMapSun.theme === 'desert') {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     const celestialX = 80, celestialY = 70;
-    
     if (!isNight) {
-      // ДЕНЬ: СОЛНЦЕ
       const pulse = 0.85 + Math.sin(Date.now() / 700) * 0.1;
       const alphaPulse = 0.25 + Math.sin(Date.now() / 600) * 0.12;
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 52 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 220, 100, ${alphaPulse * 0.6})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 44 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 200, 80, ${alphaPulse * 0.8})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 36 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 180, 60, ${alphaPulse})`;
       ctx.fill();
-      
       for(let sy=0; sy<40; sy++){
         for(let sx=0; sx<40; sx++){
           let dx=celestialX-20+sx, dy=celestialY-20+sy;
@@ -1802,33 +2132,26 @@ function render() {
           ctx.fillRect(dx,dy,1,1);
         }
       }
-      
       for(let bx=0; bx<6; bx++) for(let by=0; by<6; by++){
         if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffdd';
         else continue;
         ctx.fillRect(celestialX-3+bx, celestialY-3+by, 1,1);
       }
-      
     } else {
-      // НОЧЬ: ЛУНА
       const moonPulse = 0.88 + Math.sin(Date.now() / 900) * 0.08;
       const moonAlphaPulse = 0.2 + Math.sin(Date.now() / 800) * 0.1;
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 48 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(200, 220, 255, ${moonAlphaPulse * 0.5})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 40 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(180, 200, 240, ${moonAlphaPulse * 0.7})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 32 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(160, 180, 220, ${moonAlphaPulse})`;
       ctx.fill();
-      
       for(let sy=0; sy<36; sy++){
         for(let sx=0; sx<36; sx++){
           let dx=celestialX-18+sx, dy=celestialY-18+sy;
@@ -1839,7 +2162,6 @@ function render() {
           ctx.fillRect(dx,dy,1,1);
         }
       }
-      
       for(let bx=0; bx<5; bx++) for(let by=0; by<5; by++){
         if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffff';
         else continue;
@@ -1848,7 +2170,6 @@ function render() {
     }
   }
   
-  // ===== СЛОИ РАСТИТЕЛЬНОСТИ (ПОД ДОМАМИ И ДЕРЕВЬЯМИ) =====
   const currentMapLayer = getCurrentMap();
   let layerColor1, layerColor2;
   if (currentMapLayer.theme === 'desert') {
@@ -1863,19 +2184,13 @@ function render() {
   ctx.fillStyle = layerColor2;
   ctx.fillRect(0, ground.y - 110, W, 70);
   
-  // 5. ДЕКОРАТИВНЫЕ ОБЪЕКТЫ (ДОМА, ДЕРЕВЬЯ, КАКТУСЫ, МЕЛЬНИЦЫ) — ПОВЕРХ СЛОЁВ
   worldObjects.forEach(obj=>drawWorldObject(obj));
-  
-  // 6. ЗЕМЛЯ
   drawGround();
-  
-  // 7. ПРЕПЯТСТВИЯ, БОНУСЫ, ИГРОК, ЧАСТИЦЫ
   obstacles.forEach(drawObstacle);
   drawPowerups();
   drawPlayer();
   drawParticles();
   
-  // 8. ЭФФЕКТЫ
   ctx.fillStyle='rgba(0,0,0,0.05)';
   for(let y=0;y<H;y+=6) ctx.fillRect(0,y,W,1);
   let grd=ctx.createRadialGradient(W/2,H/2,H*0.15,W/2,H/2,H*0.8);
