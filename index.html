@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Pixel Farm Runner — Aurelia v.4.0</title>
+  <title>Pixel Farm Runner — Aurelia v.4.1</title>
   <style>
     * {
       box-sizing: border-box;
@@ -56,6 +56,7 @@
       font-family: 'Courier New', monospace;
       font-size: 18px;
       letter-spacing: 2px;
+      display: none;
     }
     #score, #best { display: inline-block; }
     #score { font-size: 34px; }
@@ -119,6 +120,7 @@
     #historyModal, #leaderboardModal, #rulesModal, #statsModal { display: none; }
     .panel {
       width: min(92vw, 520px);
+      max-height: 85vh;
       background: #0f0f12;
       border: 4px solid #ffd93b;
       padding: 20px 24px 28px;
@@ -126,8 +128,20 @@
       color: white;
       font-family: 'Courier New', monospace;
       position: relative;
-      overflow: visible;
+      overflow-y: auto;
+      overflow-x: hidden;
       box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+    }
+    .panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .panel::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 3px;
+    }
+    .panel::-webkit-scrollbar-thumb {
+      background: #ffd93b;
+      border-radius: 3px;
     }
     .scrollable-panel {
       max-height: 85vh;
@@ -214,7 +228,19 @@
       0%, 100% { opacity: 0.6; transform: scale(0.9); }
       50% { opacity: 1; transform: scale(1.1); }
     }
-    #gameOnlineIndicator { position: absolute; bottom: 20px; left: 20px; z-index: 10; }
+    #gameOnlineIndicator {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+      background: #1a1a1a;
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid #ffd93b;
+    }
     .btn {
       border: 3px solid #000;
       background: #ffd93b;
@@ -358,6 +384,40 @@
       min-height: 180px;
     }
     .shop-card.active { border-color: #3cff8b; box-shadow: 0 0 0 2px #3cff8b inset, 4px 4px 0 #000; }
+    @keyframes legendaryPulse {
+      0% { border-color: #ffd93b; box-shadow: 0 0 0 0 rgba(255, 217, 59, 0.4); }
+      50% { border-color: #ff6b6b; box-shadow: 0 0 20px 5px rgba(255, 107, 107, 0.6); }
+      100% { border-color: #ffd93b; box-shadow: 0 0 0 0 rgba(255, 217, 59, 0.4); }
+    }
+    .shop-card.legendary {
+      background: linear-gradient(135deg, #2a1a2a, #1a0a1a);
+      border-width: 3px;
+      animation: legendaryPulse 2s infinite;
+    }
+    .shop-card.legendary .shop-skin-name {
+      color: #ffaa33;
+      text-shadow: 0 0 5px #ff6b6b;
+      font-size: 14px;
+    }
+    .legendary-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff6b6b, #ffaa33);
+      color: #fff;
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    @keyframes newsPulse {
+      0% { opacity: 0.7; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); background: #6fbf5f; }
+      100% { opacity: 0.7; transform: scale(0.95); }
+    }
+    .shop-card .shop-skin-name span {
+      display: inline-block;
+      animation: newsPulse 1.2s infinite ease;
+    }
     .shop-skin-preview { width: 72px; height: 72px; margin: 0 auto 10px; border: 2px solid #000; background: #2a2a2a; position: relative; }
     .shop-skin-name { font-size: 12px; color: #ffd93b; margin-bottom: 6px; font-weight: bold; }
     .shop-skin-price { font-size: 11px; margin-bottom: 8px; }
@@ -395,6 +455,19 @@
       border-top: 2px solid #ffd93b;
       padding-top: 12px;
     }
+    .pixel-name {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffd93b;
+      text-shadow: 2px 2px 0 #000;
+      letter-spacing: 2px;
+      display: inline-block;
+      background: #1a1a1a;
+      padding: 4px 12px;
+      border: 2px solid #ffd93b;
+      margin-bottom: 8px;
+    }
     @media (max-width: 640px) {
       #ui { padding: 4px 12px; font-size: 12px; bottom: 65px; }
       #score { font-size: 28px; }
@@ -421,6 +494,7 @@
       .volume-sliders { padding: 6px 8px; }
       .shop-section-title { font-size: 14px; margin: 15px 0 5px; }
       .shop-tab { padding: 5px 10px; font-size: 11px; }
+      #gameOnlineIndicator { padding: 4px 10px; gap: 6px; }
     }
   </style>
 </head>
@@ -452,7 +526,7 @@
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
-      <div class="version" style="order: 6;">✨ v.4.0 — Новая статистика, ежедневные бонусы, пиксельный колодец, улучшенный звук ✨</div>
+      <div class="version" style="order: 6;">✨ v.4.1 — Уменьшенные окна, зелёный Wild West, улучшенная статистика ✨</div>
     </div>
   </div>
 
@@ -476,7 +550,18 @@
   <div id="leaderboardModal"><div class="panel small"><h2>🏆 LEADERBOARD</h2><div id="leaderboardList" class="leaderboard-list"><div>Loading...</div></div><div id="yourRank" style="margin:6px 0; font-size:10px;"></div><div class="online-wrapper" style="margin-top:8px;"><div id="leaderboardOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="leaderboardOnlineCount">0</span><span>online</span></div></div><button class="btn small" id="closeLeaderboardBtn">CLOSE</button></div></div>
   <div id="statsModal" class="hidden"><div class="panel scrollable-panel" style="position: relative; max-height: 80vh;"><h2>📊 PLAYER STATS</h2><div id="statsContent" style="text-align: left; margin: 16px 0;"></div><button class="btn small" id="closeStatsBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
 
-  <div id="gameOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="gameOnlineCount">0</span><span>online</span></div>
+  <div id="gameOnlineIndicator" class="online-pixel-box">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <div class="pixel-dot" style="width: 10px; height: 10px;"></div>
+      <span id="gameOnlineCount">0</span>
+      <span>online</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #ffd93b; padding-left: 12px;">
+      <div class="coin-icon-real" style="width: 14px; height: 14px;"></div>
+      <span id="gameCoinsIndicator">0</span>
+      <span>BelkaCoins</span>
+    </div>
+  </div>
   <button id="pauseBtn" class="hidden">⏸ PAUSE</button>
   <div id="countdownOverlay"><div id="countdownText">3</div></div>
   <div id="pauseOverlay"><div class="panel small"><h2>⏸ PAUSED</h2><p>Game is paused</p>
@@ -578,6 +663,15 @@ if (totalCoins === 0 && coins > 0) {
   localStorage.setItem('pixelFarmTotalCoins', totalCoins);
 }
 
+// АВТОГЕНЕРАЦИЯ НИКА
+if (!userNick) {
+  const gameUserId = localStorage.getItem('gameUserId');
+  if (gameUserId) {
+    userNick = 'Player_' + gameUserId.slice(-6);
+    localStorage.setItem('userNick', userNick);
+  }
+}
+
 // ============================================================
 // DOM ЭЛЕМЕНТЫ
 // ============================================================
@@ -622,14 +716,14 @@ const closeStatsBtn = document.getElementById('closeStatsBtn');
 // ============================================================
 const skins = {
   aurelia: { id: 'aurelia', name: 'Aurelia', price: 0, owned: true, palette: { body: '#b86a22', body2: '#d17c2d', mane: '#5b2d15', leg: '#7a3c17', face: '#f1d09a' } },
-  nocturna: { id: 'nocturna', name: 'Nocturna', price: 35, owned: false, palette: { body: '#2b2b2b', body2: '#3a3a3a', mane: '#0d0d0d', leg: '#1c1c1c', face: '#cfcfcf' } },
-  azurea: { id: 'azurea', name: 'Azurea', price: 50, owned: false, palette: { body: '#6f4dff', body2: '#8a6bff', mane: '#2d145b', leg: '#41218b', face: '#f2d8ff' } },
-  aurea: { id: 'aurea', name: 'Aurea', price: 80, owned: false, palette: { body: '#d4a017', body2: '#ffd966', mane: '#8a5f00', leg: '#9c7300', face: '#fff0b0' } },
-  viridia: { id: 'viridia', name: 'Viridia', price: 110, owned: false, palette: { body: '#3cb371', body2: '#2e8b57', mane: '#1e5a3a', leg: '#267c4a', face: '#c6ffb0' } },
-  rosalia: { id: 'rosalia', name: 'Rosalia', price: 140, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#b34e6e', leg: '#d96f8a', face: '#ffe0e6' } },
-  amethysta: { id: 'amethysta', name: 'Amethysta', price: 180, owned: false, palette: { body: '#aa6ff9', body2: '#8b4ee5', mane: '#4a1a8a', leg: '#6a32c2', face: '#e5ccff' } },
-  alisa: { id: 'alisa', name: 'Alisa', price: 250, owned: false, palette: { body: '#c084fc', body2: '#f9a8d4', mane: '#7e22ce', leg: '#c2410c', face: '#ffe6f0' } },
-  aurora: { id: 'aurora', name: 'Aurora ✨', price: 0, owned: false, exclusive: true, palette: { body: '#c0a0ff', body2: '#d8b8ff', mane: '#8050c0', leg: '#a070e0', face: '#ffe0ff' } }
+  nocturna: { id: 'nocturna', name: 'Nocturna', price: 50, owned: false, palette: { body: '#2b2b2b', body2: '#3a3a3a', mane: '#0d0d0d', leg: '#1c1c1c', face: '#cfcfcf' } },
+  azurea: { id: 'azurea', name: 'Azurea', price: 75, owned: false, palette: { body: '#6f4dff', body2: '#8a6bff', mane: '#2d145b', leg: '#41218b', face: '#f2d8ff' } },
+  aurea: { id: 'aurea', name: 'Aurea', price: 120, owned: false, palette: { body: '#d4a017', body2: '#ffd966', mane: '#8a5f00', leg: '#9c7300', face: '#fff0b0' } },
+  viridia: { id: 'viridia', name: 'Viridia', price: 165, owned: false, palette: { body: '#3cb371', body2: '#2e8b57', mane: '#1e5a3a', leg: '#267c4a', face: '#c6ffb0' } },
+  rosalia: { id: 'rosalia', name: 'Rosalia', price: 210, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#b34e6e', leg: '#d96f8a', face: '#ffe0e6' } },
+  amethysta: { id: 'amethysta', name: 'Amethysta', price: 270, owned: false, palette: { body: '#aa6ff9', body2: '#8b4ee5', mane: '#4a1a8a', leg: '#6a32c2', face: '#e5ccff' } },
+  alisa: { id: 'alisa', name: '👑 ALISA ✨', price: 750, owned: false, legendary: true, palette: { body: '#ff6b6b', body2: '#ff8c8c', mane: '#ffd700', leg: '#ff5252', face: '#fff5e6' } },
+  aurora: { id: 'aurora', name: 'Aurora ✨', price: 0, owned: false, exclusive: true, hidden: true, palette: { body: '#c0a0ff', body2: '#d8b8ff', mane: '#8050c0', leg: '#a070e0', face: '#ffe0ff' } }
 };
 let ownedSkins = JSON.parse(localStorage.getItem('pixelFarmOwnedSkins') || '["aurelia"]');
 let selectedSkin = localStorage.getItem('pixelFarmSelectedSkin') || 'aurelia';
@@ -642,10 +736,11 @@ function getCurrentSkin() { return skins[selectedSkin] || skins.aurelia; }
 // ============================================================
 const backgrounds = {
   day: { id: 'day', name: '🌞 Day', price: 0, owned: true, style: 'linear-gradient(135deg, #4a77ff, #6fa7ff)' },
-  dawn: { id: 'dawn', name: '🌅 Dawn', price: 50, owned: false, style: 'linear-gradient(135deg, #ffb87a, #ff9a6e)' },
-  sunset: { id: 'sunset', name: '🌇 Sunset', price: 80, owned: false, style: 'linear-gradient(135deg, #ff6fb5, #9b4dff)' },
-  night: { id: 'night', name: '🌙 Night', price: 120, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' },
-  goldenDawn: { id: 'goldenDawn', name: '🌟 Golden Dawn', price: 0, owned: false, exclusive: true, style: 'linear-gradient(135deg, #ffd966, #ffaa33)' }
+  dawn: { id: 'dawn', name: '🌅 Dawn', price: 75, owned: false, style: 'linear-gradient(135deg, #ffb87a, #ff9a6e)' },
+  sunset: { id: 'sunset', name: '🌇 Sunset', price: 120, owned: false, style: 'linear-gradient(135deg, #ff6fb5, #9b4dff)' },
+  night: { id: 'night', name: '🌙 Night', price: 180, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' },
+  black: { id: 'black', name: '🖤 Black', price: 300, owned: false, style: 'linear-gradient(135deg, #0a0a0a, #1a1a1a)' },
+  goldenDawn: { id: 'goldenDawn', name: '🌟 Golden Dawn', price: 500, owned: false, exclusive: true, style: 'linear-gradient(135deg, #ffd966, #ffaa33)' }
 };
 let ownedBackgrounds = JSON.parse(localStorage.getItem('pixelFarmOwnedBackgrounds') || '["day"]');
 let selectedBackground = localStorage.getItem('pixelFarmSelectedBackground') || 'day';
@@ -671,7 +766,7 @@ const maps = {
     decoColor: '#c3f267'
   },
   wildWest: { 
-    id: 'wildWest', name: '🤠 Wild West', price: 150, owned: false, theme: 'desert',
+    id: 'wildWest', name: '🤠 Wild West', price: 225, owned: false, theme: 'desert', news: true,
     groundColor: '#d4a373', groundDetail1: '#c9945e', groundDetail2: '#b87a4a', groundShadow: '#9b6a3a',
     skyGradient: { day: ['#e9c46a', '#f4a261'], dawn: ['#e76f51', '#f4a261'], sunset: ['#e63946', '#d4a373'], night: ['#2b2d42', '#3a3e5a'] },
     mountainColors: { day: ['#b87a5a', '#d49c7a'], dawn: ['#c47a5a', '#e4aa8a'], sunset: ['#9a5a4a', '#ba7a6a'], night: ['#4a3a3a', '#6a5a5a'] },
@@ -692,9 +787,11 @@ function updateCoins() {
   const val = document.getElementById('coinsValue');
   const menu = document.getElementById('menuCoinsValue');
   const shop = document.getElementById('shopCoinsValue');
+  const bottomCoins = document.getElementById('gameCoinsIndicator');
   if (val) val.textContent = coins;
   if (menu) menu.textContent = coins;
   if (shop) shop.textContent = coins;
+  if (bottomCoins) bottomCoins.textContent = coins;
   localStorage.setItem('pixelFarmCoins', coins);
 }
 function showCoinPop(amount, x, y) {
@@ -774,6 +871,24 @@ function renderStatsModal() {
   const container = document.getElementById('statsContent');
   if (!container) return;
   
+  if (!userNick || !isUserRegistered) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
+        <div style="font-size: 18px; color: #ffd93b; margin-bottom: 12px;">GUEST MODE</div>
+        <div style="font-size: 14px; margin-bottom: 20px;">Register to view your stats and save progress!</div>
+        <button class="btn small" id="statsRegisterBtn" style="background: linear-gradient(135deg, #a84ff7, #5a1df2); color: #fff;">✨ REGISTER AT bellariofilms.com ✨</button>
+      </div>
+    `;
+    const regBtn = document.getElementById('statsRegisterBtn');
+    if (regBtn) {
+      regBtn.addEventListener('click', () => {
+        window.open('https://bellariofilms.com', '_blank');
+      });
+    }
+    return;
+  }
+  
   const nickname = userNick || 'Guest';
   const best = Math.max(localBestScore, userFirebaseScore);
   const currentObs = obsPassed;
@@ -781,7 +896,7 @@ function renderStatsModal() {
   
   container.innerHTML = `
     <div style="border: 2px solid #ffd93b; padding: 12px; margin-bottom: 16px; background: #1a1a1a;">
-      <div style="font-size: 18px; color: #ffd93b; margin-bottom: 8px;">👤 ${escapeHtml(nickname)}</div>
+      <div class="pixel-name">👤 ${nickname.toUpperCase()}</div>
     </div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
       <div style="background: #0f0f12; padding: 8px; border: 1px solid #ffd93b;"><div style="font-size: 10px; color: #ffd93b;">🪙 COINS</div><div id="statCoins" style="font-size: 20px; font-weight: bold;">0</div></div>
@@ -825,9 +940,14 @@ function renderSkinsGrid() {
   if (!grid) return;
   let html = '';
   Object.values(skins).forEach(skin => {
+    if (skin.hidden && !ownedSkins.includes(skin.id)) return;
     const owned = ownedSkins.includes(skin.id);
     const active = selectedSkin === skin.id;
-    html += `<div class="shop-card ${active ? 'active' : ''}"><div class="shop-skin-preview" style="background:#222;"><div style="position:absolute; left:18px; top:22px; width:36px; height:20px; background:${skin.palette.body};"></div><div style="position:absolute; left:22px; top:16px; width:28px; height:10px; background:${skin.palette.body2};"></div><div style="position:absolute; left:46px; top:12px; width:10px; height:10px; background:${skin.palette.body};"></div><div style="position:absolute; left:50px; top:9px; width:10px; height:12px; background:${skin.palette.body};"></div><div style="position:absolute; left:52px; top:15px; width:6px; height:4px; background:${skin.palette.face};"></div><div style="position:absolute; left:9px; top:28px; width:5px; height:8px; background:${skin.palette.mane};"></div></div><div class="shop-skin-name">${skin.name}</div><div class="shop-skin-price">${owned ? 'Owned' : `${skin.price} <div class="coin-icon-real" style="display:inline-block; width:14px; height:14px; margin:0 2px -2px 0;"></div>`}</div><button class="shop-btn" onclick="window.handleSkinAction('${skin.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
+    let cardClass = `shop-card ${active ? 'active' : ''}`;
+    if (skin.id === 'alisa' && !owned) cardClass += ' legendary';
+    if (skin.id === 'alisa' && owned) cardClass += ' legendary owned';
+    const legendaryBadge = skin.id === 'alisa' ? '<span class="legendary-badge">⭐ LEGENDARY</span>' : '';
+    html += `<div class="${cardClass}"><div class="shop-skin-preview" style="background:#222;"><div style="position:absolute; left:18px; top:22px; width:36px; height:20px; background:${skin.palette.body};"></div><div style="position:absolute; left:22px; top:16px; width:28px; height:10px; background:${skin.palette.body2};"></div><div style="position:absolute; left:46px; top:12px; width:10px; height:10px; background:${skin.palette.body};"></div><div style="position:absolute; left:50px; top:9px; width:10px; height:12px; background:${skin.palette.body};"></div><div style="position:absolute; left:52px; top:15px; width:6px; height:4px; background:${skin.palette.face};"></div><div style="position:absolute; left:9px; top:28px; width:5px; height:8px; background:${skin.palette.mane};"></div></div><div class="shop-skin-name">${skin.name} ${legendaryBadge}</div><div class="shop-skin-price">${owned ? 'Owned' : `${skin.price} <div class="coin-icon-real" style="display:inline-block; width:14px; height:14px; margin:0 2px -2px 0;"></div>`}</div><button class="shop-btn" onclick="window.handleSkinAction('${skin.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
   });
   grid.innerHTML = html;
 }
@@ -839,7 +959,8 @@ function renderMapsGrid() {
     const owned = ownedMaps.includes(map.id);
     const active = selectedMap === map.id;
     let previewStyle = map.theme === 'desert' ? 'background: linear-gradient(135deg, #e9c46a, #f4a261);' : 'background: linear-gradient(135deg, #4a77ff, #6fa7ff);';
-    html += `<div class="shop-card ${active ? 'active' : ''}" style="${previewStyle}"><div class="shop-skin-name" style="color:#fff; text-shadow:1px 1px 0 #000;">${map.name}</div><div class="shop-skin-price">${owned ? 'Owned' : `${map.price} 🪙`}</div><button class="shop-btn" onclick="window.handleMapAction('${map.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
+    const newsBadge = map.news ? '<span style="background: #4caf50; color: #fff; font-size: 8px; padding: 2px 6px; border-radius: 10px; margin-left: 6px; vertical-align: middle; animation: newsPulse 1.2s infinite ease;">NEW</span>' : '';
+    html += `<div class="shop-card ${active ? 'active' : ''}" style="${previewStyle}"><div class="shop-skin-name" style="color:#fff; text-shadow:1px 1px 0 #000;">${map.name} ${newsBadge}</div><div class="shop-skin-price">${owned ? 'Owned' : `${map.price} 🪙`}</div><button class="shop-btn" onclick="window.handleMapAction('${map.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
   });
   grid.innerHTML = html;
 }
@@ -956,8 +1077,8 @@ function claimDaily() {
   }
   
   let coinsReward = 0;
-  let isWeekComplete = false;
-  let isTwoWeekComplete = false;
+  let isWeekComplete = false;      // награда за 7 дней: фон Night
+  let isTwoWeekComplete = false;   // награда за 14 дней: скин Aurora
   
   if (dailyStreak === 1) coinsReward = 5;
   else if (dailyStreak >= 2 && dailyStreak <= 6) coinsReward = 3;
@@ -969,23 +1090,25 @@ function claimDaily() {
   addCoins(coinsReward);
   showAchievementQueued(`✨ Daily Bonus Day ${dailyStreak}! +${coinsReward} 🪙 ✨`, true);
   
+  // Награда за 7 дней подряд (фон Night)
   if (isWeekComplete && !weeklyRewardGiven) {
     weeklyRewardGiven = true;
+    if (!ownedBackgrounds.includes('night')) {
+      ownedBackgrounds.push('night');
+      backgrounds.night.owned = true;
+      saveBackgrounds();
+      showAchievementQueued(`🌙 WEEKLY REWARD! You got background: NIGHT! 🌙\n+3 🪙`, true);
+    }
+  }
+  
+  // Награда за 14 дней подряд (эксклюзивный скин Aurora)
+  if (isTwoWeekComplete && !twoWeekRewardGiven) {
+    twoWeekRewardGiven = true;
     if (!ownedSkins.includes('aurora')) {
       ownedSkins.push('aurora');
       skins.aurora.owned = true;
       saveSkins();
-      showAchievementQueued(`🎁 WEEKLY REWARD! You got exclusive skin: AURORA ✨! 🎁`, true);
-    }
-  }
-  
-  if (isTwoWeekComplete && !twoWeekRewardGiven) {
-    twoWeekRewardGiven = true;
-    if (!ownedBackgrounds.includes('goldenDawn')) {
-      ownedBackgrounds.push('goldenDawn');
-      backgrounds.goldenDawn.owned = true;
-      saveBackgrounds();
-      showAchievementQueued(`🌄 2-WEEK REWARD! You got exclusive background: GOLDEN DAWN! 🌄`, true);
+      showAchievementQueued(`🎁⭐ 2-WEEK REWARD! ⭐🎁\nYou got EXCLUSIVE skin: AURORA ✨!\nNow visible in your inventory!`, true);
     }
   }
   
@@ -1012,9 +1135,9 @@ function updateDailyUI() {
     
     if (dailyStreak === 0 || dailyStreak === 1) nextReward = 'Day 2: +3 🪙';
     else if (dailyStreak >= 2 && dailyStreak <= 5) nextReward = `Day ${dailyStreak + 1}: +3 🪙`;
-    else if (dailyStreak === 6) nextReward = 'Day 7: +3 🪙 + 🎁 SKIN AURORA!';
+    else if (dailyStreak === 6) nextReward = 'Day 7: +3 🪙 + 🌙 BACKGROUND NIGHT!';
     else if (dailyStreak >= 7 && dailyStreak <= 12) nextReward = `Day ${dailyStreak + 1}: +3 🪙`;
-    else if (dailyStreak === 13) nextReward = 'Day 14: +3 🪙 + 🌄 BACKGROUND GOLDEN DAWN!';
+    else if (dailyStreak === 13) nextReward = 'Day 14: +3 🪙 + 🎁⭐ SKIN AURORA!';
     else if (dailyStreak >= 14) nextReward = 'Day 1: +5 🪙 (streak reset)';
     else nextReward = 'Day 1: +5 🪙';
     
@@ -1291,10 +1414,13 @@ updateSoundButtonsUI();
 let onlineUsersCount = 0, presenceUnsubscribe = null;
 let gameUserId = localStorage.getItem('gameUserId') || ('game_' + Date.now() + '_' + Math.random().toString(36).substr(2,6));
 localStorage.setItem('gameUserId', gameUserId);
+
 function updateAllOnlineIndicators(count) {
   ['menuOnlineCount', 'gameOnlineCount', 'gameOverOnlineCount', 'leaderboardOnlineCount'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = count; });
-  ['onlineLabel', 'gameOnlineLabel', 'gameOverOnlineLabel', 'leaderboardOnlineLabel'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = t.onlineLabel; });
+  const bottomOnline = document.getElementById('gameOnlineCount');
+  if (bottomOnline) bottomOnline.textContent = count;
 }
+
 function startGamePresence() {
   if (!userNick || !isUserRegistered) return;
   const presenceRef = doc(db, "presence", gameUserId);
@@ -1303,21 +1429,39 @@ function startGamePresence() {
       setDoc(presenceRef, { userId: gameUserId, nickname: userNick, lastSeen: serverTimestamp(), isActive: true, type: 'game' }, { merge: true }).catch(console.warn);
     }
   }, 30000);
-  const presenceQuery = query(collection(db, "presence"), where("isActive", "==", true));
-  presenceUnsubscribe = onSnapshot(presenceQuery, (snapshot) => {
-    const now = Date.now();
-    let count = 0;
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const lastSeen = data.lastSeen?.toMillis?.() || 0;
-      if (data.isActive && (now - lastSeen) < 60000 && data.nickname) count++;
-    });
-    onlineUsersCount = count;
-    updateAllOnlineIndicators(count);
-  });
 }
+
+function startGamePresenceGuest() {
+  const guestNick = 'Guest_' + gameUserId.slice(-6);
+  const presenceRef = doc(db, "presence", gameUserId);
+  setInterval(() => {
+    if (titleScr && !titleScr.classList.contains('hidden') || gameRunning) {
+      setDoc(presenceRef, { userId: gameUserId, nickname: guestNick, lastSeen: serverTimestamp(), isActive: true, type: 'guest' }, { merge: true }).catch(console.warn);
+    }
+  }, 30000);
+  setDoc(presenceRef, { userId: gameUserId, nickname: guestNick, lastSeen: serverTimestamp(), isActive: true, type: 'guest' }, { merge: true }).catch(console.warn);
+}
+
+// Глобальный слушатель онлайн
+const presenceQueryGlobal = query(collection(db, "presence"), where("isActive", "==", true));
+let globalPresenceUnsubscribe = onSnapshot(presenceQueryGlobal, (snapshot) => {
+  const now = Date.now();
+  let count = 0;
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const lastSeen = data.lastSeen?.toMillis?.() || 0;
+    if (data.isActive && (now - lastSeen) < 60000 && data.nickname) {
+      count++;
+    }
+  });
+  onlineUsersCount = count;
+  updateAllOnlineIndicators(count);
+}, (error) => {
+  console.warn("Online presence listener error:", error);
+});
+
 window.addEventListener('beforeunload', () => {
-  if (presenceUnsubscribe) presenceUnsubscribe();
+  if (globalPresenceUnsubscribe) globalPresenceUnsubscribe();
   if (gameUserId) setDoc(doc(db, "presence", gameUserId), { isActive: false, lastSeen: serverTimestamp() }, { merge: true });
 });
 
@@ -1357,20 +1501,25 @@ async function checkReg() {
   const nameSpan = document.getElementById("userName"); 
   const statsSpan = document.getElementById("userStats"); 
   if (!userNick) { 
-    status.innerHTML = t.register; 
-    nameSpan.innerHTML = "👤 Guest"; 
+    status.innerHTML = `<div class="pixel-name">👤 GUEST</div><div>${t.register}</div>`; 
+    nameSpan.innerHTML = "👤 GUEST"; 
     statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; 
     isUserRegistered = false; 
     makeLinks(); 
+    startGamePresenceGuest();
     return false; 
   } 
   const ok = await ensureUser(); 
   if (ok && isUserRegistered) { 
     const best = Math.max(localBestScore, userFirebaseScore); 
-    status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; 
-    nameSpan.innerHTML = `👤 ${userNick}`; 
+    status.innerHTML = `
+      <div class="pixel-name">👤 ${userNick.toUpperCase()}</div>
+      <div style="margin-top: 4px;">Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨</div>
+    `;
+    nameSpan.innerHTML = `👤 ${userNick.toUpperCase()}`; 
     statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; 
     makeLinks(); 
+    startGamePresence();
     return true; 
   } 
   return false; 
@@ -1448,7 +1597,7 @@ function applyTranslations() {
   const historyDiv = document.getElementById('historyText');
   if (historyDiv) historyDiv.innerHTML = '<p>📜 Здесь будет История игры. Скоро здесь появятся ваши достижения и игровая статистика!</p>';
   const rulesDiv = document.getElementById('rulesList');
-  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +5-3 coins daily! 7-day streak gives skin, 14-day gives background!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 4 backgrounds!</li></ul>`;
+  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> Day1:+5, Day2-6:+3, Day7:+3 +🌙 Night, Day14:+3 +🎁 Aurora!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 6 backgrounds!</li></ul>`;
   const sponsor = document.getElementById('sponsorLine');
   if (sponsor) sponsor.innerHTML = t.rulesSponsor.replace(/\n/g, '<br>').replace(/bellariofilms\.com/g, '<strong class="register-link">bellariofilms.com</strong>');
   makeLinks();
@@ -1502,6 +1651,13 @@ function drawPixelWell(x, y, size = 1) {
   const pxX = Math.round(x);
   const pxY = Math.round(y);
   const s = size;
+  // Яркая рамка
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if (i === 0 && j === 0) continue;
+      px(pxX + i, pxY + j, 1*s, 1*s, '#ffd93b');
+    }
+  }
   const stoneColors = ["#e0e0e0", "#cfcfcf", "#bdbdbd"];
   for (let i = 0; i < 32; i++) {
     let xOff = 16 + Math.sin(i)*6;
@@ -1520,22 +1676,22 @@ function drawPixelWell(x, y, size = 1) {
     px(pxX + 21 * s, pxY + (yOff+1) * s, 1*s, 1*s, "#5c2f14");
   }
   for (let xOff = 8; xOff < 24; xOff++) {
-    px(pxX + xOff * s, pxY + 3 * s, 1*s, 1*s, "#b03030");
-    px(pxX + xOff * s, pxY + 2 * s, 1*s, 1*s, "#8a2020");
-    if (xOff % 2 === 0) px(pxX + xOff * s, pxY + 1 * s, 1*s, 1*s, "#701818");
+    px(pxX + xOff * s, pxY + 3 * s, 1*s, 1*s, "#ff4d4d");
+    px(pxX + xOff * s, pxY + 2 * s, 1*s, 1*s, "#cc3333");
+    if (xOff % 2 === 0) px(pxX + xOff * s, pxY + 1 * s, 1*s, 1*s, "#aa2222");
   }
   for (let xOff = 11; xOff < 21; xOff++) {
-    px(pxX + xOff * s, pxY + 6 * s, 1*s, 1*s, "#6b3a1a");
+    px(pxX + xOff * s, pxY + 6 * s, 1*s, 1*s, "#8b5a2b");
   }
   for (let yOff = 7; yOff < 12; yOff++) {
-    px(pxX + 16 * s, pxY + yOff * s, 1*s, 1*s, "#c8a060");
+    px(pxX + 16 * s, pxY + yOff * s, 1*s, 1*s, "#e8b870");
   }
-  px(pxX + 15 * s, pxY + 12 * s, 1*s, 1*s, "#999");
-  px(pxX + 16 * s, pxY + 12 * s, 1*s, 1*s, "#777");
-  px(pxX + 17 * s, pxY + 12 * s, 1*s, 1*s, "#999");
-  px(pxX + 15 * s, pxY + 13 * s, 1*s, 1*s, "#555");
-  px(pxX + 16 * s, pxY + 13 * s, 1*s, 1*s, "#444");
-  px(pxX + 17 * s, pxY + 13 * s, 1*s, 1*s, "#555");
+  px(pxX + 15 * s, pxY + 12 * s, 1*s, 1*s, "#ccaa77");
+  px(pxX + 16 * s, pxY + 12 * s, 1*s, 1*s, "#aa8866");
+  px(pxX + 17 * s, pxY + 12 * s, 1*s, 1*s, "#ccaa77");
+  px(pxX + 15 * s, pxY + 13 * s, 1*s, 1*s, "#886644");
+  px(pxX + 16 * s, pxY + 13 * s, 1*s, 1*s, "#775533");
+  px(pxX + 17 * s, pxY + 13 * s, 1*s, 1*s, "#886644");
 }
 
 function drawCactus(x, y, size = 1) {
@@ -1776,7 +1932,7 @@ function spawnObstacle() {
   } else {
     const types = ['hay','fence','sheep','cart','well','pond','stone','sheep_well','well_pond','bucket_well'];
     let r=Math.random(), type;
-    if(r<0.28) type='hay'; else if(r<0.42) type='fence'; else if(r<0.52) type='sheep'; else if(r<0.62) type='cart'; else if(r<0.71) type='well'; else if(r<0.78) type='pond'; else if(r<0.84) type='stone'; else if(r<0.9) type='sheep_well'; else if(r<0.96) type='well_pond'; else type='bucket_well';
+    if(r<0.28) type='hay'; else if(r<0.42) type='fence'; else if(r<0.52) type='sheep'; else if(r<0.62) type='cart'; else if(r<0.65) type='well'; else if(r<0.72) type='pond'; else if(r<0.78) type='stone'; else if(r<0.84) type='sheep_well'; else if(r<0.9) type='well_pond'; else type='bucket_well';
     let ob;
     switch(type){
       case 'hay': ob={type, x:W+60, y:ground.y-38, w:38, h:38, counted:false}; break;
@@ -1829,6 +1985,19 @@ function performJump() {
     player.doubleJumpUsed=false; 
     createDust(player.x+10, ground.y-8,6); 
     playSound('jump'); 
+    if (selectedSkin === 'alisa') {
+      for (let i = 0; i < 8; i++) {
+        particles.push({
+          x: player.x + player.w/2,
+          y: player.y + player.h - 10,
+          vx: rand(-2, 2),
+          vy: rand(-3, -1),
+          size: rand(2, 4),
+          life: rand(15, 25),
+          color: ['#ffd700', '#ffaa33', '#ff6b6b'][Math.floor(Math.random()*3)]
+        });
+      }
+    }
   } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { 
     player.vy=player.jumpPower*0.85; 
     player.doubleJumpUsed=true; 
@@ -1838,6 +2007,19 @@ function performJump() {
     playSound('doubleJump'); 
     totalDoubleJumps++; 
     updateTotalStats(); 
+    if (selectedSkin === 'alisa') {
+      for (let i = 0; i < 12; i++) {
+        particles.push({
+          x: player.x + player.w/2,
+          y: player.y + player.h/2,
+          vx: rand(-3, 3),
+          vy: rand(-4, -1),
+          size: rand(2, 5),
+          life: rand(20, 30),
+          color: ['#ffd700', '#ffaa33', '#ff6b6b', '#ff8888'][Math.floor(Math.random()*4)]
+        });
+      }
+    }
   } 
 }
 function startGame() {
@@ -1880,15 +2062,44 @@ pauseBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePau
 historyBtnMain.addEventListener('click',()=>{ 
   playSound('buttonClick',0.25); 
   const historyTextDiv = document.getElementById('historyText');
-  if (historyTextDiv) {
-    historyTextDiv.innerHTML = '<p>📜 Здесь будет История игры. Скоро здесь появятся ваши достижения и игровая статистика!</p>';
+  if (!userNick || !isUserRegistered) {
+    if (historyTextDiv) {
+      historyTextDiv.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
+          <div style="font-size: 18px; color: #ffd93b; margin-bottom: 12px;">GUEST MODE</div>
+          <div style="font-size: 14px; margin-bottom: 20px;">Register to view your game history and achievements!</div>
+          <button class="btn small" id="historyRegisterBtn" style="background: linear-gradient(135deg, #a84ff7, #5a1df2); color: #fff;">✨ REGISTER AT bellariofilms.com ✨</button>
+        </div>
+      `;
+      const regBtn = document.getElementById('historyRegisterBtn');
+      if (regBtn) {
+        regBtn.addEventListener('click', () => {
+          window.open('https://bellariofilms.com', '_blank');
+        });
+      }
+    }
+  } else {
+    if (historyTextDiv) {
+      historyTextDiv.innerHTML = '<p>📜 Здесь будет История игры. Скоро здесь появятся ваши достижения и игровая статистика!</p>';
+    }
   }
-  historyModal.style.display='flex';
+  historyModal.style.display = 'flex';
+  historyModal.style.alignItems = 'center';
+  historyModal.style.justifyContent = 'center';
 });
 closeHistoryBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); historyModal.style.display='none'; });
 if (statsBtnMain) {
   statsBtnMain.addEventListener('click', () => {
     playSound('buttonClick', 0.25);
+    if (!userNick || !isUserRegistered) {
+      showAchievementQueued(`❌ Please register at bellariofilms.com to view stats!`, true);
+      renderStatsModal();
+      statsModal.style.display = 'flex';
+      statsModal.style.alignItems = 'center';
+      statsModal.style.justifyContent = 'center';
+      return;
+    }
     renderStatsModal();
     statsModal.style.display = 'flex';
     statsModal.style.alignItems = 'center';
@@ -1985,6 +2196,19 @@ function applyHorseshoe() {
   horseCount++; 
   totalHorseshoes++; 
   updateTotalStats(); 
+  if (selectedSkin === 'alisa') {
+    for (let i = 0; i < 15; i++) {
+      particles.push({
+        x: player.x + player.w/2,
+        y: player.y + player.h/2,
+        vx: rand(-3, 3),
+        vy: rand(-4, -1),
+        size: rand(2, 5),
+        life: rand(20, 35),
+        color: ['#ffd700', '#ffaa33', '#ff6b6b'][Math.floor(Math.random()*3)]
+      });
+    }
+  }
   if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } 
   if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } 
 }
@@ -2095,11 +2319,16 @@ function drawGround() {
 }
 
 function drawPlayer() { 
-  const skin=getCurrentSkin(); 
-  const x=player.x, y=player.y, bounce=player.grounded?Math.sin(frame*0.3)*1:0; 
+  const skin = getCurrentSkin(); 
+  const x = player.x, y = player.y, bounce = player.grounded?Math.sin(frame*0.3)*1:0; 
   if(invincible && (Math.floor(Date.now()/80)%2===0)){ ctx.fillStyle='rgba(255,215,0,0.4)'; ctx.fillRect(x-4,y-4,player.w+8,player.h+8); } 
   if(player.doubleJumpAnim>0){ ctx.fillStyle='rgba(255,255,200,0.5)'; ctx.fillRect(x-2,y+36,player.w+4,10); } 
   if(invincible && invBar>0){ const barX=x+player.w/2-invBar/2, barY=y-10; ctx.fillStyle='#ffd966'; ctx.fillRect(barX,barY,invBar,3); ctx.strokeStyle='#b8860b'; ctx.strokeRect(barX,barY,invBar,3); } 
+  if (selectedSkin === 'alisa') {
+    const glowIntensity = (Math.sin(Date.now() / 200) + 1) / 2 * 0.6 + 0.3;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = `rgba(255, 107, 107, ${glowIntensity})`;
+  }
   px(x+16, y+22+bounce, 38,22, skin.palette.body); 
   px(x+20, y+16+bounce, 30,10, skin.palette.body2); 
   px(x+48, y+12+bounce, 14,12, skin.palette.body); 
@@ -2129,7 +2358,10 @@ function drawPlayer() {
   px(x+20, y+54+bounce, 6,3, '#f1e7d2'); 
   px(x+32, y+54+bounce, 6,3, '#f1e7d2'); 
   px(x+44, y+54+bounce, 6,3, '#f1e7d2'); 
-  px(x+52, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+52, y+54+bounce, 6,3, '#f1e7d2');
+  if (selectedSkin === 'alisa') {
+    ctx.shadowBlur = 0;
+  }
 }
 
 function drawObstacle(ob){
@@ -2148,7 +2380,7 @@ function drawObstacle(ob){
     else if(ob.type==='cart'){ px(ob.x, ob.y+10, ob.w,24,'#b87c3a'); px(ob.x+6, ob.y,46,14,'#d49b5c'); px(ob.x+16, ob.y+24,10,26,'#8b5a2b'); px(ob.x+42, ob.y+24,10,26,'#8b5a2b'); px(ob.x+3, ob.y+38,54,12,'#6b3e1a'); }
     else if(ob.type==='well'){ 
       if (currentMap.id === 'farm') {
-        drawPixelWell(ob.x, ob.y, 0.45);
+        drawPixelWell(ob.x, ob.y - 8, 0.55);
       } else {
         px(ob.x+10, ob.y+6,20,28,'#7c5e3a'); px(ob.x+6, ob.y+24,28,10,'#9b7a4a'); px(ob.x+16, ob.y,6,10,'#5a3e1a'); px(ob.x+24, ob.y+10,3,18,'#3a2a12');
       }
