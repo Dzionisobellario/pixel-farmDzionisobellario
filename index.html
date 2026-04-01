@@ -1466,107 +1466,12 @@ window.addEventListener('beforeunload', () => {
 });
 
 // ============================================================
-// USER REGISTRATION & LEADERBOARD
+// ПОЛЬЗОВАТЕЛЬСКАЯ РЕГИСТРАЦИЯ И ЛИДЕРЫ
 // ============================================================
-async function ensureUser() { 
-  if (!userNick) return false; 
-  try { 
-    const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); 
-    const snap = await getDocs(q); 
-    if (!snap.empty) { 
-      const docSnap = snap.docs[0]; 
-      userDocId = docSnap.id; 
-      userFirebaseScore = docSnap.data().bestScore || 0; 
-      isUserRegistered = true; 
-      startGamePresence(); 
-      return true; 
-    } else { 
-      const ref = doc(collection(db, "userbellariofilms")); 
-      await setDoc(ref, { 
-        nickname: userNick, 
-        bestScore: 0, 
-        lastPlayed: serverTimestamp(),
-        time: new Date().toISOString()
-      }); 
-      userDocId = ref.id; 
-      userFirebaseScore = 0; 
-      isUserRegistered = true; 
-      startGamePresence(); 
-      return true; 
-    } 
-  } catch (e) { return false; } 
-}
-async function checkReg() { 
-  const status = document.getElementById("userStatusMain"); 
-  const nameSpan = document.getElementById("userName"); 
-  const statsSpan = document.getElementById("userStats"); 
-  if (!userNick) { 
-    status.innerHTML = `<div class="pixel-name">👤 GUEST</div><div style="margin-top: 6px;">${t.register}</div>`; 
-    nameSpan.innerHTML = "👤 GUEST"; 
-    statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; 
-    isUserRegistered = false; 
-    makeLinks(); 
-    return false; 
-  } 
-  const ok = await ensureUser(); 
-  if (ok && isUserRegistered) { 
-    const best = Math.max(localBestScore, userFirebaseScore); 
-    status.innerHTML = `
-      <div class="pixel-name">👤 ${userNick.toUpperCase()}</div>
-      <div style="margin-top: 6px;">Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨</div>
-    `;
-    nameSpan.innerHTML = `👤 ${userNick.toUpperCase()}`; 
-    statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; 
-    makeLinks(); 
-    startGamePresence();
-    return true; 
-  } 
-  return false; 
-}
-async function saveBest(score) { 
-  if (!isUserRegistered || !userDocId) return false; 
-  const ref = doc(db, "userbellariofilms", userDocId); 
-  try { 
-    await runTransaction(db, async (t) => { 
-      const docSnap = await t.get(ref); 
-      if (!docSnap.exists()) return; 
-      const cur = docSnap.data().bestScore || 0; 
-      if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); 
-      else t.update(ref, { lastPlayed: serverTimestamp() }); 
-    }); 
-    return true; 
-  } catch (e) { return false; } 
-}
-async function loadLeaderboard(contId, showRank = true) { 
-  const cont = document.getElementById(contId); 
-  if (!cont) return; 
-  try { 
-    const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"), limit(10)); 
-    const snap = await getDocs(q); 
-    let html = '', rank = 1, userRank = null; 
-    for (const docSnap of snap.docs) { 
-      const data = docSnap.data(); 
-      const sc = data.bestScore || 0; 
-      if (sc === 0) continue; 
-      const isYou = data.nickname === userNick && isUserRegistered; 
-      if (isYou) userRank = rank; 
-      html += `<div class="leaderboard-item ${isYou ? 'you' : ''}"><span class="rank">${rank}</span><span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span><span class="score">${sc} pts</span></div>`; 
-      rank++; 
-    } 
-    if (!html) html = '<div style="text-align:center;">No results yet</div>'; 
-    cont.innerHTML = html; 
-    if (showRank && contId === "leaderboardList") { 
-      const rankDiv = document.getElementById("yourRank"); 
-      if (rankDiv) { 
-        if (isUserRegistered) { 
-          if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; 
-          else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-10 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; 
-        } else rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; 
-        makeLinks(); 
-      } 
-    } 
-  } catch (e) { cont.innerHTML = '<div style="text-align:center;">Load error</div>'; } 
-}
+async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
+async function checkReg() { const status = document.getElementById("userStatusMain"); const nameSpan = document.getElementById("userName"); const statsSpan = document.getElementById("userStats"); if (!userNick) { status.innerHTML = t.register; nameSpan.innerHTML = "👤 Guest"; statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; isUserRegistered = false; makeLinks(); return false; } const ok = await ensureUser(); if (ok && isUserRegistered) { const best = Math.max(localBestScore, userFirebaseScore); status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; nameSpan.innerHTML = `👤 ${userNick}`; statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; makeLinks(); return true; } return false; }
+async function saveBest(score) { if (!isUserRegistered || !userDocId) return false; const ref = doc(db, "userbellariofilms", userDocId); try { await runTransaction(db, async (t) => { const docSnap = await t.get(ref); if (!docSnap.exists()) return; const cur = docSnap.data().bestScore || 0; if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); else t.update(ref, { lastPlayed: serverTimestamp() }); }); return true; } catch (e) { return false; } }
+async function loadLeaderboard(contId, showRank = true) { const cont = document.getElementById(contId); if (!cont) return; try { const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"), limit(10)); const snap = await getDocs(q); let html = '', rank = 1, userRank = null; for (const docSnap of snap.docs) { const data = docSnap.data(); const sc = data.bestScore || 0; if (sc === 0) continue; const isYou = data.nickname === userNick && isUserRegistered; if (isYou) userRank = rank; html += `<div class="leaderboard-item ${isYou ? 'you' : ''}"><span class="rank">${rank}</span><span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span><span class="score">${sc} pts</span></div>`; rank++; } if (!html) html = '<div style="text-align:center;">No results yet</div>'; cont.innerHTML = html; if (showRank && contId === "leaderboardList") { const rankDiv = document.getElementById("yourRank"); if (rankDiv) { if (isUserRegistered) { if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-10 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; } else rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; makeLinks(); } } } catch (e) { cont.innerHTML = '<div style="text-align:center;">Load error</div>'; } }
 function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]||m)) : s; }
 function updateMenuCoins() { const span = document.getElementById('menuCoinsValue'); if (span) span.textContent = coins; }
 
