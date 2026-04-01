@@ -1501,12 +1501,11 @@ async function checkReg() {
   const nameSpan = document.getElementById("userName"); 
   const statsSpan = document.getElementById("userStats"); 
   if (!userNick) { 
-    status.innerHTML = `<div class="pixel-name">👤 GUEST</div><div>${t.register}</div>`; 
+    status.innerHTML = `<div class="pixel-name">👤 GUEST</div><div style="margin-top: 6px;">${t.register}</div>`; 
     nameSpan.innerHTML = "👤 GUEST"; 
     statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; 
     isUserRegistered = false; 
     makeLinks(); 
-    startGamePresenceGuest();
     return false; 
   } 
   const ok = await ensureUser(); 
@@ -1514,7 +1513,7 @@ async function checkReg() {
     const best = Math.max(localBestScore, userFirebaseScore); 
     status.innerHTML = `
       <div class="pixel-name">👤 ${userNick.toUpperCase()}</div>
-      <div style="margin-top: 4px;">Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨</div>
+      <div style="margin-top: 6px;">Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨</div>
     `;
     nameSpan.innerHTML = `👤 ${userNick.toUpperCase()}`; 
     statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; 
