@@ -3,11 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Pixel Farm Runner — Aurelia</title>
+  <title>Pixel Farm Runner — Aurelia v.4.0</title>
   <style>
-    /* ============================================================
-       ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ)
-       ============================================================ */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -15,6 +12,8 @@
       -webkit-tap-highlight-color: transparent;
     }
     html, body {
+      margin: 0;
+      padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -31,10 +30,12 @@
     }
     canvas {
       display: block;
+      margin: 0 auto;
       width: 100%;
       height: 100%;
       image-rendering: crisp-edges;
       image-rendering: pixelated;
+      touch-action: none;
     }
     #ui {
       position: absolute;
@@ -451,7 +452,7 @@
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
-      <div class="version" style="order: 6;">✨ v.3.9 — Дикий Запад: египетские блоки, заборы, солнце/луна ✨</div>
+      <div class="version" style="order: 6;">✨ v.4.0 — Новая статистика, ежедневные бонусы, пиксельный колодец, улучшенный звук ✨</div>
     </div>
   </div>
 
@@ -522,13 +523,13 @@
 <script type="importmap">{ "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js" } }</script>
 <script type="module">
 // ============================================================
-// ВАШИ ИМПОРТЫ, ПЕРЕВОДЫ, НАСТРОЙКА FIREBASE (ПОЛНОСТЬЮ)
+// ИМПОРТЫ FIREBASE
 // ============================================================
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, query, where, getDocs, doc, setDoc, orderBy, limit, serverTimestamp, runTransaction, onSnapshot } from "firebase/firestore";
 
 // ============================================================
-// МУЛЬТИЯЗЫЧНОСТЬ (6 языков) — ПОЛНЫЙ ОБЪЕКТ
+// МУЛЬТИЯЗЫЧНОСТЬ (6 языков)
 // ============================================================
 const translations = {
   en: { startGame: "START GAME", rules: "RULES", leaderboard: "LEADERBOARD", register: "✨ Register at <span class='register-link'>bellariofilms.com</span> to compete! ✨", registerSave: "✨ Register at <span class='register-link'>bellariofilms.com</span> to save your score! ✨", gameOver: "GAME OVER", yourScore: "Your score:", topPlayers: "🏆 TOP PLAYERS 🏆", restart: "RESTART", menu: "MENU", rulesTitle: "📜 GAME RULES", scoreLabel: "SCORE:", bestLabel: "BEST:", rulesSponsor: "🏆 Your results at bellariofilms.com\nThanks to Dzioniso Bellario 🙏", dailyBonus: "✨ DAILY BONUS ✨", dailyBonusClaimed: "✓ Already claimed!", dailyBonusAvailable: "🎁 +10 BelkaCoins available!", coinsInfo: "Earn: 100 pts → +3, 500 pts → +8, bucket +1, horseshoe +2 + invinc, golden coin +25, new record +15", newObstacles: "Sheep by well, Well+pond (restores double jump), Bucket well (+1 coin)", historyTitle: "📜 GAME HISTORY", closeBtn: "CLOSE", onlineLabel: "online", shop: "SHOP", historyBtn: "HISTORY" },
@@ -555,7 +556,7 @@ let localBestScore = Number(localStorage.getItem('pixelFarmBest') || 0);
 let coins = Number(localStorage.getItem('pixelFarmCoins') || 0);
 
 // ============================================================
-// НОВЫЕ ПЕРЕМЕННЫЕ СТАТИСТИКИ
+// ПЕРЕМЕННЫЕ СТАТИСТИКИ
 // ============================================================
 let totalCoins = Number(localStorage.getItem('pixelFarmTotalCoins') || 0);
 let totalGames = Number(localStorage.getItem('pixelFarmTotalGames') || 0);
@@ -564,6 +565,18 @@ let totalObstacles = Number(localStorage.getItem('pixelFarmTotalObstacles') || 0
 let totalHorseshoes = Number(localStorage.getItem('pixelFarmTotalHorseshoes') || 0);
 let totalDoubleJumps = Number(localStorage.getItem('pixelFarmTotalDoubleJumps') || 0);
 let gameTimeInterval = null;
+
+// ПЕРЕМЕННЫЕ ДЛЯ СИСТЕМЫ ЕЖЕДНЕВНЫХ БОНУСОВ
+let dailyStreak = Number(localStorage.getItem('pixelFarmDailyStreak') || 0);
+let lastDailyDate = localStorage.getItem('pixelFarmLastDailyDate') || '';
+let weeklyRewardGiven = localStorage.getItem('pixelFarmWeeklyRewardGiven') === 'true';
+let twoWeekRewardGiven = localStorage.getItem('pixelFarmTwoWeekRewardGiven') === 'true';
+
+// МИГРАЦИЯ СТАРЫХ МОНЕТ
+if (totalCoins === 0 && coins > 0) {
+  totalCoins = coins;
+  localStorage.setItem('pixelFarmTotalCoins', totalCoins);
+}
 
 // ============================================================
 // DOM ЭЛЕМЕНТЫ
@@ -605,7 +618,7 @@ const statsBtnMain = document.getElementById('statsBtnMain');
 const closeStatsBtn = document.getElementById('closeStatsBtn');
 
 // ============================================================
-// СИСТЕМА СКИНОВ (ЛОШАДИ)
+// СИСТЕМА СКИНОВ
 // ============================================================
 const skins = {
   aurelia: { id: 'aurelia', name: 'Aurelia', price: 0, owned: true, palette: { body: '#b86a22', body2: '#d17c2d', mane: '#5b2d15', leg: '#7a3c17', face: '#f1d09a' } },
@@ -615,7 +628,8 @@ const skins = {
   viridia: { id: 'viridia', name: 'Viridia', price: 110, owned: false, palette: { body: '#3cb371', body2: '#2e8b57', mane: '#1e5a3a', leg: '#267c4a', face: '#c6ffb0' } },
   rosalia: { id: 'rosalia', name: 'Rosalia', price: 140, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#b34e6e', leg: '#d96f8a', face: '#ffe0e6' } },
   amethysta: { id: 'amethysta', name: 'Amethysta', price: 180, owned: false, palette: { body: '#aa6ff9', body2: '#8b4ee5', mane: '#4a1a8a', leg: '#6a32c2', face: '#e5ccff' } },
-  alisa: { id: 'alisa', name: 'Alisa', price: 250, owned: false, palette: { body: '#c084fc', body2: '#f9a8d4', mane: '#7e22ce', leg: '#c2410c', face: '#ffe6f0' } }
+  alisa: { id: 'alisa', name: 'Alisa', price: 250, owned: false, palette: { body: '#c084fc', body2: '#f9a8d4', mane: '#7e22ce', leg: '#c2410c', face: '#ffe6f0' } },
+  aurora: { id: 'aurora', name: 'Aurora ✨', price: 0, owned: false, exclusive: true, palette: { body: '#c0a0ff', body2: '#d8b8ff', mane: '#8050c0', leg: '#a070e0', face: '#ffe0ff' } }
 };
 let ownedSkins = JSON.parse(localStorage.getItem('pixelFarmOwnedSkins') || '["aurelia"]');
 let selectedSkin = localStorage.getItem('pixelFarmSelectedSkin') || 'aurelia';
@@ -630,7 +644,8 @@ const backgrounds = {
   day: { id: 'day', name: '🌞 Day', price: 0, owned: true, style: 'linear-gradient(135deg, #4a77ff, #6fa7ff)' },
   dawn: { id: 'dawn', name: '🌅 Dawn', price: 50, owned: false, style: 'linear-gradient(135deg, #ffb87a, #ff9a6e)' },
   sunset: { id: 'sunset', name: '🌇 Sunset', price: 80, owned: false, style: 'linear-gradient(135deg, #ff6fb5, #9b4dff)' },
-  night: { id: 'night', name: '🌙 Night', price: 120, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' }
+  night: { id: 'night', name: '🌙 Night', price: 120, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' },
+  goldenDawn: { id: 'goldenDawn', name: '🌟 Golden Dawn', price: 0, owned: false, exclusive: true, style: 'linear-gradient(135deg, #ffd966, #ffaa33)' }
 };
 let ownedBackgrounds = JSON.parse(localStorage.getItem('pixelFarmOwnedBackgrounds') || '["day"]');
 let selectedBackground = localStorage.getItem('pixelFarmSelectedBackground') || 'day';
@@ -644,7 +659,7 @@ function applySelectedBackground() {
 }
 
 // ============================================================
-// СИСТЕМА КАРТ (MAPS) — ДИКИЙ ЗАПАД
+// СИСТЕМА КАРТ
 // ============================================================
 const maps = {
   farm: { 
@@ -671,7 +686,7 @@ function saveMaps() { localStorage.setItem('pixelFarmOwnedMaps', JSON.stringify(
 function getCurrentMap() { return maps[selectedMap] || maps.farm; }
 
 // ============================================================
-// ЭКОНОМИКА (МОНЕТЫ)
+// ЭКОНОМИКА
 // ============================================================
 function updateCoins() {
   const val = document.getElementById('coinsValue');
@@ -802,7 +817,7 @@ function renderStatsModal() {
 }
 
 // ============================================================
-// МАГАЗИН (НОВЫЙ — С ВКЛАДКАМИ)
+// МАГАЗИН
 // ============================================================
 function renderShop() { renderSkinsGrid(); renderMapsGrid(); renderBackgroundsGrid(); updateCoins(); }
 function renderSkinsGrid() {
@@ -922,12 +937,91 @@ window.handleBackgroundAction = function(bgId) {
 };
 
 // ============================================================
-// ЕЖЕДНЕВНЫЙ БОНУС И ДОСТИЖЕНИЯ
+// ЕЖЕДНЕВНЫЙ БОНУС
 // ============================================================
-let dailyClaimed = false;
-function checkDaily() { const last = localStorage.getItem('dailyBonusClaim'); const today = new Date().toDateString(); dailyClaimed = (last === today); updateDailyUI(); }
-function updateDailyUI() { const info = document.getElementById('dailyBonusInfo'); if (info) info.innerHTML = dailyClaimed ? t.dailyBonusClaimed : t.dailyBonusAvailable; }
-function claimDaily() { if (!dailyClaimed) { addCoins(10); dailyClaimed = true; localStorage.setItem('dailyBonusClaim', new Date().toDateString()); showAchievementQueued(`✨ Daily Bonus +10 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins ✨`, true); updateDailyUI(); } }
+function claimDaily() {
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  
+  if (lastDailyDate === today) {
+    showAchievementQueued(`❌ Daily bonus already claimed today!`, true);
+    updateDailyUI();
+    return;
+  }
+  
+  if (lastDailyDate === yesterday) {
+    dailyStreak = Math.min(dailyStreak + 1, 14);
+  } else {
+    dailyStreak = 1;
+  }
+  
+  let coinsReward = 0;
+  let isWeekComplete = false;
+  let isTwoWeekComplete = false;
+  
+  if (dailyStreak === 1) coinsReward = 5;
+  else if (dailyStreak >= 2 && dailyStreak <= 6) coinsReward = 3;
+  else if (dailyStreak === 7) { coinsReward = 3; isWeekComplete = true; }
+  else if (dailyStreak >= 8 && dailyStreak <= 13) coinsReward = 3;
+  else if (dailyStreak === 14) { coinsReward = 3; isTwoWeekComplete = true; }
+  else coinsReward = 3;
+  
+  addCoins(coinsReward);
+  showAchievementQueued(`✨ Daily Bonus Day ${dailyStreak}! +${coinsReward} 🪙 ✨`, true);
+  
+  if (isWeekComplete && !weeklyRewardGiven) {
+    weeklyRewardGiven = true;
+    if (!ownedSkins.includes('aurora')) {
+      ownedSkins.push('aurora');
+      skins.aurora.owned = true;
+      saveSkins();
+      showAchievementQueued(`🎁 WEEKLY REWARD! You got exclusive skin: AURORA ✨! 🎁`, true);
+    }
+  }
+  
+  if (isTwoWeekComplete && !twoWeekRewardGiven) {
+    twoWeekRewardGiven = true;
+    if (!ownedBackgrounds.includes('goldenDawn')) {
+      ownedBackgrounds.push('goldenDawn');
+      backgrounds.goldenDawn.owned = true;
+      saveBackgrounds();
+      showAchievementQueued(`🌄 2-WEEK REWARD! You got exclusive background: GOLDEN DAWN! 🌄`, true);
+    }
+  }
+  
+  lastDailyDate = today;
+  localStorage.setItem('pixelFarmDailyStreak', dailyStreak);
+  localStorage.setItem('pixelFarmLastDailyDate', lastDailyDate);
+  localStorage.setItem('pixelFarmWeeklyRewardGiven', weeklyRewardGiven);
+  localStorage.setItem('pixelFarmTwoWeekRewardGiven', twoWeekRewardGiven);
+  updateDailyUI();
+}
+
+function updateDailyUI() {
+  const info = document.getElementById('dailyBonusInfo');
+  if (!info) return;
+  
+  const today = new Date().toDateString();
+  const claimed = (lastDailyDate === today);
+  
+  if (claimed) {
+    let streakText = dailyStreak > 0 ? ` Streak: ${dailyStreak} days 🔥` : '';
+    info.innerHTML = `✓ Already claimed today!${streakText}`;
+  } else {
+    let nextReward = '';
+    
+    if (dailyStreak === 0 || dailyStreak === 1) nextReward = 'Day 2: +3 🪙';
+    else if (dailyStreak >= 2 && dailyStreak <= 5) nextReward = `Day ${dailyStreak + 1}: +3 🪙`;
+    else if (dailyStreak === 6) nextReward = 'Day 7: +3 🪙 + 🎁 SKIN AURORA!';
+    else if (dailyStreak >= 7 && dailyStreak <= 12) nextReward = `Day ${dailyStreak + 1}: +3 🪙`;
+    else if (dailyStreak === 13) nextReward = 'Day 14: +3 🪙 + 🌄 BACKGROUND GOLDEN DAWN!';
+    else if (dailyStreak >= 14) nextReward = 'Day 1: +5 🪙 (streak reset)';
+    else nextReward = 'Day 1: +5 🪙';
+    
+    let rewardText = (dailyStreak === 0 || dailyStreak === 1) ? '+5 🪙' : '+3 🪙';
+    info.innerHTML = `🎁 ${rewardText} available! Streak: ${dailyStreak} days 🔥<br><small>Next: ${nextReward}</small>`;
+  }
+}
 
 let achQueue = [], achShowing = false;
 function showAchievementQueued(text, sound = true) {
@@ -938,15 +1032,13 @@ function showAchievementQueued(text, sound = true) {
 function processQueue() { if (achShowing || achQueue.length === 0) return; const { text, sound } = achQueue.shift(); achShowing = true; if (sound) playAchieveSound(); const div = document.createElement('div'); div.className = 'achievement'; div.innerHTML = text; document.body.appendChild(div); setTimeout(() => { div.remove(); achShowing = false; setTimeout(processQueue, 150); }, 2000); }
 
 // ============================================================
-// PRO AUDIO SYSTEM — STABLE VERSION
+// AUDIO SYSTEM
 // ============================================================
 let audioCtx = null;
 let audioAllowed = false;
-
 let ambientInterval = null;
 let musicPlaying = false;
 let musicInterval = null;
-
 let soundEnabled = localStorage.getItem('pixelFarmSound') !== 'false';
 let musicEnabled = localStorage.getItem('pixelFarmMusicEnabled') !== 'false';
 let sfxEnabled = localStorage.getItem('pixelFarmSfxEnabled') !== 'false';
@@ -954,18 +1046,12 @@ let ambientEnabled = localStorage.getItem('pixelFarmAmbientEnabled') !== 'false'
 let musicVolume = parseFloat(localStorage.getItem('pixelFarmMusicVolume')) || 0.25;
 let sfxVolume = parseFloat(localStorage.getItem('pixelFarmSfxVolume')) || 0.35;
 let ambientVolume = parseFloat(localStorage.getItem('pixelFarmAmbientVolume')) || 0.15;
-
 let musicGain = null;
 
-// ============================================================
-// UI
-// ============================================================
 function setSoundIcon() {
   const icon = document.getElementById('muteIcon');
   const text = document.getElementById('muteText');
-
   if (!icon || !text) return;
-
   if (soundEnabled) {
     icon.classList.remove('muted');
     text.textContent = 'SOUND ON';
@@ -984,62 +1070,34 @@ function updateSoundButtonsUI() {
   if (ambientBtn) ambientBtn.textContent = ambientEnabled ? 'ON' : 'OFF';
 }
 
-// ============================================================
-// AUDIO INIT
-// ============================================================
 function initAudio() {
   if (audioCtx) return;
-
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  } catch (e) {
-    console.warn('Audio init error:', e);
-  }
+  try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { console.warn('Audio init error:', e); }
 }
 
 async function enableAudio() {
   initAudio();
   if (!audioCtx) return;
-
   try {
-    if (audioCtx.state !== 'running') {
-      await audioCtx.resume();
-    }
-
+    if (audioCtx.state !== 'running') await audioCtx.resume();
     audioAllowed = true;
-
     if (soundEnabled) {
-      if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) {
-        playMenuMusic();
-      }
-      if (gameRunning && !gameOver && ambientEnabled) {
-        startAmbientLoop();
-      }
+      if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) playMenuMusic();
+      if (gameRunning && !gameOver && ambientEnabled) startAmbientLoop();
     }
-  } catch (e) {
-    console.warn('Audio resume error:', e);
-  }
+  } catch (e) { console.warn('Audio resume error:', e); }
 }
 
-// ============================================================
-// MENU MUSIC
-// ============================================================
 function playMenuMusic() {
   if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') return;
   if (!musicEnabled) return;
   if (musicPlaying) return;
   if (!titleScr || titleScr.classList.contains('hidden')) return;
-
   if (musicInterval) clearTimeout(musicInterval);
-
-  if (musicGain) {
-    try { musicGain.disconnect(); } catch(e) {}
-  }
-
+  if (musicGain) { try { musicGain.disconnect(); } catch(e) {} }
   musicGain = audioCtx.createGain();
   musicGain.gain.value = musicVolume;
   musicGain.connect(audioCtx.destination);
-
   const melody = [
     {freq: 261.63, dur: 0.45}, {freq: 329.63, dur: 0.45}, {freq: 392.00, dur: 0.45}, {freq: 523.25, dur: 0.55},
     {freq: 392.00, dur: 0.45}, {freq: 329.63, dur: 0.45}, {freq: 261.63, dur: 0.7},
@@ -1050,41 +1108,25 @@ function playMenuMusic() {
     {freq: 523.25, dur: 0.45}, {freq: 659.25, dur: 0.45}, {freq: 783.99, dur: 0.45}, {freq: 1046.50, dur: 0.55},
     {freq: 783.99, dur: 0.45}, {freq: 659.25, dur: 0.45}, {freq: 523.25, dur: 0.9}
   ];
-
   function playNote(freq, dur, startTime) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
     osc.type = 'triangle';
     osc.frequency.value = freq;
-
     gain.gain.setValueAtTime(0.22, startTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, startTime + dur);
-
     osc.connect(gain);
     gain.connect(musicGain);
-
     osc.start(startTime);
     osc.stop(startTime + dur);
   }
-
   let currentTime = audioCtx.currentTime;
-
-  melody.forEach(note => {
-    playNote(note.freq, note.dur, currentTime);
-    currentTime += note.dur;
-  });
-
+  melody.forEach(note => { playNote(note.freq, note.dur, currentTime); currentTime += note.dur; });
   const totalDur = currentTime - audioCtx.currentTime;
-
   musicPlaying = true;
-
   musicInterval = setTimeout(() => {
     musicPlaying = false;
-
-    if (titleScr && !titleScr.classList.contains('hidden') && soundEnabled && audioAllowed && musicEnabled) {
-      playMenuMusic();
-    }
+    if (titleScr && !titleScr.classList.contains('hidden') && soundEnabled && audioAllowed && musicEnabled) playMenuMusic();
   }, totalDur * 1000);
 }
 
@@ -1092,50 +1134,35 @@ function stopMenuMusic() {
   if (musicInterval) clearTimeout(musicInterval);
   musicInterval = null;
   musicPlaying = false;
-
-  if (musicGain) {
-    try { musicGain.disconnect(); } catch(e) {}
-    musicGain = null;
-  }
+  if (musicGain) { try { musicGain.disconnect(); } catch(e) {} musicGain = null; }
 }
 
-// ============================================================
-// SFX
-// ============================================================
 function playAchieveSound() {
   if (!soundEnabled || !audioCtx || !audioAllowed || audioCtx.state !== 'running') return;
   if (!sfxEnabled) return;
-
   const now = audioCtx.currentTime;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   osc.type = 'sine';
   osc.frequency.value = 880;
-
   gain.gain.setValueAtTime(0.12 * sfxVolume, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-
   osc.start(now);
   osc.stop(now + 0.25);
 }
 
 function playSound(type, volume = 0.2) {
   if (!soundEnabled || !audioCtx || !audioAllowed || audioCtx.state !== 'running') return;
-
   const now = audioCtx.currentTime;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   let freq = 440;
   let oscType = 'sine';
   let baseVol = volume;
   let duration = 0.35;
   let volumeGroup = 'sfx';
-
   if (type === 'jump') { oscType = 'square'; freq = 480 + (Math.random() - 0.5) * 20; baseVol = 0.2; }
   else if (type === 'doubleJump') { oscType = 'sine'; freq = 880 + (Math.random() - 0.5) * 30; baseVol = 0.18; }
   else if (type === 'crash') { oscType = 'sawtooth'; freq = 220; baseVol = 0.45; }
@@ -1155,42 +1182,28 @@ function playSound(type, volume = 0.2) {
   else if (type === 'countdownTick') { oscType = 'sine'; freq = 880 + (Math.random() - 0.5) * 20; baseVol = 0.12; duration = 0.1; }
   else if (type === 'countdownGo') { oscType = 'square'; freq = 660 + (Math.random() - 0.5) * 30; baseVol = 0.22; duration = 0.2; }
   else if (type === 'landing') { oscType = 'sine'; freq = 260 + (Math.random() - 0.5) * 30; baseVol = 0.2; }
-
   if (volumeGroup === 'sfx' && !sfxEnabled) return;
   if (volumeGroup === 'ambient' && !ambientEnabled) return;
-
-  const finalVolume = volumeGroup === 'ambient'
-    ? baseVol * ambientVolume
-    : baseVol * sfxVolume;
-
+  const finalVolume = volumeGroup === 'ambient' ? baseVol * ambientVolume : baseVol * sfxVolume;
   gain.gain.setValueAtTime(finalVolume, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
   if (type !== 'wind') osc.frequency.value = freq;
   osc.type = oscType;
-
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-
   osc.start(now);
   osc.stop(now + duration);
 }
 
-// ============================================================
-// AMBIENT LOOP
-// ============================================================
 function startAmbientLoop() {
   stopAmbientLoop();
-
   ambientInterval = setInterval(() => {
     if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') return;
     if (!ambientEnabled) return;
     if (!gameRunning || gameOver) return;
-
     const hour = timeOfDay / 100;
     const rand = Math.random();
     const currentMap = getCurrentMap();
-
     if (currentMap.theme === 'desert') {
       if (rand < 0.12) playSound('wind');
       else if (rand < 0.18 && hour >= 6 && hour < 19) playSound('bird');
@@ -1207,58 +1220,31 @@ function startAmbientLoop() {
         if (rand < 0.15) playSound('cricket');
         else if (rand < 0.25) playSound('bird');
       }
-
       if (rand < 0.1) playSound('wind');
     }
   }, 3800);
 }
 
 function stopAmbientLoop() {
-  if (ambientInterval) {
-    clearInterval(ambientInterval);
-    ambientInterval = null;
-  }
+  if (ambientInterval) { clearInterval(ambientInterval); ambientInterval = null; }
 }
 
-// ============================================================
-// TOGGLE SOUND
-// ============================================================
 async function toggleSound() {
   initAudio();
-
   soundEnabled = !soundEnabled;
   localStorage.setItem('pixelFarmSound', soundEnabled);
   setSoundIcon();
-
   if (!soundEnabled) {
     stopAmbientLoop();
     stopMenuMusic();
-
-    if (audioCtx && audioCtx.state === 'running') {
-      try { await audioCtx.suspend(); } catch(e) {}
-    }
+    if (audioCtx && audioCtx.state === 'running') { try { await audioCtx.suspend(); } catch(e) {} }
     return;
   }
-
   await enableAudio();
-
-  if (audioCtx && audioCtx.state !== 'running') {
-    try { await audioCtx.resume(); } catch(e) {}
-  }
-
-  if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) {
-    playMenuMusic();
-  }
-
-  if (gameRunning && !gameOver && ambientEnabled) {
-    startAmbientLoop();
-  }
-  
-  setTimeout(() => {
-    if (soundEnabled && audioCtx && audioCtx.state === 'running' && sfxEnabled) {
-      playSound('buttonClick', 0.15);
-    }
-  }, 50);
+  if (audioCtx && audioCtx.state !== 'running') { try { await audioCtx.resume(); } catch(e) {} }
+  if (!gameRunning && !gameOver && titleScr && !titleScr.classList.contains('hidden')) playMenuMusic();
+  if (gameRunning && !gameOver && ambientEnabled) startAmbientLoop();
+  setTimeout(() => { if (soundEnabled && audioCtx && audioCtx.state === 'running' && sfxEnabled) playSound('buttonClick', 0.15); }, 50);
 }
 
 function toggleMusic() {
@@ -1266,14 +1252,9 @@ function toggleMusic() {
   localStorage.setItem('pixelFarmMusicEnabled', musicEnabled);
   const btn = document.getElementById('toggleMusicBtn');
   if (btn) btn.textContent = musicEnabled ? 'ON' : 'OFF';
-  if (musicGain) {
-    musicGain.gain.value = musicEnabled ? musicVolume : 0;
-  }
-  if (!musicEnabled && musicPlaying) {
-    stopMenuMusic();
-  } else if (musicEnabled && !musicPlaying && titleScr && !titleScr.classList.contains('hidden') && audioAllowed && soundEnabled) {
-    playMenuMusic();
-  }
+  if (musicGain) musicGain.gain.value = musicEnabled ? musicVolume : 0;
+  if (!musicEnabled && musicPlaying) stopMenuMusic();
+  else if (musicEnabled && !musicPlaying && titleScr && !titleScr.classList.contains('hidden') && audioAllowed && soundEnabled) playMenuMusic();
 }
 
 function toggleSfx() {
@@ -1281,9 +1262,7 @@ function toggleSfx() {
   localStorage.setItem('pixelFarmSfxEnabled', sfxEnabled);
   const btn = document.getElementById('toggleSfxBtn');
   if (btn) btn.textContent = sfxEnabled ? 'ON' : 'OFF';
-  if (sfxEnabled && soundEnabled && audioCtx && audioCtx.state === 'running') {
-    playSound('buttonClick', 0.15);
-  }
+  if (sfxEnabled && soundEnabled && audioCtx && audioCtx.state === 'running') playSound('buttonClick', 0.15);
 }
 
 function toggleAmbient() {
@@ -1291,11 +1270,8 @@ function toggleAmbient() {
   localStorage.setItem('pixelFarmAmbientEnabled', ambientEnabled);
   const btn = document.getElementById('toggleAmbientBtn');
   if (btn) btn.textContent = ambientEnabled ? 'ON' : 'OFF';
-  if (!ambientEnabled) {
-    stopAmbientLoop();
-  } else if (ambientEnabled && gameRunning && !gameOver && audioAllowed && soundEnabled) {
-    startAmbientLoop();
-  }
+  if (!ambientEnabled) stopAmbientLoop();
+  else if (ambientEnabled && gameRunning && !gameOver && audioAllowed && soundEnabled) startAmbientLoop();
 }
 
 // ============================================================
@@ -1305,15 +1281,12 @@ window.addEventListener('pointerdown', enableAudio);
 document.addEventListener('keydown', enableAudio);
 document.addEventListener('touchstart', enableAudio, { passive: true });
 
-// ============================================================
-// INIT
-// ============================================================
 initAudio();
 setSoundIcon();
 updateSoundButtonsUI();
 
 // ============================================================
-// ОНЛАЙН-СИСТЕМА
+// ONLINE SYSTEM
 // ============================================================
 let onlineUsersCount = 0, presenceUnsubscribe = null;
 let gameUserId = localStorage.getItem('gameUserId') || ('game_' + Date.now() + '_' + Math.random().toString(36).substr(2,6));
@@ -1349,17 +1322,108 @@ window.addEventListener('beforeunload', () => {
 });
 
 // ============================================================
-// ПОЛЬЗОВАТЕЛЬСКАЯ РЕГИСТРАЦИЯ И ЛИДЕРЫ
+// USER REGISTRATION & LEADERBOARD
 // ============================================================
-async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
-async function checkReg() { const status = document.getElementById("userStatusMain"); const nameSpan = document.getElementById("userName"); const statsSpan = document.getElementById("userStats"); if (!userNick) { status.innerHTML = t.register; nameSpan.innerHTML = "👤 Guest"; statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; isUserRegistered = false; makeLinks(); return false; } const ok = await ensureUser(); if (ok && isUserRegistered) { const best = Math.max(localBestScore, userFirebaseScore); status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; nameSpan.innerHTML = `👤 ${userNick}`; statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; makeLinks(); return true; } return false; }
-async function saveBest(score) { if (!isUserRegistered || !userDocId) return false; const ref = doc(db, "userbellariofilms", userDocId); try { await runTransaction(db, async (t) => { const docSnap = await t.get(ref); if (!docSnap.exists()) return; const cur = docSnap.data().bestScore || 0; if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); else t.update(ref, { lastPlayed: serverTimestamp() }); }); return true; } catch (e) { return false; } }
-async function loadLeaderboard(contId, showRank = true) { const cont = document.getElementById(contId); if (!cont) return; try { const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"), limit(10)); const snap = await getDocs(q); let html = '', rank = 1, userRank = null; for (const docSnap of snap.docs) { const data = docSnap.data(); const sc = data.bestScore || 0; if (sc === 0) continue; const isYou = data.nickname === userNick && isUserRegistered; if (isYou) userRank = rank; html += `<div class="leaderboard-item ${isYou ? 'you' : ''}"><span class="rank">${rank}</span><span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span><span class="score">${sc} pts</span></div>`; rank++; } if (!html) html = '<div style="text-align:center;">No results yet</div>'; cont.innerHTML = html; if (showRank && contId === "leaderboardList") { const rankDiv = document.getElementById("yourRank"); if (rankDiv) { if (isUserRegistered) { if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-10 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; } else rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; makeLinks(); } } } catch (e) { cont.innerHTML = '<div style="text-align:center;">Load error</div>'; } }
+async function ensureUser() { 
+  if (!userNick) return false; 
+  try { 
+    const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); 
+    const snap = await getDocs(q); 
+    if (!snap.empty) { 
+      const docSnap = snap.docs[0]; 
+      userDocId = docSnap.id; 
+      userFirebaseScore = docSnap.data().bestScore || 0; 
+      isUserRegistered = true; 
+      startGamePresence(); 
+      return true; 
+    } else { 
+      const ref = doc(collection(db, "userbellariofilms")); 
+      await setDoc(ref, { 
+        nickname: userNick, 
+        bestScore: 0, 
+        lastPlayed: serverTimestamp(),
+        time: new Date().toISOString()
+      }); 
+      userDocId = ref.id; 
+      userFirebaseScore = 0; 
+      isUserRegistered = true; 
+      startGamePresence(); 
+      return true; 
+    } 
+  } catch (e) { return false; } 
+}
+async function checkReg() { 
+  const status = document.getElementById("userStatusMain"); 
+  const nameSpan = document.getElementById("userName"); 
+  const statsSpan = document.getElementById("userStats"); 
+  if (!userNick) { 
+    status.innerHTML = t.register; 
+    nameSpan.innerHTML = "👤 Guest"; 
+    statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; 
+    isUserRegistered = false; 
+    makeLinks(); 
+    return false; 
+  } 
+  const ok = await ensureUser(); 
+  if (ok && isUserRegistered) { 
+    const best = Math.max(localBestScore, userFirebaseScore); 
+    status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; 
+    nameSpan.innerHTML = `👤 ${userNick}`; 
+    statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; 
+    makeLinks(); 
+    return true; 
+  } 
+  return false; 
+}
+async function saveBest(score) { 
+  if (!isUserRegistered || !userDocId) return false; 
+  const ref = doc(db, "userbellariofilms", userDocId); 
+  try { 
+    await runTransaction(db, async (t) => { 
+      const docSnap = await t.get(ref); 
+      if (!docSnap.exists()) return; 
+      const cur = docSnap.data().bestScore || 0; 
+      if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); 
+      else t.update(ref, { lastPlayed: serverTimestamp() }); 
+    }); 
+    return true; 
+  } catch (e) { return false; } 
+}
+async function loadLeaderboard(contId, showRank = true) { 
+  const cont = document.getElementById(contId); 
+  if (!cont) return; 
+  try { 
+    const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"), limit(10)); 
+    const snap = await getDocs(q); 
+    let html = '', rank = 1, userRank = null; 
+    for (const docSnap of snap.docs) { 
+      const data = docSnap.data(); 
+      const sc = data.bestScore || 0; 
+      if (sc === 0) continue; 
+      const isYou = data.nickname === userNick && isUserRegistered; 
+      if (isYou) userRank = rank; 
+      html += `<div class="leaderboard-item ${isYou ? 'you' : ''}"><span class="rank">${rank}</span><span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span><span class="score">${sc} pts</span></div>`; 
+      rank++; 
+    } 
+    if (!html) html = '<div style="text-align:center;">No results yet</div>'; 
+    cont.innerHTML = html; 
+    if (showRank && contId === "leaderboardList") { 
+      const rankDiv = document.getElementById("yourRank"); 
+      if (rankDiv) { 
+        if (isUserRegistered) { 
+          if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; 
+          else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-10 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; 
+        } else rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; 
+        makeLinks(); 
+      } 
+    } 
+  } catch (e) { cont.innerHTML = '<div style="text-align:center;">Load error</div>'; } 
+}
 function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]||m)) : s; }
 function updateMenuCoins() { const span = document.getElementById('menuCoinsValue'); if (span) span.textContent = coins; }
 
 // ============================================================
-// ПЕРЕВОДЫ ИНТЕРФЕЙСА
+// TRANSLATIONS
 // ============================================================
 function applyTranslations() {
   document.getElementById('startBtn').textContent = t.startGame;
@@ -1382,19 +1446,19 @@ function applyTranslations() {
   const historyBtn = document.getElementById('historyBtnMain'); if (historyBtn) historyBtn.textContent = t.historyBtn;
   const shopBtn = document.getElementById('shopBtnMain'); if (shopBtn) shopBtn.textContent = t.shop;
   const historyDiv = document.getElementById('historyText');
-  if (historyDiv) historyDiv.innerHTML = `<p>📜 Здесь будет История игры. Скоро здесь появятся ваши достижения и игровая статистика!</p>`;
+  if (historyDiv) historyDiv.innerHTML = '<p>📜 Здесь будет История игры. Скоро здесь появятся ваши достижения и игровая статистика!</p>';
   const rulesDiv = document.getElementById('rulesList');
-  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 4 backgrounds!</li></ul>`;
+  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +5-3 coins daily! 7-day streak gives skin, 14-day gives background!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 4 backgrounds!</li></ul>`;
   const sponsor = document.getElementById('sponsorLine');
   if (sponsor) sponsor.innerHTML = t.rulesSponsor.replace(/\n/g, '<br>').replace(/bellariofilms\.com/g, '<strong class="register-link">bellariofilms.com</strong>');
   makeLinks();
   updateDailyUI();
   updateMenuCoins();
 }
-applyTranslations(); updateCoins(); checkDaily(); setSoundIcon(); updateSoundButtonsUI(); applySelectedBackground();
+applyTranslations(); updateCoins(); updateDailyUI(); setSoundIcon(); updateSoundButtonsUI(); applySelectedBackground();
 
 // ============================================================
-// ИГРОВАЯ ЛОГИКА (ФИЗИКА, ПРЕПЯТСТВИЯ, БОНУСЫ)
+// GAME LOGIC
 // ============================================================
 let W, H, dpr = Math.max(1, Math.min(devicePixelRatio||1,2));
 function resize() { W = innerWidth; H = innerHeight; canvas.width = Math.floor(W*dpr); canvas.height = Math.floor(H*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); }
@@ -1415,9 +1479,6 @@ let last100Reward = 0, last500Reward = 0;
 let worldObjects = [];
 let obsTimer = 0, powTimer = 0, goldTimer = 0;
 
-// ============================================================
-// НОВАЯ ФУНКЦИЯ ДЛЯ ЕГИПЕТСКИХ БЛОКОВ
-// ============================================================
 function drawEgyptianBlock(x, y, size = 1) {
   px(x + 0, y + 0, 32 * size, 28 * size, '#c9b68b');
   px(x + 2*size, y + 2*size, 28*size, 24*size, '#b89f6a');
@@ -1437,9 +1498,46 @@ function drawEgyptianBlock(x, y, size = 1) {
   px(x + 24*size, y + 16*size, 2*size, 6*size, '#6a4a2a');
 }
 
-// ============================================================
-// ДЕКОРАТИВНЫЕ ОБЪЕКТЫ
-// ============================================================
+function drawPixelWell(x, y, size = 1) {
+  const pxX = Math.round(x);
+  const pxY = Math.round(y);
+  const s = size;
+  const stoneColors = ["#e0e0e0", "#cfcfcf", "#bdbdbd"];
+  for (let i = 0; i < 32; i++) {
+    let xOff = 16 + Math.sin(i)*6;
+    let yOff = 20 + Math.cos(i)*3;
+    px(pxX + Math.round(xOff * s), pxY + Math.round(yOff * s), 1*s, 1*s, stoneColors[i % 3]);
+  }
+  for (let yOff = 16; yOff < 20; yOff++) {
+    for (let xOff = 10; xOff < 22; xOff++) {
+      px(pxX + xOff * s, pxY + yOff * s, 1*s, 1*s, "#1a1a1a");
+    }
+  }
+  for (let yOff = 4; yOff < 20; yOff++) {
+    px(pxX + 10 * s, pxY + yOff * s, 1*s, 1*s, "#7a3f1a");
+    px(pxX + 21 * s, pxY + yOff * s, 1*s, 1*s, "#7a3f1a");
+    px(pxX + 10 * s, pxY + (yOff+1) * s, 1*s, 1*s, "#5c2f14");
+    px(pxX + 21 * s, pxY + (yOff+1) * s, 1*s, 1*s, "#5c2f14");
+  }
+  for (let xOff = 8; xOff < 24; xOff++) {
+    px(pxX + xOff * s, pxY + 3 * s, 1*s, 1*s, "#b03030");
+    px(pxX + xOff * s, pxY + 2 * s, 1*s, 1*s, "#8a2020");
+    if (xOff % 2 === 0) px(pxX + xOff * s, pxY + 1 * s, 1*s, 1*s, "#701818");
+  }
+  for (let xOff = 11; xOff < 21; xOff++) {
+    px(pxX + xOff * s, pxY + 6 * s, 1*s, 1*s, "#6b3a1a");
+  }
+  for (let yOff = 7; yOff < 12; yOff++) {
+    px(pxX + 16 * s, pxY + yOff * s, 1*s, 1*s, "#c8a060");
+  }
+  px(pxX + 15 * s, pxY + 12 * s, 1*s, 1*s, "#999");
+  px(pxX + 16 * s, pxY + 12 * s, 1*s, 1*s, "#777");
+  px(pxX + 17 * s, pxY + 12 * s, 1*s, 1*s, "#999");
+  px(pxX + 15 * s, pxY + 13 * s, 1*s, 1*s, "#555");
+  px(pxX + 16 * s, pxY + 13 * s, 1*s, 1*s, "#444");
+  px(pxX + 17 * s, pxY + 13 * s, 1*s, 1*s, "#555");
+}
+
 function drawCactus(x, y, size = 1) {
   px(x + 4*size, y + 20*size, 6*size, 28*size, '#5a8f4c');
   px(x + 2*size, y + 16*size, 4*size, 8*size, '#6aa35a');
@@ -1565,9 +1663,6 @@ function updateWorldObjects() {
   }
 }
 
-// ============================================================
-// ЭФФЕКТЫ
-// ============================================================
 function startPollen() {
   if (pollenInterval) clearInterval(pollenInterval);
   pollenInterval = setInterval(() => {
@@ -1626,9 +1721,6 @@ function setupWorld() {
 }
 setupWorld(); createFireflyCont(); startPollen();
 
-// ============================================================
-// ПРЕПЯТСТВИЯ
-// ============================================================
 function drawCactusObstacle(x, y, size=1) {
   px(x+10*size, y+8*size, 10*size, 32*size, '#3a7a2a');
   px(x+8*size, y+12*size, 4*size, 12*size, '#4a8f3a');
@@ -1702,9 +1794,6 @@ function spawnObstacle() {
   }
 }
 
-// ============================================================
-// ИГРОВОЙ ЦИКЛ
-// ============================================================
 function startCountdown() {
   countdownOverlay.style.display = 'flex';
   const steps = ['3','2','1','GO!'];
@@ -1731,7 +1820,26 @@ function togglePause(force=null) {
     if(ambientEnabled) startAmbientLoop();
   }
 }
-function performJump() { if(!gameRunning || gameOver || gamePaused) return; if(player.grounded) { player.vy=player.jumpPower; player.grounded=false; player.doubleJumpAvailable=true; player.doubleJumpUsed=false; createDust(player.x+10, ground.y-8,6); playSound('jump'); } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { player.vy=player.jumpPower*0.85; player.doubleJumpUsed=true; player.doubleJumpAvailable=false; player.doubleJumpAnim=6; createDust(player.x+20, player.y+20,8); playSound('doubleJump'); totalDoubleJumps++; updateTotalStats(); } }
+function performJump() { 
+  if(!gameRunning || gameOver || gamePaused) return; 
+  if(player.grounded) { 
+    player.vy=player.jumpPower; 
+    player.grounded=false; 
+    player.doubleJumpAvailable=true; 
+    player.doubleJumpUsed=false; 
+    createDust(player.x+10, ground.y-8,6); 
+    playSound('jump'); 
+  } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { 
+    player.vy=player.jumpPower*0.85; 
+    player.doubleJumpUsed=true; 
+    player.doubleJumpAvailable=false; 
+    player.doubleJumpAnim=6; 
+    createDust(player.x+20, player.y+20,8); 
+    playSound('doubleJump'); 
+    totalDoubleJumps++; 
+    updateTotalStats(); 
+  } 
+}
 function startGame() {
   titleScr.classList.add('hidden'); gameOverScr.classList.add('hidden'); rulesModal.classList.add('hidden'); historyModal.style.display='none';
   pauseOverlay.style.display='none'; shopModal.style.display='none'; if(statsModal) statsModal.style.display='none';
@@ -1749,6 +1857,10 @@ function endGame() {
   if(score>bestScore) { bestScore=score; localStorage.setItem('pixelFarmBest',bestScore); bestEl.textContent=`${t.bestLabel} ${bestScore}`; if(!recBonus) { addCoins(15,W/2,H/2); showAchievementQueued(`🏆 NEW RECORD! +15 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins 🏆`,true); recBonus=true; } }
   if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic();
 }
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
 startBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
 restartBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
 menuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); gameOverScr.classList.add('hidden'); titleScr.classList.remove('hidden'); timeOfDay=800; updateSky(); pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic(); });
@@ -1774,11 +1886,15 @@ historyBtnMain.addEventListener('click',()=>{
   historyModal.style.display='flex';
 });
 closeHistoryBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); historyModal.style.display='none'; });
-statsBtnMain.addEventListener('click', () => {
-  playSound('buttonClick', 0.25);
-  renderStatsModal();
-  statsModal.style.display = 'flex';
-});
+if (statsBtnMain) {
+  statsBtnMain.addEventListener('click', () => {
+    playSound('buttonClick', 0.25);
+    renderStatsModal();
+    statsModal.style.display = 'flex';
+    statsModal.style.alignItems = 'center';
+    statsModal.style.justifyContent = 'center';
+  });
+}
 closeStatsBtn.addEventListener('click', () => {
   playSound('buttonClick', 0.25);
   statsModal.style.display = 'none';
@@ -1794,12 +1910,9 @@ if (toggleAmbientBtn) toggleAmbientBtn.addEventListener('click', () => { playSou
 function initShopScrollHint() {
   const shopGrids = ['shopSkinsGrid', 'shopMapsGrid', 'shopBackgroundsGrid'];
   const scrollHint = document.querySelector('#shopModal .scroll-hint');
-  
   if (!scrollHint) return;
-  
   let hintHidden = false;
   let globalTouchHandler = null;
-  
   const hideHint = () => {
     if (!hintHidden) {
       scrollHint.classList.add('hidden');
@@ -1818,11 +1931,9 @@ function initShopScrollHint() {
       }
     }
   };
-  
   globalTouchHandler = (e) => {
     if (e.target.closest('.shop-grid')) hideHint();
   };
-  
   shopGrids.forEach(gridId => {
     const grid = document.getElementById(gridId);
     if (grid) {
@@ -1831,7 +1942,6 @@ function initShopScrollHint() {
       grid.addEventListener('wheel', hideHint);
     }
   });
-  
   const shopModalElem = document.getElementById('shopModal');
   if (shopModalElem) {
     shopModalElem.addEventListener('touchstart', globalTouchHandler);
@@ -1852,6 +1962,13 @@ muteBtn.addEventListener('click', () => {
   toggleSound();
 });
 
+if (dailyBtn) {
+  dailyBtn.addEventListener('click', () => {
+    playSound('buttonClick', 0.25);
+    claimDaily();
+  });
+}
+
 window.addEventListener('keydown',e=>{
   if(e.code==='KeyP'||e.code==='Escape'){ e.preventDefault(); if(!titleScr.classList.contains('hidden')&&!gameOver){ playSound('buttonClick',0.2); togglePause(); } return; }
   if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); if(gameRunning&&!gameOver&&!gamePaused) performJump(); }
@@ -1861,7 +1978,16 @@ window.addEventListener('pointerdown',()=>{ if(gameRunning&&!gameOver&&!gamePaus
 function rand(a,b){ return Math.random()*(b-a)+a; }
 function rectsCollide(a,b){ return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
 function createDust(x,y,c=5){ for(let i=0;i<c;i++) particles.push({x,y,vx:rand(-2,2),vy:rand(-2,-0.4),size:rand(3,5),life:rand(20,30),color:['#f2c879','#c98a3d'][Math.floor(Math.random()*2)]}); }
-function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); addCoins(2,player.x+player.w/2,player.y+player.h/2); createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; totalHorseshoes++; updateTotalStats(); if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } }
+function applyHorseshoe() { 
+  invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); 
+  addCoins(2,player.x+player.w/2,player.y+player.h/2); 
+  createDust(player.x+player.w/2,player.y+player.h/2,10); 
+  horseCount++; 
+  totalHorseshoes++; 
+  updateTotalStats(); 
+  if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } 
+  if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } 
+}
 function applyGoldenCoin(x,y) { addCoins(25,x,y); showAchievementQueued(`🪙 GOLDEN COIN! +25 BelkaCoins 🪙`,true); createDust(x,y,15); playSound('horseshoe'); }
 function splashEffect(x,y) { for(let i=0;i<8;i++) particles.push({x:x+rand(-10,30), y:y+rand(-5,15), vx:rand(-2,2), vy:rand(-1,3), size:rand(2,4), life:rand(15,25), color:'#7ac4ff'}); playSound('horseshoe'); }
 
@@ -1901,13 +2027,19 @@ function update() {
       if(!invincible) { createDust(player.x+player.w/2,player.y+player.h/2,12); endGame(); break; }
     }
   }
-  for(let i=0;i<obstacles.length;i++) { if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { obstacles[i].counted=true; obsPassed++; totalObstacles++; updateTotalStats(); if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } } }
+  for(let i=0;i<obstacles.length;i++) { 
+    if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { 
+      obstacles[i].counted=true; 
+      obsPassed++; 
+      totalObstacles++; 
+      updateTotalStats(); 
+      if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } 
+      if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } 
+    } 
+  }
   cloudTimer++; if(cloudTimer>=200) { cloudTimer=0; cloudHue=(cloudHue+20)%360; }
 }
 
-// ============================================================
-// ОТРИСОВКА (RENDER)
-// ============================================================
 function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
 
 function drawMountainsAndForest() {
@@ -1962,7 +2094,43 @@ function drawGround() {
   if(ground.y+ground.h<H) px(0, ground.y+ground.h, W, H-(ground.y+ground.h), currentMap.groundShadow);
 }
 
-function drawPlayer() { const skin=getCurrentSkin(); const x=player.x, y=player.y, bounce=player.grounded?Math.sin(frame*0.3)*1:0; if(invincible && (Math.floor(Date.now()/80)%2===0)){ ctx.fillStyle='rgba(255,215,0,0.4)'; ctx.fillRect(x-4,y-4,player.w+8,player.h+8); } if(player.doubleJumpAnim>0){ ctx.fillStyle='rgba(255,255,200,0.5)'; ctx.fillRect(x-2,y+36,player.w+4,10); } if(invincible && invBar>0){ const barX=x+player.w/2-invBar/2, barY=y-10; ctx.fillStyle='#ffd966'; ctx.fillRect(barX,barY,invBar,3); ctx.strokeStyle='#b8860b'; ctx.strokeRect(barX,barY,invBar,3); } px(x+16, y+22+bounce, 38,22, skin.palette.body); px(x+20, y+16+bounce, 30,10, skin.palette.body2); px(x+48, y+12+bounce, 14,12, skin.palette.body); px(x+56, y+8+bounce, 14,16, skin.palette.body); px(x+62, y+14+bounce, 8,6, skin.palette.face); px(x+50, y+6+bounce, 6,10, skin.palette.mane); px(x+44, y+8+bounce, 6,8, skin.palette.mane); px(x+40, y+10+bounce, 5,8, skin.palette.mane); px(x+54, y+4+bounce, 5,10, skin.palette.mane); px(x+62, y+2+bounce, 3,6, skin.palette.leg); px(x+66, y+3+bounce, 3,6, skin.palette.leg); px(x+62, y+14+bounce, 3,3, '#111'); px(x+5, y+28+bounce, 6,10, skin.palette.mane); px(x+1, y+32+bounce, 5,8, skin.palette.leg); px(x+6, y+36+bounce, 5,6, skin.palette.mane); if(player.legFrame===0){ px(x+20, y+42+bounce, 6,14, skin.palette.leg); px(x+32, y+44+bounce, 6,12, skin.palette.leg); px(x+44, y+42+bounce, 6,14, skin.palette.leg); px(x+52, y+44+bounce, 6,12, skin.palette.leg); }else{ px(x+20, y+44+bounce, 6,12, skin.palette.leg); px(x+32, y+42+bounce, 6,14, skin.palette.leg); px(x+44, y+44+bounce, 6,12, skin.palette.leg); px(x+52, y+42+bounce, 6,14, skin.palette.leg); } px(x+20, y+54+bounce, 6,3, '#f1e7d2'); px(x+32, y+54+bounce, 6,3, '#f1e7d2'); px(x+44, y+54+bounce, 6,3, '#f1e7d2'); px(x+52, y+54+bounce, 6,3, '#f1e7d2'); }
+function drawPlayer() { 
+  const skin=getCurrentSkin(); 
+  const x=player.x, y=player.y, bounce=player.grounded?Math.sin(frame*0.3)*1:0; 
+  if(invincible && (Math.floor(Date.now()/80)%2===0)){ ctx.fillStyle='rgba(255,215,0,0.4)'; ctx.fillRect(x-4,y-4,player.w+8,player.h+8); } 
+  if(player.doubleJumpAnim>0){ ctx.fillStyle='rgba(255,255,200,0.5)'; ctx.fillRect(x-2,y+36,player.w+4,10); } 
+  if(invincible && invBar>0){ const barX=x+player.w/2-invBar/2, barY=y-10; ctx.fillStyle='#ffd966'; ctx.fillRect(barX,barY,invBar,3); ctx.strokeStyle='#b8860b'; ctx.strokeRect(barX,barY,invBar,3); } 
+  px(x+16, y+22+bounce, 38,22, skin.palette.body); 
+  px(x+20, y+16+bounce, 30,10, skin.palette.body2); 
+  px(x+48, y+12+bounce, 14,12, skin.palette.body); 
+  px(x+56, y+8+bounce, 14,16, skin.palette.body); 
+  px(x+62, y+14+bounce, 8,6, skin.palette.face); 
+  px(x+50, y+6+bounce, 6,10, skin.palette.mane); 
+  px(x+44, y+8+bounce, 6,8, skin.palette.mane); 
+  px(x+40, y+10+bounce, 5,8, skin.palette.mane); 
+  px(x+54, y+4+bounce, 5,10, skin.palette.mane); 
+  px(x+62, y+2+bounce, 3,6, skin.palette.leg); 
+  px(x+66, y+3+bounce, 3,6, skin.palette.leg); 
+  px(x+62, y+14+bounce, 3,3, '#111'); 
+  px(x+5, y+28+bounce, 6,10, skin.palette.mane); 
+  px(x+1, y+32+bounce, 5,8, skin.palette.leg); 
+  px(x+6, y+36+bounce, 5,6, skin.palette.mane); 
+  if(player.legFrame===0){ 
+    px(x+20, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+32, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+44, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+52, y+44+bounce, 6,12, skin.palette.leg); 
+  }else{ 
+    px(x+20, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+32, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+44, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+52, y+42+bounce, 6,14, skin.palette.leg); 
+  } 
+  px(x+20, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+32, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+44, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+52, y+54+bounce, 6,3, '#f1e7d2'); 
+}
 
 function drawObstacle(ob){
   ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(ob.x+3, ob.y+ob.h-3, ob.w-6,4);
@@ -1978,7 +2146,13 @@ function drawObstacle(ob){
     else if(ob.type==='fence'){ px(ob.x+3, ob.y+6,6,38,'#8a5526'); px(ob.x+19, ob.y+0,6,44,'#8a5526'); px(ob.x+35, ob.y+8,6,36,'#8a5526'); px(ob.x+0, ob.y+14,50,6,'#b77935'); px(ob.x+0, ob.y+26,50,6,'#b77935'); }
     else if(ob.type==='sheep'){ px(ob.x+8, ob.y+6,30,18,'#f5f1ea'); px(ob.x+0, ob.y+12,12,10,'#2f2f2f'); px(ob.x+3, ob.y+6,6,6,'#2f2f2f'); px(ob.x+10, ob.y+24,3,8,'#2f2f2f'); px(ob.x+20, ob.y+24,3,8,'#2f2f2f'); px(ob.x+30, ob.y+24,3,8,'#2f2f2f'); }
     else if(ob.type==='cart'){ px(ob.x, ob.y+10, ob.w,24,'#b87c3a'); px(ob.x+6, ob.y,46,14,'#d49b5c'); px(ob.x+16, ob.y+24,10,26,'#8b5a2b'); px(ob.x+42, ob.y+24,10,26,'#8b5a2b'); px(ob.x+3, ob.y+38,54,12,'#6b3e1a'); }
-    else if(ob.type==='well'){ px(ob.x+10, ob.y+6,20,28,'#7c5e3a'); px(ob.x+6, ob.y+24,28,10,'#9b7a4a'); px(ob.x+16, ob.y,6,10,'#5a3e1a'); px(ob.x+24, ob.y+10,3,18,'#3a2a12'); }
+    else if(ob.type==='well'){ 
+      if (currentMap.id === 'farm') {
+        drawPixelWell(ob.x, ob.y, 0.45);
+      } else {
+        px(ob.x+10, ob.y+6,20,28,'#7c5e3a'); px(ob.x+6, ob.y+24,28,10,'#9b7a4a'); px(ob.x+16, ob.y,6,10,'#5a3e1a'); px(ob.x+24, ob.y+10,3,18,'#3a2a12');
+      }
+    }
     else if(ob.type==='pond'){ px(ob.x-4, ob.y+4, ob.w+8,6,'#7c5e3a'); px(ob.x, ob.y+4, ob.w,6,'#5aa9dd'); for(let i=0;i<4;i++) px(ob.x+6+i*12, ob.y+8,3,3,'#7ac4ff'); px(ob.x+10, ob.y+6,5,2,'#6b8c3a'); px(ob.x+32, ob.y+6,4,2,'#6b8c3a'); }
     else if(ob.type==='stone'){ px(ob.x, ob.y, ob.w, ob.h, '#6b5a4a'); px(ob.x+3, ob.y+3, ob.w-6, ob.h-6, '#8c7a64'); }
     else if(ob.type==='sheep_well'){ px(ob.x+8, ob.y+12,32,20,'#f5f1ea'); px(ob.x+28, ob.y+8,12,12,'#f5f1ea'); px(ob.x+34, ob.y+12,4,4,'#2f2f2f'); px(ob.x+12, ob.y+28,4,6,'#2f2f2f'); px(ob.x+20, ob.y+28,4,6,'#2f2f2f'); px(ob.x+28, ob.y+28,4,6,'#2f2f2f'); px(ob.x+36, ob.y+28,4,6,'#2f2f2f'); px(ob.x+46, ob.y+18,16,24,'#7c5e3a'); px(ob.x+50, ob.y+12,8,6,'#9b7a4a'); px(ob.x+54, ob.y+32,4,8,'#5a3e1a'); }
@@ -1991,13 +2165,10 @@ function drawParticles(){ particles.forEach(p=>px(p.x,p.y,p.size,p.size,p.color)
 
 function render() {
   ctx.clearRect(0,0,W,H);
-  
   const skyGrad=getSkyGrad();
   ctx.fillStyle=skyGrad;
   ctx.fillRect(0,0,W,ground.y);
-  
   drawMountainsAndForest();
-  
   clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
   birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
   drawPlane(plane.x,plane.y);
@@ -2006,26 +2177,21 @@ function render() {
   if (currentMapSun.theme === 'desert') {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     const celestialX = 80, celestialY = 70;
-    
     if (!isNight) {
       const pulse = 0.85 + Math.sin(Date.now() / 700) * 0.1;
       const alphaPulse = 0.25 + Math.sin(Date.now() / 600) * 0.12;
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 52 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 220, 100, ${alphaPulse * 0.6})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 44 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 200, 80, ${alphaPulse * 0.8})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 36 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 180, 60, ${alphaPulse})`;
       ctx.fill();
-      
       for(let sy=0; sy<40; sy++){
         for(let sx=0; sx<40; sx++){
           let dx=celestialX-20+sx, dy=celestialY-20+sy;
@@ -2036,32 +2202,26 @@ function render() {
           ctx.fillRect(dx,dy,1,1);
         }
       }
-      
       for(let bx=0; bx<6; bx++) for(let by=0; by<6; by++){
         if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffdd';
         else continue;
         ctx.fillRect(celestialX-3+bx, celestialY-3+by, 1,1);
       }
-      
     } else {
       const moonPulse = 0.88 + Math.sin(Date.now() / 900) * 0.08;
       const moonAlphaPulse = 0.2 + Math.sin(Date.now() / 800) * 0.1;
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 48 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(200, 220, 255, ${moonAlphaPulse * 0.5})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 40 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(180, 200, 240, ${moonAlphaPulse * 0.7})`;
       ctx.fill();
-      
       ctx.beginPath();
       ctx.arc(celestialX, celestialY, 32 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(160, 180, 220, ${moonAlphaPulse})`;
       ctx.fill();
-      
       for(let sy=0; sy<36; sy++){
         for(let sx=0; sx<36; sx++){
           let dx=celestialX-18+sx, dy=celestialY-18+sy;
@@ -2072,7 +2232,6 @@ function render() {
           ctx.fillRect(dx,dy,1,1);
         }
       }
-      
       for(let bx=0; bx<5; bx++) for(let by=0; by<5; by++){
         if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffff';
         else continue;
@@ -2096,9 +2255,7 @@ function render() {
   ctx.fillRect(0, ground.y - 110, W, 70);
   
   worldObjects.forEach(obj=>drawWorldObject(obj));
-  
   drawGround();
-  
   obstacles.forEach(drawObstacle);
   drawPowerups();
   drawPlayer();
