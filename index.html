@@ -485,7 +485,7 @@
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
       <div id="userStatusMain" class="register-hint"></div>
-      <div class="version">✨ v.04.0 — Las Vegas: неон, полиция, способности скинов! ✨</div>
+      <div class="version">✨ v.04.1 — Las Vegas: неон, полиция, высотные дома, пальмы! ✨</div>
     </div>
   </div>
 
@@ -656,7 +656,7 @@ const maps = {
     decoColor: '#e9c46a'
   },
   lasVegas: { 
-    id: 'lasVegas', name: '🎰 Las Vegas', price: 1, owned: false, theme: 'vegas',
+    id: 'lasVegas', name: '🎰 Las Vegas', price: 1000, owned: false, theme: 'vegas',
     groundColor: '#d4a373', groundDetail1: '#c9945e', groundDetail2: '#b87a4a', groundShadow: '#9b6a3a',
     skyGradient: { 
       day: ['#ff6b9d', '#c44b8b', '#8b3a62'], 
@@ -1277,7 +1277,7 @@ function applyTranslations() {
   const historyDiv = document.getElementById('historyText');
   if (historyDiv) historyDiv.innerHTML = `<p>Welcome to Pixel Farm Runner! Collect BelkaCoins, buy skins, backgrounds and maps, and set new records. Good luck!</p>`;
   const rulesDiv = document.getElementById('rulesList');
-  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Las Vegas - неон, полиция, способности скинов!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 3 maps + 4 backgrounds!</li><li>✨ <strong>Способности скинов:</strong> У каждого скина уникальная способность при сборе BelkaCoin!</li></ul>`;
+  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Las Vegas - неон, полиция, высотные дома, пальмы!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 3 maps + 4 backgrounds!</li><li>✨ <strong>Способности скинов:</strong> У каждого скина уникальная способность при сборе BelkaCoin!</li></ul>`;
   const sponsor = document.getElementById('sponsorLine');
   if (sponsor) sponsor.innerHTML = t.rulesSponsor.replace(/\n/g, '<br>').replace(/bellariofilms\.com/g, '<strong class="register-link">bellariofilms.com</strong>');
   makeLinks();
@@ -1306,229 +1306,196 @@ let last100Reward = 0, last500Reward = 0;
 let worldObjects = [];
 let obsTimer = 0, powTimer = 0, goldTimer = 0;
 
-// Дополнительные функции для Vegas карты
-function drawVegasBackground() {
-  const hour = timeOfDay / 100;
-  // Отели-казино на заднем плане
-  for(let i = 0; i < 5; i++) {
-    const x = -100 + i * 250 + (mountOff * 0.3) % 500;
-    const hotelW = 60, hotelH = 90;
-    ctx.fillStyle = '#3a3a4a';
-    ctx.fillRect(x, ground.y - hotelH - 20, hotelW, hotelH);
-    // Окна
-    ctx.fillStyle = '#ffdd88';
-    for(let wy = 0; wy < 5; wy++) {
-      for(let wx = 0; wx < 4; wx++) {
-        if(Math.random() > 0.7) continue;
-        ctx.fillRect(x + 10 + wx * 12, ground.y - hotelH - 15 + wy * 15, 6, 8);
-      }
-    }
-    // Неоновая вывеска на отеле
-    const neonBlink = (Math.sin(Date.now() * 0.005 + i) + 1) / 2;
-    ctx.fillStyle = `rgba(255, 68, 204, ${neonBlink * 0.8 + 0.2})`;
-    ctx.fillRect(x + 10, ground.y - hotelH - 25, 40, 10);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 7px "Courier New", monospace';
-    ctx.fillText('CASINO', x + 15, ground.y - hotelH - 18);
-  }
-  
-  // Знак "WELCOME TO LAS VEGAS"
-  const signX = 50;
-  ctx.fillStyle = '#ff4444';
-  ctx.fillRect(signX, ground.y - 60, 120, 25);
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(signX + 2, ground.y - 58, 116, 21);
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 8px "Courier New", monospace';
-  ctx.fillText('WELCOME TO', signX + 15, ground.y - 48);
-  ctx.fillText('LAS VEGAS', signX + 25, ground.y - 38);
-}
+// ============================================================
+// НОВЫЕ ФУНКЦИИ ДЛЯ КАРТЫ VEGAS
+// ============================================================
 
-function activateSkinAbility() {
-    const currentSkin = getCurrentSkin();
-    const ability = currentSkin.ability;
+// Высотные дома (Нью-Йорк стиль)
+function drawTallBuilding(x, y, width, height, buildingType, timeOfDay) {
+    const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     
-    if (ability === 'none') {
-        showAchievementQueued(`✨ Нет способности у ${currentSkin.name} ✨`, true);
-        return;
+    ctx.fillStyle = '#2a2a3a';
+    ctx.fillRect(x, y - height, width, height);
+    
+    if (buildingType === 'skyscraper') {
+        const stepHeight = Math.min(15, height * 0.2);
+        ctx.fillStyle = '#3a3a4a';
+        ctx.fillRect(x + width/4, y - height - stepHeight, width/2, stepHeight);
+        ctx.fillStyle = '#c0c0c0';
+        ctx.fillRect(x + width/2 - 2, y - height - stepHeight - 8, 4, 10);
     }
     
-    // Сбрасываем предыдущие способности
-    tripleJumpAvailable = false;
-    tripleJumpUsed = false;
-    speedBoostActive = false;
-    slowMotionActive = false;
-    doubleCoinsActive = false;
-    magnetActive = false;
-    invisibilityActive = false;
+    const windowW = 4;
+    const windowH = 5;
+    const startY = y - height + 8;
     
-    abilityActive = true;
-    abilityTimer = abilityDuration;
+    for(let wy = 0; wy < Math.floor(height / 12); wy++) {
+        for(let wx = 0; wx < Math.floor(width / 10); wx++) {
+            if (Math.random() > 0.65) continue;
+            const windowX = x + 6 + wx * 10;
+            const windowY = startY + wy * 12;
+            if (isNight) {
+                const blink = Math.sin(Date.now() * 0.003 + windowX * 0.1) > 0 ? 0.9 : 0.5;
+                ctx.fillStyle = `rgba(255, 220, 100, ${blink})`;
+            } else {
+                ctx.fillStyle = '#4a4a5a';
+            }
+            ctx.fillRect(windowX, windowY, windowW, windowH);
+        }
+    }
     
-    switch(ability) {
-        case 'tripleJump':
-            tripleJumpAvailable = true;
-            tripleJumpUsed = false;
-            player.tripleJumpAvailable = true;
-            showAchievementQueued(`🌈 ТРОЙНОЙ ПРЫЖОК (10 сек)! 🌈`, true);
-            break;
-        case 'speedBoost':
-            speedBoostActive = true;
-            showAchievementQueued(`⚡ УСКОРЕНИЕ (10 сек)! ⚡`, true);
-            break;
-        case 'slowMotion':
-            slowMotionActive = true;
-            showAchievementQueued(`🐢 ЗАМЕДЛЕНИЕ ВРЕМЕНИ (10 сек)! 🐢`, true);
-            break;
-        case 'doubleCoins':
-            doubleCoinsActive = true;
-            showAchievementQueued(`🪙 ДВОЙНЫЕ МОНЕТЫ (10 сек)! 🪙`, true);
-            break;
-        case 'healthRegen':
-            showAchievementQueued(`💚 ВОССТАНОВЛЕНИЕ ЗДОРОВЬЯ! 💚`, true);
-            break;
-        case 'magnet':
-            magnetActive = true;
-            showAchievementQueued(`🧲 МАГНИТ (10 сек)! 🧲`, true);
-            break;
-        case 'invisibility':
-            invisibilityActive = true;
-            showAchievementQueued(`👻 НЕВИДИМОСТЬ (10 сек)! 👻`, true);
-            break;
+    if (isNight && width > 40) {
+        const neonBlink = (Math.sin(Date.now() * 0.005) + 1) / 2;
+        ctx.fillStyle = `rgba(255, 68, 204, ${neonBlink * 0.8 + 0.2})`;
+        ctx.fillRect(x + 5, y - height - 5, width - 10, 6);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 5px "Courier New", monospace';
+        ctx.fillText('HOTEL', x + width/2 - 12, y - height - 1);
     }
 }
 
-function applyVegasCoin(x,y) {
-    let coinValue = 25;
-    if (doubleCoinsActive) coinValue = 50;
-    addCoins(coinValue, x, y);
-    showAchievementQueued(`🪙 BELKACOIN! +${coinValue} BelkaCoins 🪙`, true);
-    createDust(x, y, 15);
-    playSound('horseshoe');
+// Пальма (с гирляндами)
+function drawPalmTree(x, y, s, timeOfDay) {
+    const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     
-    // Активируем способность текущего скина
-    activateSkinAbility();
+    px(x+22*s, y+40*s, 8*s, 50*s, '#8B5A2B');
+    px(x+24*s, y+35*s, 6*s, 10*s, '#A06B3A');
+    px(x+20*s, y+85*s, 12*s, 8*s, '#6B3E1A');
+    
+    px(x+0*s, y+15*s, 18*s, 12*s, '#2d6a4f');
+    px(x+28*s, y+15*s, 18*s, 12*s, '#2d6a4f');
+    px(x+5*s, y+8*s, 15*s, 10*s, '#40916c');
+    px(x+26*s, y+8*s, 15*s, 10*s, '#40916c');
+    px(x+8*s, y+0*s, 12*s, 10*s, '#52b788');
+    px(x+26*s, y+0*s, 12*s, 10*s, '#52b788');
+    px(x+15*s, y-5*s, 16*s, 8*s, '#74c69d');
+    
+    px(x+20*s, y+30*s, 4*s, 4*s, '#8B5A2B');
+    px(x+24*s, y+32*s, 4*s, 4*s, '#8B5A2B');
+    
+    if (isNight || (timeOfDay >= 1800 && timeOfDay < 2000)) {
+        for(let i=0; i<5; i++) {
+            const lightX = x + 10*s + i*8*s;
+            const lightY = y + 5*s + Math.sin(i) * 8*s;
+            const colorBlink = (Math.sin(Date.now() * 0.01 + i) + 1) / 2;
+            
+            ctx.fillStyle = `rgba(255, 200, 50, ${colorBlink * 0.8 + 0.3})`;
+            ctx.fillRect(lightX, lightY, 3*s, 3*s);
+            
+            if(i % 2 === 0) {
+                ctx.fillStyle = `rgba(255, 68, 204, ${colorBlink * 0.8})`;
+            } else {
+                ctx.fillStyle = `rgba(68, 204, 255, ${colorBlink * 0.8})`;
+            }
+            ctx.fillRect(lightX+2, lightY-2, 2*s, 2*s);
+        }
+    }
 }
 
-function drawPoliceCar(x, y, w, h, blinkPhase) {
+// Полицейская машина (по вашему изображению)
+function drawPoliceCarBg(x, y, w, h, blinkPhase) {
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x+3, y+h-3, w-6, 5);
-    px(x+5, y+8, w-10, h-12, '#1a1a1a');
-    px(x+3, y+18, w-6, h-18, '#f0f0f0');
-    px(x+8, y+h-8, 10, 6, '#333333');
-    px(x+w-18, y+h-8, 10, 6, '#333333');
+    
+    px(x+5, y+6, w-10, h-14, '#1a1a1a');
+    px(x+3, y+16, w-6, h-20, '#f0f0f0');
+    px(x+5, y+22, w-10, 3, '#cc0000');
+    
+    px(x+8, y+h-8, 10, 6, '#1a1a1a');
+    px(x+w-18, y+h-8, 10, 6, '#1a1a1a');
     px(x+10, y+h-7, 6, 4, '#888888');
     px(x+w-16, y+h-7, 6, 4, '#888888');
-    px(x+10, y+10, 12, 8, '#7ac4ff');
-    px(x+w-22, y+10, 12, 8, '#7ac4ff');
-    px(x+28, y+12, 6, 6, '#7ac4ff');
+    
+    px(x+8, y+9, 10, 7, '#7ac4ff');
+    px(x+w-18, y+9, 10, 7, '#7ac4ff');
+    px(x+22, y+11, 6, 5, '#7ac4ff');
+    px(x+w-28, y+11, 6, 5, '#7ac4ff');
     
     const blink = (Math.sin(Date.now() * 0.01 + blinkPhase) + 1) / 2;
     ctx.fillStyle = `rgba(0, 100, 255, ${blink * 0.8 + 0.2})`;
-    ctx.fillRect(x+w/2-10, y+4, 6, 6);
+    ctx.fillRect(x+w/2-10, y+4, 5, 5);
     ctx.fillStyle = `rgba(255, 0, 0, ${(1 - blink) * 0.8 + 0.2})`;
-    ctx.fillRect(x+w/2-2, y+4, 6, 6);
+    ctx.fillRect(x+w/2-3, y+4, 5, 5);
+    
+    ctx.fillStyle = '#ffcc00';
+    ctx.font = 'bold 5px "Courier New", monospace';
+    ctx.fillText('POLICE', x+18, y+27);
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 6px "Courier New", monospace';
-    ctx.fillText('POLICE', x+15, y+22);
-    px(x+2, y+20, 4, 4, '#ffff88');
-    px(x+w-6, y+20, 4, 4, '#ffff88');
-    px(x+5, y+24, w-10, 3, '#1a1a1a');
-}
-
-function drawSurfboard(x, y, color, s) {
-    px(x + 4*s, y + 0*s, 4*s, 60*s, color);
-    px(x + 6*s, y + 2*s, 2*s, 56*s, '#ffffff');
-    px(x + 3*s, y + 10*s, 2*s, 8*s, '#ffffff');
-    px(x + 7*s, y + 20*s, 2*s, 6*s, '#ffffff');
-    px(x + 4*s, y + 40*s, 8*s, 4*s, '#8B5A2B');
-    for(let i=0;i<3;i++) {
-        px(x + 5*s + i*2*s, y + 25*s + i*5*s, 1, 3, '#4fc3f7');
+    ctx.font = 'bold 4px "Courier New", monospace';
+    ctx.fillText('911', x+12, y+20);
+    
+    px(x+3, y+18, 4, 4, '#ffcc00');
+    px(x+w-7, y+18, 4, 4, '#ffcc00');
+    px(x+2, y+28, w-4, 3, '#888888');
+    
+    ctx.fillStyle = '#ffcc00';
+    ctx.font = 'bold 5px "Courier New", monospace';
+    for(let i=0; i<5; i++) {
+        ctx.fillText('★', x+35 + i*5, y+18);
     }
 }
 
-function drawBillboard(planeX, planeY) {
-    const billboardX = planeX + 20;
-    const billboardY = planeY + 25;
+// Пожарная машина на фоне (боком)
+function drawFireTruckBg(x, y, w, h, blinkPhase) {
+    px(x+2, y+8, w-4, h-14, '#cc0000');
+    px(x+4, y+4, w-8, 6, '#ff4444');
+    px(x+8, y+h-8, 8, 5, '#333333');
+    px(x+w-16, y+h-8, 8, 5, '#333333');
     
-    billboardSway += billboardSwaySpeed;
-    const swayOffset = Math.sin(billboardSway) * billboardSwayAmount;
-    const swayOffset2 = Math.sin(billboardSway * 1.7) * (billboardSwayAmount * 0.7);
-    const rotationAngle = (swayOffset + swayOffset2) * 0.04;
-    const bottomOffset = Math.sin(billboardSway * 2.3) * 3;
-    
-    ctx.beginPath();
-    ctx.moveTo(planeX + 45, planeY + 28);
-    ctx.lineTo(billboardX + 30, billboardY + 8);
-    ctx.strokeStyle = '#8B5A2B';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.moveTo(planeX + 45, planeY + 28);
-    ctx.lineTo(billboardX + 30 + bottomOffset * 0.5, billboardY + 35);
-    ctx.stroke();
-    
-    ctx.save();
-    ctx.translate(billboardX + 30, billboardY + 22);
-    ctx.rotate(rotationAngle);
-    
-    textShake += textShakeSpeed;
-    const textOffsetX = Math.sin(textShake * 2) * 0.8;
-    const textOffsetY = Math.cos(textShake * 1.7) * 0.6;
-    
-    px(-30, -10, 60, 4, '#6B3E1A');
-    ctx.fillStyle = '#D4A373';
-    ctx.fillRect(-28, -6, 56, 32);
-    ctx.fillStyle = '#B87A4A';
-    ctx.fillRect(-26, -4, 52, 28);
-    ctx.fillStyle = '#FEF5E7';
-    ctx.fillRect(-24, -2, 48, 24);
-    ctx.fillStyle = '#9B6A3A';
-    for(let i = -23; i <= 23; i += 23) {
-        ctx.fillRect(i, -1, 2, 22);
-        ctx.fillRect(i, -1, 2, 2);
-        ctx.fillRect(i, 21, 2, 2);
+    px(x+10, y+3, w-20, 3, '#ffcc00');
+    for(let i=0; i<4; i++) {
+        px(x+15+i*12, y+2, 2, 4, '#ffcc00');
     }
     
+    const blink = (Math.sin(Date.now() * 0.015 + blinkPhase) + 1) / 2;
+    ctx.fillStyle = `rgba(255, 0, 0, ${blink * 0.8 + 0.2})`;
+    ctx.fillRect(x+w/2-4, y+2, 8, 4);
+}
+
+// Знак "WELCOME TO LAS VEGAS"
+function drawWelcomeSign(x, y, timeOfDay) {
+    const w = 160;
+    const h = 42;
+    const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
+    
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(x+3, y+h-3, w-6, 6);
+    
+    ctx.fillStyle = '#cc0000';
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#ffcc00';
+    ctx.fillRect(x+2, y+2, w-4, h-4);
+    ctx.fillStyle = '#ff8800';
+    ctx.fillRect(x+2, y+2, w-4, 6);
+    ctx.fillStyle = '#cc0000';
+    ctx.fillRect(x+2, y+h-8, w-4, 6);
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 7px "Courier New", monospace';
+    ctx.fillText('WELCOME TO', x+45, y+15);
+    ctx.fillText('FABULOUS', x+52, y+25);
+    ctx.font = 'bold 11px "Courier New", monospace';
+    ctx.fillText('LAS VEGAS', x+38, y+38);
+    ctx.font = 'bold 5px "Courier New", monospace';
+    ctx.fillText('NEVADA', x+58, y+52);
+    
+    ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 8px "Courier New", monospace';
-    ctx.fillStyle = '#2D2D2D';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.fillText('★', x+10, y+22);
+    ctx.fillText('★', x+w-18, y+22);
+    ctx.fillText('★', x+15, y+40);
+    ctx.fillText('★', x+w-23, y+40);
     
-    let text = billboardText;
-    let lines = [];
-    if (text.length > 12) {
-        lines = [text.substring(0, 12), text.substring(12, 24)];
-    } else {
-        lines = [text];
+    if (isNight) {
+        const neonBlink = (Math.sin(Date.now() * 0.003) + 1) / 2;
+        ctx.fillStyle = `rgba(0, 102, 204, ${neonBlink * 0.5})`;
+        ctx.fillRect(x-3, y-2, w+6, h+4);
     }
     
-    for(let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], textOffsetX, -2 + i * 12 + textOffsetY);
-    }
-    
-    ctx.fillStyle = '#C97E3A';
-    ctx.fillRect(-26, -8, 4, 4);
-    ctx.fillRect(22, -8, 4, 4);
-    ctx.fillRect(-26, 24, 4, 4);
-    ctx.fillRect(22, 24, 4, 4);
-    
-    ctx.restore();
-    
-    ctx.fillStyle = '#FF6666';
-    ctx.beginPath();
-    ctx.moveTo(billboardX + 30 + bottomOffset, billboardY + 38);
-    ctx.lineTo(billboardX + 30 + bottomOffset - 6, billboardY + 44);
-    ctx.lineTo(billboardX + 30 + bottomOffset + 6, billboardY + 44);
-    ctx.fill();
-}
-
-function setBillboardText(newText) {
-    if (newText && newText.length > 0) {
-        billboardText = newText.substring(0, 24);
-        localStorage.setItem('billboardText', billboardText);
-        console.log(`[BILLBOARD] Текст изменён: "${billboardText}"`);
+    ctx.fillStyle = '#ffffff';
+    for(let i = 0; i < 8; i++) {
+        ctx.fillRect(x+5 + i*18, y+h-5, 2, 2);
+        ctx.fillRect(x+5 + i*18, y+3, 2, 2);
     }
 }
 
@@ -1652,11 +1619,20 @@ function drawWorldObject(obj) {
   }
   else if(obj.type === 'cactus' && currentMap.theme === 'desert') drawCactus(obj.x, obj.y, obj.scale||0.8);
   else if(obj.type === 'rock' && currentMap.theme === 'desert') drawRock(obj.x, obj.y, obj.scale||0.7);
-  else if(obj.type === 'policeCar') {
-    drawPoliceCar(obj.x, obj.y, obj.w||55, obj.h||34, obj.lightBlink || 0);
+  else if(obj.type === 'tallBuilding') {
+    drawTallBuilding(obj.x, obj.y, obj.w, obj.h, obj.buildingType, timeOfDay);
   }
-  else if(obj.type === 'surfboard') {
-    drawSurfboard(obj.x, obj.y, obj.color || '#ff4444', obj.size || 1);
+  else if(obj.type === 'palmTree') {
+    drawPalmTree(obj.x, obj.y, obj.scale || 1, timeOfDay);
+  }
+  else if(obj.type === 'policeCarBg') {
+    drawPoliceCarBg(obj.x, obj.y, obj.w, obj.h, obj.lightBlink);
+  }
+  else if(obj.type === 'fireTruckBg') {
+    drawFireTruckBg(obj.x, obj.y, obj.w, obj.h, obj.lightBlink);
+  }
+  else if(obj.type === 'welcomeSign') {
+    drawWelcomeSign(obj.x, obj.y, timeOfDay);
   }
 }
 
@@ -1678,8 +1654,11 @@ function updateWorldObjects() {
       else if(obj.type === 'windmill') obj.x = W + rand(100,400);
       else if(obj.type === 'cactus' && currentMap.theme === 'desert') obj.x = W + rand(30,250);
       else if(obj.type === 'rock' && currentMap.theme === 'desert') obj.x = W + rand(20,300);
-      else if(obj.type === 'policeCar') obj.x = W + rand(300, 600);
-      else if(obj.type === 'surfboard') obj.x = W + rand(100, 300);
+      else if(obj.type === 'tallBuilding') obj.x = W + rand(300, 800);
+      else if(obj.type === 'palmTree') obj.x = W + rand(150, 400);
+      else if(obj.type === 'policeCarBg') obj.x = W + rand(800, 1500);
+      else if(obj.type === 'fireTruckBg') obj.x = W + rand(1200, 2000);
+      else if(obj.type === 'welcomeSign') obj.x = W + rand(500, 1000);
     }
   }
 }
@@ -1734,13 +1713,78 @@ function setupWorld() {
     }
     for(let i=0;i<3;i++) worldObjects.push({ type:'windmill', x:W+i*500+Math.random()*200, y:ground.y-170-Math.random()*20, w:100+Math.random()*20, h:170, speedMul:0.22, bladeAngle:Math.random()*Math.PI*2, bladeSpeed:0.02+Math.random()*0.02 });
   } else if(currentMap.theme === 'vegas') {
-    for(let i=0;i<8;i++) worldObjects.push({ type:'surfboard', x:i*180+Math.random()*120, y:ground.y-65-Math.random()*20, color: ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff'][Math.floor(Math.random() * 6)], size:0.8+Math.random()*0.5, speedMul:0.3 });
-    for(let i=0;i<5;i++) {
-      worldObjects.push({ type:'policeCar', x:200 + i * 300 + Math.random() * 50, y:ground.y - 35, w:55, h:34, speedMul:0.35, lightBlink: Math.random() * Math.PI * 2 });
+    // Высотные дома
+    const buildings = [
+        { x: 50, width: 45, height: 120, type: 'skyscraper' },
+        { x: 110, width: 35, height: 90, type: 'building' },
+        { x: 160, width: 55, height: 150, type: 'skyscraper' },
+        { x: 230, width: 40, height: 100, type: 'building' },
+        { x: 290, width: 50, height: 130, type: 'skyscraper' },
+        { x: 360, width: 35, height: 85, type: 'building' },
+        { x: 410, width: 60, height: 160, type: 'skyscraper' },
+        { x: 490, width: 45, height: 110, type: 'building' },
+        { x: 550, width: 50, height: 140, type: 'skyscraper' },
+        { x: 620, width: 40, height: 95, type: 'building' },
+        { x: 680, width: 55, height: 155, type: 'skyscraper' }
+    ];
+    for(let b of buildings) {
+        worldObjects.push({
+            type: 'tallBuilding',
+            x: b.x,
+            y: ground.y - 20,
+            w: b.width,
+            h: b.height,
+            buildingType: b.type,
+            speedMul: 0.15
+        });
     }
-    for(let i=0;i<5;i++) {
-      worldObjects.push({ type:'tree', x:i*250+Math.random()*100, y:ground.y-110-Math.random()*20, scale:0.8+Math.random()*0.5, speedMul:0.3 });
+    
+    // Пальмы
+    for(let i=0; i<12; i++) {
+        worldObjects.push({
+            type: 'palmTree',
+            x: 50 + i * 180 + Math.random() * 80,
+            y: ground.y - 85,
+            scale: 0.8 + Math.random() * 0.5,
+            speedMul: 0.3
+        });
     }
+    
+    // Полицейские машины на фоне
+    for(let i=0; i<5; i++) {
+        worldObjects.push({
+            type: 'policeCarBg',
+            x: 200 + i * 1000 + Math.random() * 200,
+            y: ground.y - 38,
+            w: 58,
+            h: 36,
+            speedMul: 0.2,
+            lightBlink: Math.random() * Math.PI * 2
+        });
+    }
+    
+    // Пожарные машины на фоне
+    for(let i=0; i<2; i++) {
+        worldObjects.push({
+            type: 'fireTruckBg',
+            x: 500 + i * 1500 + Math.random() * 300,
+            y: ground.y - 42,
+            w: 70,
+            h: 38,
+            speedMul: 0.2,
+            lightBlink: Math.random() * Math.PI * 2
+        });
+    }
+    
+    // Знак "WELCOME TO LAS VEGAS"
+    worldObjects.push({
+        type: 'welcomeSign',
+        x: 80,
+        y: ground.y - 75,
+        w: 160,
+        h: 58,
+        speedMul: 0.15
+    });
   } else {
     for(let i=0;i<5;i++) worldObjects.push({ type:'house', x:i*320+Math.random()*120, y:ground.y-100-Math.random()*15, scale:0.8+Math.random()*0.35, speedMul:0.2 });
     for(let i=0;i<12;i++) worldObjects.push({ type:'tree', x:i*170+Math.random()*80, y:ground.y-110-Math.random()*20, scale:0.7+Math.random()*0.8, speedMul:0.4 });
@@ -1816,8 +1860,9 @@ function spawnObstacle() {
     }
     obstacles.push({ type, x:W+60, y:y, w:w, h:h, counted:false });
   } else if(currentMap.theme === 'vegas') {
-    let types = ['bench', 'trashcan', 'container', 'police_car', 'surfboard_ground'];
-    if (score < 500) types = ['bench', 'surfboard_ground', 'bench'];
+    // Только понятные препятствия: скамейки, мусорные баки, контейнеры
+    let types = ['bench', 'trashcan', 'container'];
+    if (score < 500) types = ['bench', 'trashcan'];
     const type = types[Math.floor(Math.random()*types.length)];
     let w, h, y;
     if (type === 'bench') {
@@ -1829,12 +1874,6 @@ function spawnObstacle() {
     } else if (type === 'container') {
       w = 48; h = 44; y = ground.y - h + 4;
       obstacles.push({ type, x:W+60, y: y, w: w, h: h, counted: false });
-    } else if (type === 'police_car') {
-      w = 55; h = 34; y = ground.y - h + 4;
-      obstacles.push({ type, x:W+60, y: y, w: w, h: h, counted: false, lightBlink: Math.random() * Math.PI * 2 });
-    } else if (type === 'surfboard_ground') {
-      w = 42; h = 8; y = ground.y - h + 4;
-      obstacles.push({ type, x:W+60, y: y, w: w, h: h, counted: false, color: ['#ff4444', '#44ff44', '#4444ff'][Math.floor(Math.random() * 3)] });
     }
   } else {
     const types = ['hay','fence','sheep','cart','well','pond','stone','sheep_well','well_pond','bucket_well'];
@@ -2060,7 +2099,15 @@ function update() {
   clouds.forEach(c=>{ c.x-=c.speed; if(c.x<-180) { c.x=W+80; c.y=40+Math.random()*(H*0.3); } });
   birdTimer--; if(birdTimer<=0 && birds.length<3) { birds.push({ x:W+50, y:50+Math.random()*(H*0.25), speed:0.5+Math.random()*0.6, wingPhase:Math.random()*Math.PI*2, size:0.7+Math.random()*0.5 }); birdTimer=180+Math.random()*100; }
   for(let i=0;i<birds.length;i++) { let b=birds[i]; b.x-=b.speed; b.wingPhase+=0.12; if(b.x+30<0) { birds.splice(i,1); i--; } }
-  plane.x+=plane.speed; if(plane.x>W+200) { plane.x=-220; plane.y=60+Math.random()*70; if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('plane'); }
+  
+  // НОВЫЙ БЕЛЫЙ ПАССАЖИРСКИЙ САМОЛЁТ
+  plane.x+=plane.speed; 
+  if(plane.x>W+200) { 
+    plane.x=-220; 
+    plane.y=60+Math.random()*70; 
+    if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('plane'); 
+  }
+  
   obsTimer--; if(obsTimer<=0) { spawnObstacle(); 
     let baseDelay = 70;
     if (score < 500) baseDelay = 110;
@@ -2108,10 +2155,18 @@ function update() {
 function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
 
 function drawMountainsAndForest() {
-  const mbY=ground.y-160;
-  const hour=timeOfDay/100;
-  const currentMap=getCurrentMap();
-  const mCol=currentMap.mountainColors;
+  const currentMap = getCurrentMap();
+  
+  // Для Vegas — не рисуем горы, рисуем высотные дома (они уже добавлены в worldObjects)
+  if (currentMap.theme === 'vegas') {
+    // Ничего не рисуем здесь, дома уже в worldObjects
+    return;
+  }
+  
+  // Остальные карты — рисуем горы как было
+  const mbY = ground.y-160;
+  const hour = timeOfDay/100;
+  const mCol = currentMap.mountainColors;
   let mountainColors;
   if(hour>=20||hour<6) mountainColors=mCol.night;
   else if(hour>=18&&hour<20) mountainColors=mCol.sunset;
@@ -2146,7 +2201,112 @@ function drawMountainsAndForest() {
 }
 function drawCloud(x,y,s){ const fs=s, hue=cloudHue; px(x+8*fs, y+10*fs, 45*fs, 18*fs, `hsl(${hue},85%,88%)`); px(x+0*fs, y+18*fs, 65*fs, 16*fs, `hsl(${hue},85%,88%)`); px(x+15*fs, y+0*fs, 28*fs, 16*fs, `hsl(${hue+10},80%,82%)`); px(x+40*fs, y+8*fs, 22*fs, 14*fs, `hsl(${hue+10},80%,82%)`); }
 function drawBird(x,y,wp,s){ let wy=Math.sin(wp)*2; px(x, y, 10*s, 5*s, '#2c2c2c'); px(x+6*s, y-2*s+wy, 5*s, 3*s, '#4a4a4a'); px(x-2*s, y-2*s+wy, 5*s, 3*s, '#4a4a4a'); px(x+8*s, y+1*s, 3*s, 2*s, '#e8a735'); }
-function drawPlane(x,y){ px(x+10, y+18, 44,5,'#8B5A2B'); px(x+6, y+20, 52,3,'#A87542'); px(x+10, y+6, 44,4,'#8B5A2B'); px(x+6, y+8, 52,3,'#A87542'); px(x+18, y+11, 3,6,'#6B3E1A'); px(x+44, y+11, 3,6,'#6B3E1A'); px(x+18, y+12, 34,10,'#C97E3A'); px(x+22, y+10, 26,3,'#E89E5A'); px(x+40, y+8, 10,6,'#7AC4FF'); px(x+42, y+9, 6,4,'#FFFFFF'); px(x+6, y+14, 10,6,'#B87A3A'); px(x+2, y+16, 5,3,'#9B5E2A'); px(x+56, y+14, 8,3,'#B87A3A'); px(x+62, y+10, 3,10,'#B87A3A'); px(x+26, y+23, 5,3,'#2C2C2C'); px(x+44, y+23, 5,3,'#2C2C2C'); px(x+30, y+16, 3,2,'#F5E5B5'); px(x+40, y+16, 3,2,'#F5E5B5'); }
+
+// НОВЫЙ БЕЛЫЙ ПАССАЖИРСКИЙ ЛАЙНЕР
+function drawPlane(x,y){ 
+  px(x+10, y+18, 44, 6, '#f0f0f0');
+  px(x+8, y+20, 48, 4, '#e0e0e0');
+  px(x+10, y+6, 44, 4, '#ffffff');
+  px(x+8, y+8, 48, 3, '#f5f5f5');
+  px(x+18, y+11, 8, 7, '#d0d0d0');
+  px(x+44, y+11, 8, 7, '#d0d0d0');
+  px(x+18, y+22, 8, 5, '#c0c0c0');
+  px(x+44, y+22, 8, 5, '#c0c0c0');
+  px(x+54, y+8, 6, 16, '#e8e8e8');
+  px(x+56, y+6, 4, 20, '#d8d8d8');
+  for(let i=0; i<5; i++) {
+    px(x+16+i*8, y+19, 3, 2, '#7ac4ff');
+  }
+  px(x+12, y+17, 4, 4, '#7ac4ff');
+  px(x+13, y+18, 2, 2, '#ffffff');
+  px(x+20, y+25, 6, 4, '#888888');
+  px(x+40, y+25, 6, 4, '#888888');
+}
+
+function drawBillboard(planeX, planeY) {
+    const billboardX = planeX + 20;
+    const billboardY = planeY + 25;
+    
+    billboardSway += billboardSwaySpeed;
+    const swayOffset = Math.sin(billboardSway) * billboardSwayAmount;
+    const swayOffset2 = Math.sin(billboardSway * 1.7) * (billboardSwayAmount * 0.7);
+    const rotationAngle = (swayOffset + swayOffset2) * 0.04;
+    const bottomOffset = Math.sin(billboardSway * 2.3) * 3;
+    
+    ctx.beginPath();
+    ctx.moveTo(planeX + 45, planeY + 28);
+    ctx.lineTo(billboardX + 30, billboardY + 8);
+    ctx.strokeStyle = '#8B5A2B';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(planeX + 45, planeY + 28);
+    ctx.lineTo(billboardX + 30 + bottomOffset * 0.5, billboardY + 35);
+    ctx.stroke();
+    
+    ctx.save();
+    ctx.translate(billboardX + 30, billboardY + 22);
+    ctx.rotate(rotationAngle);
+    
+    textShake += textShakeSpeed;
+    const textOffsetX = Math.sin(textShake * 2) * 0.8;
+    const textOffsetY = Math.cos(textShake * 1.7) * 0.6;
+    
+    px(-30, -10, 60, 4, '#6B3E1A');
+    ctx.fillStyle = '#D4A373';
+    ctx.fillRect(-28, -6, 56, 32);
+    ctx.fillStyle = '#B87A4A';
+    ctx.fillRect(-26, -4, 52, 28);
+    ctx.fillStyle = '#FEF5E7';
+    ctx.fillRect(-24, -2, 48, 24);
+    ctx.fillStyle = '#9B6A3A';
+    for(let i = -23; i <= 23; i += 23) {
+        ctx.fillRect(i, -1, 2, 22);
+        ctx.fillRect(i, -1, 2, 2);
+        ctx.fillRect(i, 21, 2, 2);
+    }
+    
+    ctx.font = 'bold 8px "Courier New", monospace';
+    ctx.fillStyle = '#2D2D2D';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    let text = billboardText;
+    let lines = [];
+    if (text.length > 12) {
+        lines = [text.substring(0, 12), text.substring(12, 24)];
+    } else {
+        lines = [text];
+    }
+    
+    for(let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], textOffsetX, -2 + i * 12 + textOffsetY);
+    }
+    
+    ctx.fillStyle = '#C97E3A';
+    ctx.fillRect(-26, -8, 4, 4);
+    ctx.fillRect(22, -8, 4, 4);
+    ctx.fillRect(-26, 24, 4, 4);
+    ctx.fillRect(22, 24, 4, 4);
+    
+    ctx.restore();
+    
+    ctx.fillStyle = '#FF6666';
+    ctx.beginPath();
+    ctx.moveTo(billboardX + 30 + bottomOffset, billboardY + 38);
+    ctx.lineTo(billboardX + 30 + bottomOffset - 6, billboardY + 44);
+    ctx.lineTo(billboardX + 30 + bottomOffset + 6, billboardY + 44);
+    ctx.fill();
+}
+
+function setBillboardText(newText) {
+    if (newText && newText.length > 0) {
+        billboardText = newText.substring(0, 24);
+        localStorage.setItem('billboardText', billboardText);
+        console.log(`[BILLBOARD] Текст изменён: "${billboardText}"`);
+    }
+}
 
 function drawGround() {
   const currentMap=getCurrentMap();
@@ -2163,7 +2323,6 @@ function drawPlayer() {
   const skin=getCurrentSkin(); 
   const x=player.x, y=player.y, bounce=player.grounded?Math.sin(frame*0.3)*1:0; 
   
-  // Эффект невидимости
   if(invisibilityActive) {
     ctx.globalAlpha = 0.4;
   }
@@ -2172,7 +2331,6 @@ function drawPlayer() {
   if(player.doubleJumpAnim>0){ ctx.fillStyle='rgba(255,255,200,0.5)'; ctx.fillRect(x-2,y+36,player.w+4,10); } 
   if(invincible && invBar>0){ const barX=x+player.w/2-invBar/2, barY=y-10; ctx.fillStyle='#ffd966'; ctx.fillRect(barX,barY,invBar,3); ctx.strokeStyle='#b8860b'; ctx.strokeRect(barX,barY,invBar,3); } 
   
-  // Эффект активной способности
   if(abilityActive) {
       const pulse = (Math.sin(Date.now() / 100) + 1) / 2 * 0.5 + 0.3;
       let glowColor = '#aa44ff';
@@ -2190,7 +2348,6 @@ function drawPlayer() {
       ctx.fillText(skin.abilityName, x+10, y-10);
   }
   
-  // Эффект тройного прыжка
   if(tripleJumpAvailable && skin.ability === 'tripleJump') {
       const pulse = (Math.sin(Date.now() / 100) + 1) / 2 * 0.5 + 0.3;
       ctx.fillStyle = `rgba(170, 68, 255, ${pulse * 0.5})`;
@@ -2238,23 +2395,20 @@ function drawObstacle(ob){
       px(ob.x+4, ob.y+4, 6, 10, '#d0d0d0');
       px(ob.x+ob.w-10, ob.y+4, 6, 10, '#d0d0d0');
       px(ob.x+8, ob.y+16, 24, 4, '#e0e0e0');
+      px(ob.x+5, ob.y+2, 4, 12, '#d0d0d0');
+      px(ob.x+ob.w-9, ob.y+2, 4, 12, '#d0d0d0');
     } else if (ob.type === 'trashcan') {
       px(ob.x+4, ob.y+4, 16, 24, '#888888');
       px(ob.x+6, ob.y+2, 12, 6, '#aaaaaa');
       px(ob.x+8, ob.y+20, 8, 4, '#666666');
+      px(ob.x+10, ob.y+26, 4, 4, '#555555');
     } else if (ob.type === 'container') {
       px(ob.x+2, ob.y+4, 44, 36, '#2e7d32');
       px(ob.x+4, ob.y+2, 40, 4, '#4caf50');
       px(ob.x+20, ob.y+20, 8, 16, '#1b5e20');
       px(ob.x+10, ob.y+30, 8, 6, '#1b5e20');
       px(ob.x+30, ob.y+30, 8, 6, '#1b5e20');
-    } else if (ob.type === 'police_car') {
-      drawPoliceCar(ob.x, ob.y, ob.w, ob.h, ob.lightBlink || 0);
-    } else if (ob.type === 'surfboard_ground') {
-      px(ob.x, ob.y+2, ob.w, 4, ob.color || '#ff4444');
-      px(ob.x+4, ob.y, 6, 4, '#ffffff');
-      px(ob.x+ob.w-10, ob.y, 6, 4, '#ffffff');
-      px(ob.x+ob.w/2-2, ob.y+4, 4, 3, '#8B5A2B');
+      px(ob.x+2, ob.y, 44, 4, '#1b5e20');
     }
   } else {
     if(ob.type==='hay'){ px(ob.x, ob.y+10, ob.w,26,'#d9a92e'); px(ob.x+3, ob.y+3, ob.w-6,12,'#f3c84d'); px(ob.x+8, ob.y+14,3,18,'#c18a1c'); px(ob.x+19, ob.y+12,3,20,'#c18a1c'); px(ob.x+28, ob.y+16,3,16,'#c18a1c'); }
@@ -2329,11 +2483,6 @@ function render() {
   ctx.fillStyle=skyGrad;
   ctx.fillRect(0,0,W,ground.y);
   drawMountainsAndForest();
-  
-  // Vegas дополнительные фоновые элементы
-  if (getCurrentMap().theme === 'vegas') {
-    drawVegasBackground();
-  }
   
   clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
   birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
@@ -2542,33 +2691,10 @@ setTimeout(() => {
         });
     }
     
-}, 500);
-
-// ============================================================
-// КНОПКИ ВКЛ/ВЫКЛ В ПАУЗЕ
-// ============================================================
-setTimeout(() => {
+    // Дополнительная привязка для Vegas
     const toggleMusicBtn = document.getElementById('toggleMusicBtn');
     const toggleSfxBtn = document.getElementById('toggleSfxBtn');
     const toggleAmbientBtn = document.getElementById('toggleAmbientBtn');
-    
-    function updateSoundToggleButtons() {
-        if (toggleMusicBtn) {
-            toggleMusicBtn.textContent = musicVolume > 0 ? '🎵 MUSIC: ON' : '🎵 MUSIC: OFF';
-            toggleMusicBtn.style.background = musicVolume > 0 ? '#ffd93b' : '#555555';
-            toggleMusicBtn.style.color = musicVolume > 0 ? '#1a1a1a' : '#cccccc';
-        }
-        if (toggleSfxBtn) {
-            toggleSfxBtn.textContent = sfxVolume > 0 ? '🔊 SFX: ON' : '🔊 SFX: OFF';
-            toggleSfxBtn.style.background = sfxVolume > 0 ? '#ffd93b' : '#555555';
-            toggleSfxBtn.style.color = sfxVolume > 0 ? '#1a1a1a' : '#cccccc';
-        }
-        if (toggleAmbientBtn) {
-            toggleAmbientBtn.textContent = ambientVolume > 0 ? '🌾 AMBIENT: ON' : '🌾 AMBIENT: OFF';
-            toggleAmbientBtn.style.background = ambientVolume > 0 ? '#ffd93b' : '#555555';
-            toggleAmbientBtn.style.color = ambientVolume > 0 ? '#1a1a1a' : '#cccccc';
-        }
-    }
     
     if (toggleMusicBtn) {
         toggleMusicBtn.addEventListener('click', () => {
@@ -2576,7 +2702,10 @@ setTimeout(() => {
             localStorage.setItem('pixelFarmMusicVolume', musicVolume);
             const bgm = document.getElementById('bgm');
             if (bgm) bgm.volume = musicVolume;
-            updateSoundToggleButtons();
+            if (toggleMusicBtn) {
+                toggleMusicBtn.textContent = musicVolume > 0 ? '🎵 MUSIC: ON' : '🎵 MUSIC: OFF';
+                toggleMusicBtn.style.background = musicVolume > 0 ? '#ffd93b' : '#555555';
+            }
             if (typeof playSound === 'function') playSound('buttonClick', 0.25);
         });
     }
@@ -2585,7 +2714,10 @@ setTimeout(() => {
         toggleSfxBtn.addEventListener('click', () => {
             sfxVolume = sfxVolume > 0 ? 0 : 0.35;
             localStorage.setItem('pixelFarmSfxVolume', sfxVolume);
-            updateSoundToggleButtons();
+            if (toggleSfxBtn) {
+                toggleSfxBtn.textContent = sfxVolume > 0 ? '🔊 SFX: ON' : '🔊 SFX: OFF';
+                toggleSfxBtn.style.background = sfxVolume > 0 ? '#ffd93b' : '#555555';
+            }
             if (typeof playSound === 'function') playSound('buttonClick', 0.25);
         });
     }
@@ -2594,13 +2726,15 @@ setTimeout(() => {
         toggleAmbientBtn.addEventListener('click', () => {
             ambientVolume = ambientVolume > 0 ? 0 : 0.15;
             localStorage.setItem('pixelFarmAmbientVolume', ambientVolume);
-            updateSoundToggleButtons();
+            if (toggleAmbientBtn) {
+                toggleAmbientBtn.textContent = ambientVolume > 0 ? '🌾 AMBIENT: ON' : '🌾 AMBIENT: OFF';
+                toggleAmbientBtn.style.background = ambientVolume > 0 ? '#ffd93b' : '#555555';
+            }
             if (typeof playSound === 'function') playSound('buttonClick', 0.25);
         });
     }
     
-    updateSoundToggleButtons();
-}, 600);
+}, 500);
 </script>
 
 <audio id="bgm" src="https://docs.google.com/uc?export=download&id=1REFQFiGDmo3ShAnQj-BHm61suD-yYR_N" loop></audio>
