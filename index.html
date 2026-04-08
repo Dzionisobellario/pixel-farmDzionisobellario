@@ -81,6 +81,23 @@
     #score, #best { display: inline-block; }
     #score { font-size: 34px; }
     #best { font-size: 16px; margin-left: 20px; }
+    .ui-pause-btn {
+      background: #1a1a1a;
+      border: 2px solid #ffd93b;
+      color: #ffd93b;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-family: monospace;
+      margin-left: 16px;
+      border-radius: 4px;
+      transition: none;
+      pointer-events: auto;
+    }
+    .ui-pause-btn:active {
+      transform: translate(2px, 2px);
+    }
     #titleScreen, #gameOverScreen, #rulesModal, #leaderboardModal, #historyModal {
       position: absolute;
       inset: 0;
@@ -270,13 +287,6 @@
       position: relative;
     }
     .menu-coins .coin-icon::after { content: "🪙"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; opacity: 0.7; }
-    #pauseBtn {
-      position: absolute; bottom: 20px; left: 20px; z-index: 12;
-      background: #0a0a0a; color: #ffd93b; border: 2px solid #ffd93b;
-      padding: 6px 12px; font-size: 14px; font-family: monospace; font-weight: bold;
-      cursor: pointer; box-shadow: 3px 3px 0 #000;
-    }
-    #pauseBtn.hidden { display: none !important; }
     #countdownOverlay, #pauseOverlay, #shopModal {
       position: absolute; inset: 0; z-index: 30;
       display: none; align-items: center; justify-content: center;
@@ -413,6 +423,29 @@
       border-top: 2px solid #ffd93b;
       padding-top: 12px;
     }
+    #loadingScreen {
+      position: absolute;
+      inset: 0;
+      z-index: 100;
+      background: #000000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      transition: opacity 0.5s ease;
+    }
+    #loadingBar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff44cc, #aa44ff, #ff44cc);
+      background-size: 200% 100%;
+      animation: loadingShimmer 0.5s infinite linear;
+    }
+    @keyframes loadingShimmer {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
     @media (max-width: 640px) {
       #ui { padding: 4px 12px; font-size: 12px; bottom: 65px; gap: 8px; }
       #score { font-size: 28px; }
@@ -420,6 +453,7 @@
       .ui-online-indicator { padding: 2px 6px; gap: 4px; }
       .ui-online-dot { width: 8px; height: 8px; }
       #uiOnlineCount { font-size: 10px; }
+      .ui-pause-btn { font-size: 14px; padding: 2px 8px; margin-left: 8px; }
       .game-logo { width: 320px; margin-top: -50px; }
       .btn { font-size: 18px; padding: 10px 24px; min-width: 130px; }
       .btn.small { font-size: 15px; padding: 8px 18px; }
@@ -427,7 +461,6 @@
       .achievement { font-size: 10px; padding: 3px 8px; top: 35%; }
       .menu-coins { padding: 4px 10px; font-size: 12px; }
       .coin-icon-real { width: 14px; height: 14px; }
-      #pauseBtn { bottom: 15px; left: 15px; padding: 4px 10px; font-size: 12px; }
       .pixel-note { width: 16px; height: 16px; margin-right: 6px; }
       .pixel-note .note-head { width: 6px; height: 6px; left: 3px; top: 3px; }
       .pixel-note .note-stem { width: 2px; height: 10px; left: 8px; top: -1px; }
@@ -464,6 +497,15 @@
     </div>
     <span id="score">SCORE: 0</span>
     <span id="best">BEST: 0</span>
+    <button id="pauseBtnUi" class="ui-pause-btn">⏸</button>
+  </div>
+
+  <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
+  <div id="loadingScreen">
+    <img src="https://static.tildacdn.com/tild6535-3964-4065-b865-313733666163/IMG_6944.PNG" style="max-width: 80%; width: 400px; image-rendering: pixelated;">
+    <div style="width: 300px; height: 12px; background: #1a1a1a; border: 2px solid #ffd93b;">
+      <div id="loadingBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff44cc, #aa44ff, #ff44cc); background-size: 200% 100%; animation: loadingShimmer 0.5s infinite linear;"></div>
+    </div>
   </div>
 
   <!-- ГЛАВНОЕ МЕНЮ -->
@@ -483,9 +525,10 @@
         <button class="btn small" id="leaderboardBtnMain">🏆 LEADERBOARD</button>
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
+        <button class="btn small" id="exitBtn">🚪 EXIT</button>
       </div>
       <div id="userStatusMain" class="register-hint"></div>
-      <div class="version">✨ v.05.0 — Alisa-единорог, радужный шлейф, цикл дня и ночи! ✨</div>
+      <div class="version">✨ v.06.0 — Загрузочный экран, пляж Vegas, солнце/луна везде! ✨</div>
     </div>
   </div>
 
@@ -508,7 +551,6 @@
   <div id="historyModal" class="hidden"><div class="panel scrollable-panel" style="position: relative;"><h2 id="historyTitle">📜 HISTORY</h2><div class="history-text" id="historyText"></div><button class="btn small" id="closeHistoryBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
   <div id="leaderboardModal"><div class="panel small"><h2>🏆 LEADERBOARD</h2><div id="leaderboardList" class="leaderboard-list"><div>Loading...</div></div><div id="yourRank" style="margin:6px 0; font-size:10px;"></div><div class="online-wrapper" style="margin-top:8px;"><div id="leaderboardOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="leaderboardOnlineCount">0</span><span>online</span></div></div><button class="btn small" id="closeLeaderboardBtn">CLOSE</button></div></div>
 
-  <button id="pauseBtn" class="hidden">⏸ PAUSE</button>
   <div id="countdownOverlay"><div id="countdownText">3</div></div>
   <div id="pauseOverlay"><div class="panel small"><h2>⏸ PAUSED</h2><p>Game is paused</p>
     <div class="sound-toggle-buttons">
@@ -592,7 +634,7 @@ const muteBtn = document.getElementById('muteBtn');
 const historyBtnMain = document.getElementById('historyBtnMain');
 const historyModal = document.getElementById('historyModal');
 const closeHistoryBtn = document.getElementById('closeHistoryBtn');
-const pauseBtn = document.getElementById('pauseBtn');
+const pauseBtnUi = document.getElementById('pauseBtnUi');
 const countdownOverlay = document.getElementById('countdownOverlay');
 const countdownText = document.getElementById('countdownText');
 const pauseOverlay = document.getElementById('pauseOverlay');
@@ -600,8 +642,9 @@ const resumeBtn = document.getElementById('resumeBtn');
 const pauseMenuBtn = document.getElementById('pauseMenuBtn');
 const shopModal = document.getElementById('shopModal');
 const shopBtnMain = document.getElementById('shopBtnMain');
+const exitBtn = document.getElementById('exitBtn');
 
-// СКИНЫ — ALISA ЕДИНОРОГ НА ПЕРВОМ МЕСТЕ, ЛЕГЕНДАРНАЯ
+// СКИНЫ — ALISA ЕДИНОРОГ
 const skins = {
   alisa: { id: 'alisa', name: 'Alisa ⭐', price: 500, owned: false, legendary: true, ability: 'tripleJump', abilityName: 'Тройной прыжок', abilityDesc: '3 прыжка в воздухе', palette: { body: '#e0b0ff', body2: '#f0c0ff', mane: '#ff88ff', leg: '#d080ff', face: '#ffeef8', horn: '#ffdd88', hornGlow: '#ffaa44' } },
   aurelia: { id: 'aurelia', name: 'Aurelia', price: 0, owned: true, ability: 'none', abilityName: 'Нет', abilityDesc: 'Базовая лошадь', palette: { body: '#b86a22', body2: '#d17c2d', mane: '#5b2d15', leg: '#7a3c17', face: '#f1d09a' } },
@@ -731,7 +774,6 @@ function renderSkinsGrid() {
         <div style="position:absolute; left:52px; top:15px; width:6px; height:4px; background:${skin.palette.face};"></div>
         <div style="position:absolute; left:9px; top:28px; width:5px; height:8px; background:${skin.palette.mane};"></div>`;
     
-    // Рог для Alisa в превью
     if (skin.id === 'alisa') {
         html += `<div style="position:absolute; left:58px; top:0px; width:3px; height:8px; background:#ffdd88;"></div>
                  <div style="position:absolute; left:59px; top:-4px; width:1px; height:6px; background:#ffdd88;"></div>`;
@@ -1011,7 +1053,6 @@ if (isNaN(ambientVolume) || ambientVolume === null) {
     localStorage.setItem('pixelFarmAmbientVolume', ambientVolume);
 }
 
-// Билборд для самолёта (только для Farm и WildWest)
 let billboardText = localStorage.getItem('billboardText') || "PIXEL FARM";
 let billboardSway = 0;
 let billboardSwaySpeed = 0.04;
@@ -1019,19 +1060,18 @@ let billboardSwayAmount = 4;
 let textShake = 0;
 let textShakeSpeed = 0.05;
 
-// Переменные для цикла дня и ночи
 let sunX = 80, sunY = 70;
 let moonX = 80, moonY = 70;
 let isSunVisible = true;
 let isMoonVisible = false;
 
-// ВЕРТОЛЁТ для Vegas
-let policeHeli = { x: -260, y: 60, speed: 1.0, lightBlink: 0, active: false };
+let policeHeli = { x: -260, y: 60, speed: 1.0, lightBlink: 0, active: false, baseY: 60 };
+let heliBob = 0;
+let heliBobSpeed = 0.03;
 
-// Переменные для способностей скинов
 let abilityActive = false;
 let abilityTimer = 0;
-let abilityDuration = 900; // 15 секунд для Alisa
+let abilityDuration = 900;
 let tripleJumpAvailable = false;
 let tripleJumpUsed = false;
 let speedBoostActive = false;
@@ -1040,12 +1080,10 @@ let doubleCoinsActive = false;
 let magnetActive = false;
 let invisibilityActive = false;
 
-// Специфичные для Alisa
 let alisaMagnetActive = false;
 let alisaTripleCoinsActive = false;
 let alisaSuperJumpActive = false;
 
-// Радужный шлейф для Alisa
 let rainbowTrail = [];
 let rainbowColors = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#aa44ff'];
 
@@ -1173,17 +1211,12 @@ function playSound(type, volume = 0.2) {
 
 function startAmbientLoop() {
   stopAmbientLoop();
-  console.log('[AMBIENT] Цикл запущен, ambientVolume =', ambientVolume);
   ambientInterval = setInterval(() => {
-    if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') {
-      return;
-    }
+    if (!soundEnabled || !audioAllowed || !audioCtx || audioCtx.state !== 'running') return;
     if (!gameRunning || gameOver) return;
-    
     const hour = timeOfDay / 100;
     const rand = Math.random();
     const currentMap = getCurrentMap();
-    
     if (currentMap.theme === 'desert') {
       if (rand < 0.12) playSound('wind');
       else if (rand < 0.18 && hour >= 6 && hour < 19) playSound('bird');
@@ -1357,7 +1390,7 @@ function applyTranslations() {
   const historyDiv = document.getElementById('historyText');
   if (historyDiv) historyDiv.innerHTML = `<p>Welcome to Pixel Farm Runner! Collect BelkaCoins, buy skins, backgrounds and maps, and set new records. Good luck!</p>`;
   const rulesDiv = document.getElementById('rulesList');
-  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Las Vegas - неон, полиция, высотные дома, пальмы!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 3 maps + 4 backgrounds!</li><li>✨ <strong>Способности скинов:</strong> У каждого скина уникальная способность при сборе BelkaCoin!</li></ul>`;
+  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Las Vegas - неон, полиция, высотные дома, пальмы, пляж!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 3 maps + 4 backgrounds!</li><li>✨ <strong>Способности скинов:</strong> У каждого скина уникальная способность при сборе BelkaCoin!</li></ul>`;
   const sponsor = document.getElementById('sponsorLine');
   if (sponsor) sponsor.innerHTML = t.rulesSponsor.replace(/\n/g, '<br>').replace(/bellariofilms\.com/g, '<strong class="register-link">bellariofilms.com</strong>');
   makeLinks();
@@ -1390,7 +1423,6 @@ let obsTimer = 0, powTimer = 0, goldTimer = 0;
 // НОВЫЕ ФУНКЦИИ ДЛЯ КАРТЫ VEGAS
 // ============================================================
 
-// ЯРКИЕ РАЗНОЦВЕТНЫЕ ДОМА (разной этажности)
 const buildingColors = ['#4a7ad9', '#d94a7a', '#4ad97a', '#d9a34a', '#7a4ad9', '#d94a4a', '#4ad9d9', '#d9d94a', '#d94ad9'];
 
 function drawBuildingWithRoof(x, y, width, height, roofType, colorIdx, timeOfDay) {
@@ -1425,14 +1457,13 @@ function drawBuildingWithRoof(x, y, width, height, roofType, colorIdx, timeOfDay
                 const blink = Math.sin(Date.now() * 0.003 + windowX) > 0 ? 0.9 : 0.5;
                 ctx.fillStyle = `rgba(255, 220, 100, ${blink})`;
             } else {
-                ctx.fillStyle = '#ffdd88';
+                ctx.fillStyle = '#4a4a5a';
             }
             ctx.fillRect(windowX, windowY, 5, 7);
         }
     }
 }
 
-// ТЕЛЕБАШНЯ
 function drawTVTower(x, y, timeOfDay) {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     const height = 160;
@@ -1463,7 +1494,6 @@ function drawTVTower(x, y, timeOfDay) {
     }
 }
 
-// НОВАЯ ПАЛЬМА (по вашему образцу)
 function drawVegasPalm(x, y, timeOfDay) {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     
@@ -1493,7 +1523,6 @@ function drawVegasPalm(x, y, timeOfDay) {
     }
 }
 
-// ПОЛИЦЕЙСКАЯ МАШИНА (фон, реже)
 function drawPoliceCarBg(x, y, w, h, blinkPhase) {
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x+3, y+h-3, w-6, 5);
@@ -1536,7 +1565,6 @@ function drawPoliceCarBg(x, y, w, h, blinkPhase) {
     }
 }
 
-// НОВАЯ ПОЖАРНАЯ МАШИНА
 function drawFireTruckBg(x, y, w, h, blinkPhase) {
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x+3, y+h-3, w-6, 5);
@@ -1573,7 +1601,6 @@ function drawFireTruckBg(x, y, w, h, blinkPhase) {
     ctx.fillText('FIRE', x+30, y+28);
 }
 
-// СКОРАЯ ПОМОЩЬ (активное препятствие)
 function drawAmbulance(x, y, w, h, blinkPhase) {
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x+3, y+h-3, w-6, 5);
@@ -1608,43 +1635,87 @@ function drawAmbulance(x, y, w, h, blinkPhase) {
     px(x+w-7, y+18, 4, 4, '#ffcc00');
 }
 
-// ПОЛИЦЕЙСКИЙ ВЕРТОЛЁТ (НОВЫЙ, ПО ВАШЕМУ ОБРАЗЦУ)
+// ПЛЯЖНЫЙ ЗОНТИК (красно-белая полоска)
+function drawBeachUmbrellaStriped(x, y, timeOfDay) {
+    px(x+10, y+15, 3, 30, '#8B5A2B');
+    
+    ctx.fillStyle = '#ff4444';
+    ctx.beginPath();
+    ctx.moveTo(x+2, y+15);
+    ctx.lineTo(x+12, y+0);
+    ctx.lineTo(x+22, y+15);
+    ctx.fill();
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(x+6, y+15);
+    ctx.lineTo(x+12, y+4);
+    ctx.lineTo(x+18, y+15);
+    ctx.fill();
+    
+    px(x+11, y-2, 2, 4, '#ffcc00');
+    
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    ctx.fillRect(x+2, y+15, 20, 5);
+}
+
+// ПЛЯЖНЫЙ ЛЕЖАК (сине-белая полоска)
+function drawBeachLounger(x, y, timeOfDay) {
+    px(x+0, y+8, 28, 4, '#c4a47a');
+    px(x+2, y+12, 24, 3, '#a07850');
+    
+    px(x+4, y+15, 3, 8, '#8B5A2B');
+    px(x+21, y+15, 3, 8, '#8B5A2B');
+    
+    for(let i=0; i<5; i++) {
+        const stripeColor = (i % 2 === 0) ? '#4a7ad9' : '#ffffff';
+        px(x+2 + i*5, y+4, 4, 5, stripeColor);
+    }
+    
+    ctx.fillStyle = '#ffaa88';
+    ctx.fillRect(x+20, y+2, 8, 8);
+    px(x+22, y+1, 4, 2, '#ffccaa');
+    
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    ctx.fillRect(x+2, y+15, 24, 4);
+}
+
+// ПОЛИЦЕЙСКИЙ ВЕРТОЛЁТ (улучшенный)
 function drawPoliceHelicopter(x, y, blinkPhase) {
     const angle = Date.now() * 0.02;
     ctx.save();
-    ctx.translate(x + 32, y + 20);
+    ctx.translate(x + 30, y + 18);
     ctx.rotate(angle);
-    ctx.fillStyle = '#D2D2D2';
-    ctx.fillRect(-30, -2, 60, 4);
+    ctx.fillStyle = '#c0c0c0';
+    ctx.fillRect(-28, -2, 56, 4);
     ctx.restore();
     
-    px(x+45, y+25, 15, 4, '#464646');
-    px(x+52, y+23, 8, 3, '#464646');
+    px(x+48, y+22, 20, 5, '#2a5a8a');
+    px(x+62, y+21, 12, 4, '#1a3a6e');
+    px(x+72, y+20, 6, 6, '#888888');
     
-    px(x+10, y+24, 40, 8, '#ECECEC');
-    px(x+8, y+28, 44, 6, '#ECECEC');
-    px(x+12, y+22, 36, 4, '#7D7D7D');
-    px(x+10, y+30, 40, 2, '#282828');
+    px(x+8, y+20, 42, 10, '#2a5a8a');
+    px(x+6, y+24, 46, 8, '#1a3a6e');
+    px(x+8, y+26, 42, 3, '#ffffff');
     
-    px(x+35, y+26, 12, 6, '#A0B4BE');
-    px(x+37, y+24, 8, 4, '#A0B4BE');
+    px(x+35, y+22, 12, 8, '#7ac4ff');
+    px(x+38, y+19, 8, 5, '#a0d4ff');
     
-    px(x+15, y+34, 4, 6, '#1A1A1A');
-    px(x+35, y+34, 4, 6, '#1A1A1A');
-    px(x+12, y+38, 30, 2, '#1A1A1A');
+    px(x+12, y+32, 4, 6, '#333333');
+    px(x+38, y+32, 4, 6, '#333333');
+    px(x+9, y+36, 36, 3, '#444444');
     
     const blink = (Math.sin(Date.now() * 0.015 + blinkPhase) + 1) / 2;
-    ctx.fillStyle = `rgba(0, 100, 255, ${blink * 0.8 + 0.2})`;
-    ctx.fillRect(x+28, y+20, 5, 4);
-    ctx.fillStyle = `rgba(255, 0, 0, ${(1 - blink) * 0.8 + 0.2})`;
-    ctx.fillRect(x+35, y+20, 5, 4);
+    ctx.fillStyle = `rgba(0, 100, 255, ${blink * 0.9})`;
+    ctx.fillRect(x+22, y+16, 6, 5);
+    ctx.fillStyle = `rgba(255, 0, 0, ${(1 - blink) * 0.9})`;
+    ctx.fillRect(x+30, y+16, 6, 5);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 5px "Courier New", monospace';
-    ctx.fillText('POLICE', x+18, y+33);
+    ctx.font = 'bold 6px "Courier New", monospace';
+    ctx.fillText('POLICE', x+18, y+30);
 }
 
-// Знак "WELCOME TO LAS VEGAS"
 function drawWelcomeSign(x, y, timeOfDay) {
     const w = 160;
     const h = 42;
@@ -1829,6 +1900,12 @@ function drawWorldObject(obj) {
   else if(obj.type === 'welcomeSign') {
     drawWelcomeSign(obj.x, obj.y, timeOfDay);
   }
+  else if(obj.type === 'beachUmbrellaStriped') {
+    drawBeachUmbrellaStriped(obj.x, obj.y, timeOfDay);
+  }
+  else if(obj.type === 'beachLounger') {
+    drawBeachLounger(obj.x, obj.y, timeOfDay);
+  }
 }
 
 function updateWorldObjects() {
@@ -1855,6 +1932,8 @@ function updateWorldObjects() {
       else if(obj.type === 'policeCarBg') obj.x = W + rand(1500, 2500);
       else if(obj.type === 'fireTruckBg') obj.x = W + rand(1200, 2000);
       else if(obj.type === 'welcomeSign') obj.x = W + rand(500, 1000);
+      else if(obj.type === 'beachUmbrellaStriped') obj.x = W + rand(800, 1200);
+      else if(obj.type === 'beachLounger') obj.x = W + rand(800, 1200);
     }
   }
 }
@@ -1889,21 +1968,21 @@ function updateSky() {
         timeOfDay = (timeOfDay + cycleSpeed) % 2400;
         
         const hour = timeOfDay / 100;
-        // Солнце: встаёт в 6:00, зенит в 12:00, садится в 18:00
+        const horizonY = ground.y - 30;
+        const zenithY = horizonY - 160;
+        
         if (hour >= 6 && hour <= 18) {
             isSunVisible = true;
             isMoonVisible = false;
+            
+            sunX = 60 + ((hour - 6) / 12) * 160;
             const t = (hour - 6) / 12;
-            sunX = 80 + t * 140;
-            sunY = 80 - t * 40;
-            if (hour > 12) {
-                sunY = 40 + (hour - 12) / 6 * 40;
-            }
+            const parabolaHeight = 4 * t * (1 - t);
+            sunY = horizonY - parabolaHeight * 160;
         } else {
             isSunVisible = false;
         }
         
-        // Луна: появляется в 18:00, пик в 0:00, исчезает в 6:00
         if (hour >= 18 || hour <= 6) {
             isMoonVisible = true;
             let t;
@@ -1912,13 +1991,9 @@ function updateSky() {
             } else {
                 t = (hour + 6) / 12;
             }
-            moonX = 80 + t * 140;
-            moonY = 80 - t * 40;
-            if (hour > 0 && hour < 6) {
-                moonY = 40 + (hour) / 6 * 40;
-            } else if (hour > 18) {
-                moonY = 40 + (hour - 18) / 6 * 40;
-            }
+            moonX = 60 + t * 160;
+            const parabolaHeight = 4 * t * (1 - t);
+            moonY = horizonY - parabolaHeight * 160;
         } else {
             isMoonVisible = false;
         }
@@ -1927,7 +2002,8 @@ function updateSky() {
 }
 
 function setupWorld() {
-  ground.h = Math.max(140, H*0.22); ground.y = H - ground.h;
+  ground.h = Math.max(130, H*0.18);
+  ground.y = H - ground.h;
   player.y = ground.y - player.h + 8; player.vy = 0; player.grounded = true; player.doubleJumpAvailable = false; player.doubleJumpUsed = false; player.doubleJumpAnim = 0;
   obstacles = []; powerups = []; particles = []; clouds = []; birds = []; balloons = [];
   worldObjects = [];
@@ -1943,7 +2019,7 @@ function setupWorld() {
   }
   
   plane = { x:-260, y:70+Math.random()*70, speed:1.2 };
-  policeHeli = { x: -260, y: 30 + Math.random() * 50, speed: 1.0, lightBlink: 0, active: false };
+  policeHeli = { x: -260, y: 30 + Math.random() * 50, speed: 1.0, lightBlink: 0, active: false, baseY: 30 + Math.random() * 50 };
   
   if(currentMap.theme === 'desert') {
     for(let i=0;i<8;i++) worldObjects.push({ type:'cactus', x:i*280+Math.random()*120, y:ground.y-35-Math.random()*25, scale:0.6+Math.random()*0.7, speedMul:0.35 });
@@ -1954,18 +2030,19 @@ function setupWorld() {
     for(let i=0;i<3;i++) worldObjects.push({ type:'windmill', x:W+i*500+Math.random()*200, y:ground.y-170-Math.random()*20, w:100+Math.random()*20, h:170, speedMul:0.22, bladeAngle:Math.random()*Math.PI*2, bladeSpeed:0.02+Math.random()*0.02 });
   } else if(currentMap.theme === 'vegas') {
     const buildings = [
-        { x: 50, width: 55, height: 100, roof: 'pointed', colorIdx: 0 },
-        { x: 120, width: 40, height: 70, roof: 'flat', colorIdx: 1 },
-        { x: 175, width: 65, height: 120, roof: 'stepped', colorIdx: 2 },
-        { x: 255, width: 45, height: 85, roof: 'pointed', colorIdx: 3 },
-        { x: 315, width: 70, height: 110, roof: 'flat', colorIdx: 4 },
-        { x: 400, width: 40, height: 65, roof: 'stepped', colorIdx: 5 },
-        { x: 455, width: 75, height: 130, roof: 'pointed', colorIdx: 6 },
-        { x: 545, width: 50, height: 95, roof: 'flat', colorIdx: 7 },
-        { x: 610, width: 60, height: 115, roof: 'stepped', colorIdx: 0 },
-        { x: 685, width: 45, height: 80, roof: 'pointed', colorIdx: 1 },
-        { x: 745, width: 70, height: 125, roof: 'flat', colorIdx: 2 },
-        { x: 830, width: 50, height: 105, roof: 'stepped', colorIdx: 3 }
+        { x: 40, width: 45, height: 85, roof: 'pointed', colorIdx: 0 },
+        { x: 100, width: 35, height: 60, roof: 'flat', colorIdx: 1 },
+        { x: 150, width: 55, height: 140, roof: 'stepped', colorIdx: 2 },
+        { x: 220, width: 40, height: 70, roof: 'pointed', colorIdx: 3 },
+        { x: 275, width: 65, height: 160, roof: 'flat', colorIdx: 4 },
+        { x: 355, width: 35, height: 55, roof: 'stepped', colorIdx: 5 },
+        { x: 405, width: 70, height: 180, roof: 'pointed', colorIdx: 6 },
+        { x: 490, width: 45, height: 90, roof: 'flat', colorIdx: 7 },
+        { x: 550, width: 55, height: 150, roof: 'stepped', colorIdx: 0 },
+        { x: 620, width: 40, height: 65, roof: 'pointed', colorIdx: 1 },
+        { x: 675, width: 75, height: 200, roof: 'flat', colorIdx: 2 },
+        { x: 765, width: 45, height: 100, roof: 'stepped', colorIdx: 3 },
+        { x: 825, width: 50, height: 130, roof: 'pointed', colorIdx: 4 }
     ];
     for(let i=0; i<buildings.length; i++) {
         const b = buildings[i];
@@ -2029,6 +2106,24 @@ function setupWorld() {
         h: 58,
         speedMul: 0.15
     });
+    
+    for(let i=0; i<8; i++) {
+        worldObjects.push({
+            type: 'beachUmbrellaStriped',
+            x: 900 + i * 140 + Math.random() * 60,
+            y: ground.y - 38,
+            speedMul: 0.25
+        });
+    }
+    
+    for(let i=0; i<10; i++) {
+        worldObjects.push({
+            type: 'beachLounger',
+            x: 920 + i * 130 + Math.random() * 50,
+            y: ground.y - 28,
+            speedMul: 0.25
+        });
+    }
   } else {
     for(let i=0;i<5;i++) worldObjects.push({ type:'house', x:i*320+Math.random()*120, y:ground.y-100-Math.random()*15, scale:0.8+Math.random()*0.35, speedMul:0.2 });
     for(let i=0;i<12;i++) worldObjects.push({ type:'tree', x:i*170+Math.random()*80, y:ground.y-110-Math.random()*20, scale:0.7+Math.random()*0.8, speedMul:0.4 });
@@ -2156,14 +2251,17 @@ function startCountdown() {
   }
   nextStep();
 }
+
 function togglePause(force=null) {
   if(gameOver || !titleScr.classList.contains('hidden')) return;
   if(!gameRunning && !gamePaused) return;
   if(force===true || (!gamePaused && force===null)) {
-    gamePaused=true; gameRunning=false; pauseOverlay.style.display='flex'; pauseBtn.textContent='▶ RESUME';
+    gamePaused=true; gameRunning=false; pauseOverlay.style.display='flex';
+    if (pauseBtnUi) pauseBtnUi.textContent = '▶';
     stopAmbientLoop();
   } else {
-    gamePaused=false; gameRunning=true; pauseOverlay.style.display='none'; pauseBtn.textContent='⏸ PAUSE';
+    gamePaused=false; gameRunning=true; pauseOverlay.style.display='none';
+    if (pauseBtnUi) pauseBtnUi.textContent = '⏸';
     startAmbientLoop();
   }
 }
@@ -2240,7 +2338,7 @@ function startGame() {
   alisaSuperJumpActive = false;
   rainbowTrail = [];
   scoreEl.textContent=`${t.scoreLabel} 0`; setupWorld(); flash.style.background='rgba(255,0,0,0)'; timeOfDay=800; updateSky();
-  pauseBtn.classList.remove('hidden'); startCountdown();
+  startCountdown();
   enableAudio();
   const bgm = document.getElementById('bgm');
   if (bgm && !bgm.paused) bgm.pause();
@@ -2248,7 +2346,7 @@ function startGame() {
 function endGame() {
   gameOver=true; gameRunning=false; timeOfDay=1800; updateSky();
   if(score>bestScore) { bestScore=score; localStorage.setItem('pixelFarmBest',bestScore); bestEl.textContent=`${t.bestLabel} ${bestScore}`; if(!recBonus) { addCoins(15,W/2,H/2); showAchievementQueued(`🏆 NEW RECORD! +15 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins 🏆`,true); recBonus=true; } }
-  if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; pauseBtn.classList.add('hidden');
+  if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; 
   const bgm = document.getElementById('bgm');
   if (bgm && soundEnabled && titleScr && !titleScr.classList.contains('hidden')) {
     bgm.volume = musicVolume;
@@ -2257,7 +2355,7 @@ function endGame() {
 }
 startBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
 restartBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
-menuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); gameOverScr.classList.add('hidden'); titleScr.classList.remove('hidden'); timeOfDay=800; updateSky(); pauseBtn.classList.add('hidden'); 
+menuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); gameOverScr.classList.add('hidden'); titleScr.classList.remove('hidden'); timeOfDay=800; updateSky(); 
   const bgm = document.getElementById('bgm');
   if (bgm && soundEnabled) {
     bgm.volume = musicVolume;
@@ -2269,16 +2367,28 @@ closeRules.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesMo
 leaderBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); loadLeaderboard("leaderboardList",true); leaderModal.style.display='flex'; });
 closeLeader.addEventListener('click',()=>{ playSound('buttonClick',0.25); leaderModal.style.display='none'; });
 resumeBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); });
-pauseMenuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); gameOverScr.classList.remove('hidden'); titleScr.classList.add('hidden'); gameRunning=false; gameOver=true; pauseBtn.classList.add('hidden'); 
+pauseMenuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); gameOverScr.classList.remove('hidden'); titleScr.classList.add('hidden'); gameRunning=false; gameOver=true; 
   const bgm = document.getElementById('bgm');
   if (bgm && soundEnabled) {
     bgm.volume = musicVolume;
     bgm.play().catch(()=>{});
   }
 });
-pauseBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(); });
+if (pauseBtnUi) {
+    pauseBtnUi.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        playSound('buttonClick', 0.25);
+        togglePause();
+    });
+}
 shopBtnMain.addEventListener('click',()=>{ playSound('buttonClick',0.25); renderShop(); switchShopTab('skins'); shopModal.style.display='flex'; });
 document.querySelectorAll('.shop-tab').forEach(tab=>{ tab.addEventListener('click',()=>switchShopTab(tab.dataset.tab)); });
+if (exitBtn) {
+    exitBtn.addEventListener('click', () => {
+        window.open('https://bellariofilms.com', '_blank');
+    });
+}
 
 window.addEventListener('keydown',e=>{
   if(e.code==='KeyP'||e.code==='Escape'){ e.preventDefault(); if(!titleScr.classList.contains('hidden')&&!gameOver){ playSound('buttonClick',0.2); togglePause(); } return; }
@@ -2406,7 +2516,6 @@ function update() {
   updateFireflies();
   updateWorldObjects();
   
-  // Обновление радужного шлейфа
   for(let i=0; i<rainbowTrail.length; i++) {
       rainbowTrail[i].life--;
       if(rainbowTrail[i].life <= 0) {
@@ -2492,10 +2601,15 @@ function update() {
         if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('plane'); 
       }
   } else {
+      heliBob += heliBobSpeed;
+      const bobOffset = Math.sin(heliBob) * 2;
+      policeHeli.y = policeHeli.baseY + bobOffset;
+      
       policeHeli.x += policeHeli.speed;
       if(policeHeli.x > W+200) {
           policeHeli.x = -260;
-          policeHeli.y = 30 + Math.random() * 50;
+          policeHeli.baseY = 30 + Math.random() * 50;
+          policeHeli.y = policeHeli.baseY;
           policeHeli.lightBlink = Math.random() * Math.PI * 2;
           if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('heli');
       }
@@ -2923,41 +3037,47 @@ function render() {
       drawBillboard(plane.x, plane.y);
   }
   
-  // Солнце и Луна (для всех карт)
+  // СОЛНЦЕ И ЛУНА НА ВСЕХ КАРТАХ
+  const hour = timeOfDay / 100;
+  let sizeMultiplier = 1;
+  if (hour < 7 || hour > 17) sizeMultiplier = 0.6;
+  else if (hour < 8 || hour > 16) sizeMultiplier = 0.8;
+  else sizeMultiplier = 1;
+  
   if (isSunVisible) {
       const pulse = 0.85 + Math.sin(Date.now() / 700) * 0.1;
       const alphaPulse = 0.25 + Math.sin(Date.now() / 600) * 0.12;
       
       ctx.beginPath();
-      ctx.arc(sunX, sunY, 42 * pulse, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 42 * pulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 220, 100, ${alphaPulse * 0.6})`;
       ctx.fill();
       
       ctx.beginPath();
-      ctx.arc(sunX, sunY, 36 * pulse, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 36 * pulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 200, 80, ${alphaPulse * 0.8})`;
       ctx.fill();
       
       ctx.beginPath();
-      ctx.arc(sunX, sunY, 30 * pulse, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 30 * pulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 180, 60, ${alphaPulse})`;
       ctx.fill();
       
-      for(let sy=0; sy<34; sy++){
-          for(let sx=0; sx<34; sx++){
-              let dx=sunX-17+sx, dy=sunY-17+sy;
-              let dist=Math.hypot(sx-17,sy-17);
-              if(dist<14) ctx.fillStyle='#ffdd66';
-              else if(dist<17) ctx.fillStyle='#ffcc33';
+      for(let sy=0; sy<34 * sizeMultiplier; sy++){
+          for(let sx=0; sx<34 * sizeMultiplier; sx++){
+              let dx=sunX-17*sizeMultiplier+sx, dy=sunY-17*sizeMultiplier+sy;
+              let dist=Math.hypot(sx-17*sizeMultiplier,sy-17*sizeMultiplier);
+              if(dist<14*sizeMultiplier) ctx.fillStyle='#ffdd66';
+              else if(dist<17*sizeMultiplier) ctx.fillStyle='#ffcc33';
               else continue;
               ctx.fillRect(dx,dy,1,1);
           }
       }
       
-      for(let bx=0; bx<5; bx++) for(let by=0; by<5; by++){
-          if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffdd';
+      for(let bx=0; bx<5*sizeMultiplier; bx++) for(let by=0; by<5*sizeMultiplier; by++){
+          if((bx===2*sizeMultiplier||bx===3*sizeMultiplier) && (by===2*sizeMultiplier||by===3*sizeMultiplier)) ctx.fillStyle='#ffffdd';
           else continue;
-          ctx.fillRect(sunX-2+bx, sunY-2+by, 1,1);
+          ctx.fillRect(sunX-2*sizeMultiplier+bx, sunY-2*sizeMultiplier+by, 1,1);
       }
   }
   
@@ -2966,26 +3086,26 @@ function render() {
       const moonAlphaPulse = 0.2 + Math.sin(Date.now() / 800) * 0.1;
       
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 38 * moonPulse, 0, Math.PI * 2);
+      ctx.arc(moonX, moonY, 38 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(200, 220, 255, ${moonAlphaPulse * 0.5})`;
       ctx.fill();
       
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 32 * moonPulse, 0, Math.PI * 2);
+      ctx.arc(moonX, moonY, 32 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(180, 200, 240, ${moonAlphaPulse * 0.7})`;
       ctx.fill();
       
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 26 * moonPulse, 0, Math.PI * 2);
+      ctx.arc(moonX, moonY, 26 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(160, 180, 220, ${moonAlphaPulse})`;
       ctx.fill();
       
-      for(let sy=0; sy<30; sy++){
-          for(let sx=0; sx<30; sx++){
-              let dx=moonX-15+sx, dy=moonY-15+sy;
-              let dist=Math.hypot(sx-15,sy-15);
-              if(dist<12) ctx.fillStyle='#e0e8fc';
-              else if(dist<14) ctx.fillStyle='#d0d8f0';
+      for(let sy=0; sy<30 * sizeMultiplier; sy++){
+          for(let sx=0; sx<30 * sizeMultiplier; sx++){
+              let dx=moonX-15*sizeMultiplier+sx, dy=moonY-15*sizeMultiplier+sy;
+              let dist=Math.hypot(sx-15*sizeMultiplier,sy-15*sizeMultiplier);
+              if(dist<12*sizeMultiplier) ctx.fillStyle='#e0e8fc';
+              else if(dist<14*sizeMultiplier) ctx.fillStyle='#d0d8f0';
               else continue;
               ctx.fillRect(dx,dy,1,1);
           }
@@ -3005,9 +3125,9 @@ function render() {
     layerColor2 = '#7ec347';
   }
   ctx.fillStyle = layerColor1;
-  ctx.fillRect(0, ground.y - 140, W, 140);
+  ctx.fillRect(0, ground.y - 100, W, 100);
   ctx.fillStyle = layerColor2;
-  ctx.fillRect(0, ground.y - 110, W, 70);
+  ctx.fillRect(0, ground.y - 80, W, 60);
   
   worldObjects.forEach(obj=>drawWorldObject(obj));
   drawGround();
@@ -3037,150 +3157,30 @@ function render() {
 }
 function loop(){ update(); render(); requestAnimationFrame(loop); }
 
+// ЗАГРУЗОЧНЫЙ ЭКРАН
+const loadingBar = document.getElementById('loadingBar');
+if (loadingBar) {
+    let width = 0;
+    const interval = setInterval(() => {
+        width += 2;
+        loadingBar.style.width = width + '%';
+        if (width >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 500);
+        }
+    }, 50);
+}
+
 checkReg().then(()=>{ loadLeaderboard("gameOverLeaderboard",false); loadLeaderboard("leaderboardList",true); renderShop(); });
 loop();
-
-setTimeout(() => {
-    const muteBtnFix = document.getElementById('muteBtn');
-    if (muteBtnFix) {
-        muteBtnFix.removeEventListener('click', toggleSound);
-        muteBtnFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            if (typeof toggleSound === 'function') toggleSound();
-        });
-    }
-    
-    const rulesBtnFix = document.getElementById('rulesBtnMain');
-    const rulesModalFix = document.getElementById('rulesModal');
-    if (rulesBtnFix && rulesModalFix) {
-        rulesBtnFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            rulesModalFix.classList.remove('hidden');
-        });
-    }
-    
-    const leaderBtnFix = document.getElementById('leaderboardBtnMain');
-    const leaderModalFix = document.getElementById('leaderboardModal');
-    if (leaderBtnFix && leaderModalFix) {
-        leaderBtnFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            if (typeof loadLeaderboard === 'function') loadLeaderboard("leaderboardList", true);
-            leaderModalFix.style.display = 'flex';
-        });
-    }
-    
-    const historyBtnFix = document.getElementById('historyBtnMain');
-    const historyModalFix = document.getElementById('historyModal');
-    if (historyBtnFix && historyModalFix) {
-        historyBtnFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            historyModalFix.style.display = 'flex';
-        });
-    }
-    
-    const closeHistoryFix = document.getElementById('closeHistoryBtn');
-    if (closeHistoryFix && historyModalFix) {
-        closeHistoryFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            historyModalFix.style.display = 'none';
-        });
-    }
-    
-    const closeLeaderFix = document.getElementById('closeLeaderboardBtn');
-    if (closeLeaderFix && leaderModalFix) {
-        closeLeaderFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            leaderModalFix.style.display = 'none';
-        });
-    }
-    
-    const closeRulesFix = document.getElementById('closeRulesBtn');
-    if (closeRulesFix && rulesModalFix) {
-        closeRulesFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            rulesModalFix.classList.add('hidden');
-        });
-    }
-    
-    const dailyBtnFix = document.getElementById('dailyBonusBtn');
-    if (dailyBtnFix) {
-        dailyBtnFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            if (typeof claimDaily === 'function') claimDaily();
-        });
-    }
-    
-    const shopBtnFix = document.getElementById('shopBtnMain');
-    if (shopBtnFix) {
-        shopBtnFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            if (typeof renderShop === 'function') renderShop();
-            if (typeof switchShopTab === 'function') switchShopTab('skins');
-            if (shopModal) shopModal.style.display = 'flex';
-        });
-    }
-    
-    const closeShopCross = document.getElementById('closeShopCross');
-    if (closeShopCross) {
-        closeShopCross.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            if (shopModal) shopModal.style.display = 'none';
-        });
-    }
-    
-    const toggleMusicBtn = document.getElementById('toggleMusicBtn');
-    const toggleSfxBtn = document.getElementById('toggleSfxBtn');
-    const toggleAmbientBtn = document.getElementById('toggleAmbientBtn');
-    
-    if (toggleMusicBtn) {
-        toggleMusicBtn.addEventListener('click', () => {
-            musicVolume = musicVolume > 0 ? 0 : 0.25;
-            localStorage.setItem('pixelFarmMusicVolume', musicVolume);
-            const bgm = document.getElementById('bgm');
-            if (bgm) bgm.volume = musicVolume;
-            if (toggleMusicBtn) {
-                toggleMusicBtn.textContent = musicVolume > 0 ? '🎵 MUSIC: ON' : '🎵 MUSIC: OFF';
-                toggleMusicBtn.style.background = musicVolume > 0 ? '#ffd93b' : '#555555';
-            }
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-        });
-    }
-    
-    if (toggleSfxBtn) {
-        toggleSfxBtn.addEventListener('click', () => {
-            sfxVolume = sfxVolume > 0 ? 0 : 0.35;
-            localStorage.setItem('pixelFarmSfxVolume', sfxVolume);
-            if (toggleSfxBtn) {
-                toggleSfxBtn.textContent = sfxVolume > 0 ? '🔊 SFX: ON' : '🔊 SFX: OFF';
-                toggleSfxBtn.style.background = sfxVolume > 0 ? '#ffd93b' : '#555555';
-            }
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-        });
-    }
-    
-    if (toggleAmbientBtn) {
-        toggleAmbientBtn.addEventListener('click', () => {
-            ambientVolume = ambientVolume > 0 ? 0 : 0.15;
-            localStorage.setItem('pixelFarmAmbientVolume', ambientVolume);
-            if (toggleAmbientBtn) {
-                toggleAmbientBtn.textContent = ambientVolume > 0 ? '🌾 AMBIENT: ON' : '🌾 AMBIENT: OFF';
-                toggleAmbientBtn.style.background = ambientVolume > 0 ? '#ffd93b' : '#555555';
-            }
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-        });
-    }
-    
-}, 500);
 </script>
 
 <audio id="bgm" src="https://docs.google.com/uc?export=download&id=1REFQFiGDmo3ShAnQj-BHm61suD-yYR_N" loop></audio>
