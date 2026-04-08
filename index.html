@@ -271,9 +271,9 @@
     }
     .menu-coins .coin-icon::after { content: "🪙"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; opacity: 0.7; }
     #pauseBtn {
-      position: absolute; top: 12px; left: 12px; z-index: 12;
+      position: absolute; bottom: 20px; left: 20px; z-index: 12;
       background: #0a0a0a; color: #ffd93b; border: 2px solid #ffd93b;
-      padding: 8px 12px; font-size: 14px; font-family: monospace; font-weight: bold;
+      padding: 6px 12px; font-size: 14px; font-family: monospace; font-weight: bold;
       cursor: pointer; box-shadow: 3px 3px 0 #000;
     }
     #pauseBtn.hidden { display: none !important; }
@@ -427,7 +427,7 @@
       .achievement { font-size: 10px; padding: 3px 8px; top: 35%; }
       .menu-coins { padding: 4px 10px; font-size: 12px; }
       .coin-icon-real { width: 14px; height: 14px; }
-      #pauseBtn { top: 6px; left: 6px; font-size: 12px; padding: 6px 10px; }
+      #pauseBtn { bottom: 15px; left: 15px; padding: 4px 10px; font-size: 12px; }
       .pixel-note { width: 16px; height: 16px; margin-right: 6px; }
       .pixel-note .note-head { width: 6px; height: 6px; left: 3px; top: 3px; }
       .pixel-note .note-stem { width: 2px; height: 10px; left: 8px; top: -1px; }
@@ -485,7 +485,7 @@
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
       <div id="userStatusMain" class="register-hint"></div>
-      <div class="version">✨ v.04.2 — Лидерборд, скорая помощь, вертолёт! ✨</div>
+      <div class="version">✨ v.05.0 — Alisa-единорог, радужный шлейф, цикл дня и ночи! ✨</div>
     </div>
   </div>
 
@@ -601,9 +601,9 @@ const pauseMenuBtn = document.getElementById('pauseMenuBtn');
 const shopModal = document.getElementById('shopModal');
 const shopBtnMain = document.getElementById('shopBtnMain');
 
-// СКИНЫ — ALISA НА ПЕРВОМ МЕСТЕ, ЛЕГЕНДАРНАЯ, СО СПОСОБНОСТЯМИ
+// СКИНЫ — ALISA ЕДИНОРОГ НА ПЕРВОМ МЕСТЕ, ЛЕГЕНДАРНАЯ
 const skins = {
-  alisa: { id: 'alisa', name: 'Alisa ⭐', price: 500, owned: false, legendary: true, ability: 'tripleJump', abilityName: 'Тройной прыжок', abilityDesc: '3 прыжка в воздухе', palette: { body: '#c084fc', body2: '#f9a8d4', mane: '#7e22ce', leg: '#c2410c', face: '#ffe6f0' } },
+  alisa: { id: 'alisa', name: 'Alisa ⭐', price: 500, owned: false, legendary: true, ability: 'tripleJump', abilityName: 'Тройной прыжок', abilityDesc: '3 прыжка в воздухе', palette: { body: '#e0b0ff', body2: '#f0c0ff', mane: '#ff88ff', leg: '#d080ff', face: '#ffeef8', horn: '#ffdd88', hornGlow: '#ffaa44' } },
   aurelia: { id: 'aurelia', name: 'Aurelia', price: 0, owned: true, ability: 'none', abilityName: 'Нет', abilityDesc: 'Базовая лошадь', palette: { body: '#b86a22', body2: '#d17c2d', mane: '#5b2d15', leg: '#7a3c17', face: '#f1d09a' } },
   nocturna: { id: 'nocturna', name: 'Nocturna', price: 35, owned: false, ability: 'speedBoost', abilityName: 'Ускорение', abilityDesc: 'Временное ускорение бега', palette: { body: '#2b2b2b', body2: '#3a3a3a', mane: '#0d0d0d', leg: '#1c1c1c', face: '#cfcfcf' } },
   azurea: { id: 'azurea', name: 'Azurea', price: 80, owned: false, ability: 'slowMotion', abilityName: 'Замедление', abilityDesc: 'Препятствия замедляются', palette: { body: '#6f4dff', body2: '#8a6bff', mane: '#2d145b', leg: '#41218b', face: '#f2d8ff' } },
@@ -657,12 +657,12 @@ const maps = {
   },
   lasVegas: { 
     id: 'lasVegas', name: '🎰 Las Vegas', price: 1000, owned: false, theme: 'vegas',
-    groundColor: '#d4a373', groundDetail1: '#c9945e', groundDetail2: '#b87a4a', groundShadow: '#9b6a3a',
+    groundColor: '#8cc63f', groundDetail1: '#7db132', groundDetail2: '#70a42a', groundShadow: '#7b4a21',
     skyGradient: { 
-      day: ['#ff6b9d', '#c44b8b', '#8b3a62'], 
-      dawn: ['#ff9a6e', '#ff6b9d', '#c44b8b'], 
-      sunset: ['#ff4444', '#ff6b9d', '#8b3a62'], 
-      night: ['#1a1a3a', '#2a2a5a', '#3a3a7a'] 
+      day: ['#4a77ff', '#6fa7ff'], 
+      dawn: ['#ffb87a', '#ff9a6e'], 
+      sunset: ['#ff6fb5', '#9b4dff'], 
+      night: ['#1a2a4a', '#0a1a3a'] 
     },
     mountainColors: { 
       day: ['#5a3a4a', '#7a5a6a'], 
@@ -726,11 +726,18 @@ function renderSkinsGrid() {
       <div class="shop-skin-preview" style="background:#222;">
         <div style="position:absolute; left:18px; top:22px; width:36px; height:20px; background:${skin.palette.body};"></div>
         <div style="position:absolute; left:22px; top:16px; width:28px; height:10px; background:${skin.palette.body2};"></div>
-        <div style="position:absolute; left:46px; top:12px; width:10px; height:10px; background:${skin.palette.body};"></div>
-        <div style="position:absolute; left:50px; top:9px; width:10px; height:12px; background:${skin.palette.body};"></div>
+        <div style="position:absolute; left:46px; top:12px; width:14px; height:12px; background:${skin.palette.body};"></div>
+        <div style="position:absolute; left:50px; top:9px; width:14px; height:16px; background:${skin.palette.body};"></div>
         <div style="position:absolute; left:52px; top:15px; width:6px; height:4px; background:${skin.palette.face};"></div>
-        <div style="position:absolute; left:9px; top:28px; width:5px; height:8px; background:${skin.palette.mane};"></div>
-      </div>
+        <div style="position:absolute; left:9px; top:28px; width:5px; height:8px; background:${skin.palette.mane};"></div>`;
+    
+    // Рог для Alisa в превью
+    if (skin.id === 'alisa') {
+        html += `<div style="position:absolute; left:58px; top:0px; width:3px; height:8px; background:#ffdd88;"></div>
+                 <div style="position:absolute; left:59px; top:-4px; width:1px; height:6px; background:#ffdd88;"></div>`;
+    }
+    
+    html += `</div>
       <div class="shop-skin-name" style="${isLegendary ? 'color: #ff88ff; text-shadow: 0 0 4px #ff44cc;' : ''}">${skin.name}</div>
       ${abilityText}
       <div class="shop-skin-price">${owned ? 'Owned' : `${skin.price} <div class="coin-icon-real" style="display:inline-block; width:14px; height:14px; margin:0 2px -2px 0;"></div>`}</div>
@@ -749,7 +756,7 @@ function renderMapsGrid() {
     const active = selectedMap === map.id;
     let previewStyle = '';
     if (map.theme === 'desert') previewStyle = 'background: linear-gradient(135deg, #e9c46a, #f4a261);';
-    else if (map.theme === 'vegas') previewStyle = 'background: linear-gradient(135deg, #ff6b9d, #aa44ff);';
+    else if (map.theme === 'vegas') previewStyle = 'background: linear-gradient(135deg, #4a77ff, #6fa7ff);';
     else previewStyle = 'background: linear-gradient(135deg, #4a77ff, #6fa7ff);';
     html += `<div class="shop-card ${active ? 'active' : ''}" style="${previewStyle}"><div class="shop-skin-name" style="color:#fff; text-shadow:1px 1px 0 #000;">${map.name}</div><div class="shop-skin-price">${owned ? 'Owned' : `${map.price} 🪙`}</div><button class="shop-btn" onclick="window.handleMapAction('${map.id}')">${owned ? (active ? 'SELECTED' : 'SELECT') : 'BUY'}</button></div>`;
   });
@@ -848,7 +855,7 @@ window.handleBackgroundAction = function(bgId) {
   selectedBackground = bgId;
   saveBackgrounds();
   renderBackgroundsGrid();
-    applySelectedBackground();
+  applySelectedBackground();
   playSound('skinPurchase', 0.25);
   showAchievementQueued(`🎨 Background changed: ${bg.name}`, false);
 };
@@ -1012,13 +1019,19 @@ let billboardSwayAmount = 4;
 let textShake = 0;
 let textShakeSpeed = 0.05;
 
+// Переменные для цикла дня и ночи
+let sunX = 80, sunY = 70;
+let moonX = 80, moonY = 70;
+let isSunVisible = true;
+let isMoonVisible = false;
+
 // ВЕРТОЛЁТ для Vegas
-let policeHeli = { x: -200, y: 60, speed: 1.0, lightBlink: 0, active: false };
+let policeHeli = { x: -260, y: 60, speed: 1.0, lightBlink: 0, active: false };
 
 // Переменные для способностей скинов
 let abilityActive = false;
 let abilityTimer = 0;
-let abilityDuration = 600;
+let abilityDuration = 900; // 15 секунд для Alisa
 let tripleJumpAvailable = false;
 let tripleJumpUsed = false;
 let speedBoostActive = false;
@@ -1027,7 +1040,28 @@ let doubleCoinsActive = false;
 let magnetActive = false;
 let invisibilityActive = false;
 
+// Специфичные для Alisa
+let alisaMagnetActive = false;
+let alisaTripleCoinsActive = false;
+let alisaSuperJumpActive = false;
+
+// Радужный шлейф для Alisa
+let rainbowTrail = [];
+let rainbowColors = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#aa44ff'];
+
 let vegasCoinTimer = 0;
+
+function addRainbowTrail(x, y) {
+    rainbowTrail.unshift({
+        x: x + 20,
+        y: y + 30,
+        life: 25,
+        color: rainbowColors[Math.floor(Math.random() * rainbowColors.length)]
+    });
+    if (rainbowTrail.length > 20) {
+        rainbowTrail.pop();
+    }
+}
 
 function updateVolumeSliders() {
   const bgm = document.getElementById('bgm');
@@ -1245,19 +1279,17 @@ async function ensureUser() { if (!userNick) return false; try { const q = query
 async function checkReg() { const status = document.getElementById("userStatusMain"); if (!userNick) { status.innerHTML = t.register; isUserRegistered = false; makeLinks(); updateUserNameDisplay(); return false; } const ok = await ensureUser(); if (ok && isUserRegistered) { const best = Math.max(localBestScore, userFirebaseScore); status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; makeLinks(); updateUserNameDisplay(); return true; } return false; }
 async function saveBest(score) { if (!isUserRegistered || !userDocId) return false; const ref = doc(db, "userbellariofilms", userDocId); try { await runTransaction(db, async (t) => { const docSnap = await t.get(ref); if (!docSnap.exists()) return; const cur = docSnap.data().bestScore || 0; if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); else t.update(ref, { lastPlayed: serverTimestamp() }); }); return true; } catch (e) { return false; } }
 
-// НОВАЯ ФУНКЦИЯ ЛИДЕРБОРДА — ВСЕ ЗАРЕГИСТРИРОВАННЫЕ ИГРОКИ (БЕЗ ЛИМИТА 10)
 async function loadLeaderboard(contId, showRank = true) {
     const cont = document.getElementById(contId);
     if (!cont) return;
     try {
-        // Получаем всех пользователей, отсортированных по убыванию очков
         const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"));
         const snap = await getDocs(q);
         let html = '', rank = 1, userRank = null;
         for (const docSnap of snap.docs) {
             const data = docSnap.data();
             const sc = data.bestScore || 0;
-            if (sc === 0) continue; // пропускаем нулевые результаты
+            if (sc === 0) continue;
             const isYou = data.nickname === userNick && isUserRegistered;
             if (isYou) userRank = rank;
             html += `<div class="leaderboard-item ${isYou ? 'you' : ''}">
@@ -1266,7 +1298,7 @@ async function loadLeaderboard(contId, showRank = true) {
                         <span class="score">${sc} pts</span>
                      </div>`;
             rank++;
-            if (rank > 50) break; // ограничиваем 50 для производительности
+            if (rank > 50) break;
         }
         if (!html) html = '<div style="text-align:center;">Нет зарегистрированных игроков</div>';
         cont.innerHTML = html;
@@ -1361,15 +1393,29 @@ let obsTimer = 0, powTimer = 0, goldTimer = 0;
 // ЯРКИЕ РАЗНОЦВЕТНЫЕ ДОМА (разной этажности)
 const buildingColors = ['#4a7ad9', '#d94a7a', '#4ad97a', '#d9a34a', '#7a4ad9', '#d94a4a', '#4ad9d9', '#d9d94a', '#d94ad9'];
 
-function drawColorfulBuilding(x, y, width, height, colorIdx, timeOfDay) {
+function drawBuildingWithRoof(x, y, width, height, roofType, colorIdx, timeOfDay) {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     const mainColor = buildingColors[colorIdx % buildingColors.length];
     
-    // Основное здание
     ctx.fillStyle = mainColor;
     ctx.fillRect(x, y - height, width, height);
     
-    // Окна
+    if (roofType === 'flat') {
+        ctx.fillStyle = '#888888';
+        ctx.fillRect(x - 2, y - height - 4, width + 4, 4);
+    } else if (roofType === 'pointed') {
+        ctx.fillStyle = '#cc4444';
+        ctx.beginPath();
+        ctx.moveTo(x - 3, y - height);
+        ctx.lineTo(x + width/2, y - height - 15);
+        ctx.lineTo(x + width + 3, y - height);
+        ctx.fill();
+    } else if (roofType === 'stepped') {
+        ctx.fillStyle = '#aa8866';
+        ctx.fillRect(x + width/4, y - height - 8, width/2, 8);
+        ctx.fillRect(x + width/3, y - height - 14, width/3, 6);
+    }
+    
     for(let wy = 0; wy < Math.floor(height / 12); wy++) {
         for(let wx = 0; wx < Math.floor(width / 10); wx++) {
             if (Math.random() > 0.7) continue;
@@ -1384,60 +1430,65 @@ function drawColorfulBuilding(x, y, width, height, colorIdx, timeOfDay) {
             ctx.fillRect(windowX, windowY, 5, 7);
         }
     }
+}
+
+// ТЕЛЕБАШНЯ
+function drawTVTower(x, y, timeOfDay) {
+    const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
+    const height = 160;
     
-    // Крыша
-    ctx.fillStyle = '#cc4444';
-    ctx.fillRect(x - 3, y - height - 5, width + 6, 5);
+    for(let i = 0; i < height; i += 10) {
+        const color = (Math.floor(i / 10) % 2 === 0) ? '#cc0000' : '#ffffff';
+        ctx.fillStyle = color;
+        ctx.fillRect(x + 8, y - height + i, 16, 10);
+    }
     
-    // Неоновая вывеска (ночью)
-    if (isNight && width > 40) {
-        const neonBlink = (Math.sin(Date.now() * 0.005) + 1) / 2;
-        ctx.fillStyle = `rgba(255, 68, 204, ${neonBlink * 0.8 + 0.2})`;
-        ctx.fillRect(x + 5, y - height - 5, width - 10, 5);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 4px "Courier New", monospace';
-        ctx.fillText('HOTEL', x + width/2 - 10, y - height - 2);
+    ctx.fillStyle = '#666666';
+    ctx.fillRect(x + 2, y - 20, 28, 20);
+    
+    for(let i = 0; i < height; i += 20) {
+        ctx.fillStyle = '#999999';
+        ctx.fillRect(x + 2, y - height + i, 28, 3);
+    }
+    
+    ctx.fillStyle = '#cccccc';
+    ctx.fillRect(x + 14, y - height - 15, 4, 20);
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(x + 15, y - height - 20, 2, 6);
+    
+    if (isNight) {
+        const blink = (Math.sin(Date.now() * 0.005) + 1) / 2;
+        ctx.fillStyle = `rgba(255, 0, 0, ${blink * 0.8 + 0.2})`;
+        ctx.fillRect(x + 15, y - height - 22, 2, 4);
     }
 }
 
-// ЯРКИЕ ПАЛЬМЫ (салатовые листья)
-function drawPalmTree(x, y, s, timeOfDay) {
+// НОВАЯ ПАЛЬМА (по вашему образцу)
+function drawVegasPalm(x, y, timeOfDay) {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     
-    // Ствол
-    px(x+22*s, y+40*s, 8*s, 50*s, '#8B5A2B');
-    px(x+24*s, y+35*s, 6*s, 10*s, '#A06B3A');
-    px(x+20*s, y+85*s, 12*s, 8*s, '#6B3E1A');
+    px(x+28, y+20, 8, 40, '#7E522A');
+    px(x+30, y+16, 6, 8, '#7E522A');
+    px(x+26, y+54, 10, 8, '#7E522A');
     
-    // ЯРКИЕ САЛАТОВЫЕ ЛИСТЬЯ
-    px(x+0*s, y+15*s, 18*s, 12*s, '#a4f07a');
-    px(x+28*s, y+15*s, 18*s, 12*s, '#a4f07a');
-    px(x+5*s, y+8*s, 15*s, 10*s, '#b8ff8a');
-    px(x+26*s, y+8*s, 15*s, 10*s, '#b8ff8a');
-    px(x+8*s, y+0*s, 12*s, 10*s, '#c8ff9a');
-    px(x+26*s, y+0*s, 12*s, 10*s, '#c8ff9a');
-    px(x+15*s, y-5*s, 16*s, 8*s, '#d8ffaa');
+    px(x+8, y+12, 48, 8, '#34843A');
+    px(x+4, y+8, 56, 8, '#34843A');
+    px(x+0, y+4, 64, 8, '#34843A');
+    px(x+8, y+0, 48, 8, '#34843A');
+    px(x+12, y+16, 40, 4, '#2d6a2d');
+    px(x+16, y+20, 32, 4, '#2d6a2d');
     
-    // Кокосы
-    px(x+20*s, y+30*s, 4*s, 4*s, '#8B5A2B');
-    px(x+24*s, y+32*s, 4*s, 4*s, '#8B5A2B');
+    px(x+28, y+12, 4, 4, '#3A2416');
+    px(x+32, y+14, 4, 4, '#3A2416');
+    px(x+24, y+14, 4, 4, '#3A2416');
     
-    // Гирлянды (ночью)
-    if (isNight || (timeOfDay >= 1800 && timeOfDay < 2000)) {
-        for(let i=0; i<5; i++) {
-            const lightX = x + 10*s + i*8*s;
-            const lightY = y + 5*s + Math.sin(i) * 8*s;
+    if (isNight) {
+        for(let i=0; i<6; i++) {
+            const lightX = x + 10 + i*8;
+            const lightY = y + 4 + Math.sin(i) * 4;
             const colorBlink = (Math.sin(Date.now() * 0.01 + i) + 1) / 2;
-            
             ctx.fillStyle = `rgba(255, 200, 50, ${colorBlink * 0.8 + 0.3})`;
-            ctx.fillRect(lightX, lightY, 3*s, 3*s);
-            
-            if(i % 2 === 0) {
-                ctx.fillStyle = `rgba(255, 68, 204, ${colorBlink * 0.8})`;
-            } else {
-                ctx.fillStyle = `rgba(68, 204, 255, ${colorBlink * 0.8})`;
-            }
-            ctx.fillRect(lightX+2, lightY-2, 2*s, 2*s);
+            ctx.fillRect(lightX, lightY, 3, 3);
         }
     }
 }
@@ -1485,50 +1536,38 @@ function drawPoliceCarBg(x, y, w, h, blinkPhase) {
     }
 }
 
-// НОВАЯ ПОЖАРНАЯ МАШИНА (узнаваемая, с лестницей)
+// НОВАЯ ПОЖАРНАЯ МАШИНА
 function drawFireTruckBg(x, y, w, h, blinkPhase) {
-    // Тень
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x+3, y+h-3, w-6, 5);
     
-    // Кузов (красный)
     px(x+4, y+8, w-8, h-14, '#cc0000');
     px(x+6, y+4, w-12, 6, '#ff4444');
-    
-    // Жёлтая полоса
     px(x+4, y+24, w-8, 3, '#ffcc00');
     
-    // Колёса
     px(x+8, y+h-8, 10, 6, '#333333');
     px(x+w-18, y+h-8, 10, 6, '#333333');
     px(x+10, y+h-7, 6, 4, '#888888');
     px(x+w-16, y+h-7, 6, 4, '#888888');
     
-    // Кабина
     px(x+4, y+6, 15, 20, '#aa0000');
     px(x+6, y+9, 10, 7, '#7ac4ff');
     
-    // ЛЕСТНИЦА на крыше
     px(x+20, y+3, w-24, 4, '#ffcc00');
     for(let i=0; i<5; i++) {
         px(x+22 + i*8, y+2, 2, 6, '#ffcc00');
     }
     
-    // Цистерна
     ctx.fillStyle = '#dd2222';
     ctx.fillRect(x+22, y+12, w-26, 18);
-    
-    // Шланг
     px(x+w-12, y+20, 8, 4, '#888888');
     
-    // Мигалки
     const blink = (Math.sin(Date.now() * 0.015 + blinkPhase) + 1) / 2;
     ctx.fillStyle = `rgba(255, 0, 0, ${blink * 0.8 + 0.2})`;
     ctx.fillRect(x+w/2-6, y+2, 5, 4);
     ctx.fillStyle = `rgba(255, 100, 0, ${(1 - blink) * 0.8 + 0.2})`;
     ctx.fillRect(x+w/2, y+2, 5, 4);
     
-    // Надпись FIRE
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 5px "Courier New", monospace';
     ctx.fillText('FIRE', x+30, y+28);
@@ -1536,82 +1575,73 @@ function drawFireTruckBg(x, y, w, h, blinkPhase) {
 
 // СКОРАЯ ПОМОЩЬ (активное препятствие)
 function drawAmbulance(x, y, w, h, blinkPhase) {
-    // Тень
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x+3, y+h-3, w-6, 5);
     
-    // Кузов (белый)
     px(x+5, y+6, w-10, h-14, '#ffffff');
     px(x+3, y+16, w-6, h-20, '#f0f0f0');
-    
-    // Красная полоса
     px(x+5, y+22, w-10, 4, '#cc0000');
-    
-    // КРАСНЫЙ КРЕСТ на боку
     px(x+15, y+18, 12, 4, '#cc0000');
     px(x+19, y+14, 4, 12, '#cc0000');
     
-    // Колёса
     px(x+8, y+h-8, 10, 6, '#333333');
     px(x+w-18, y+h-8, 10, 6, '#333333');
     px(x+10, y+h-7, 6, 4, '#888888');
     px(x+w-16, y+h-7, 6, 4, '#888888');
     
-    // Окна
     px(x+8, y+9, 10, 7, '#7ac4ff');
     px(x+w-18, y+9, 10, 7, '#7ac4ff');
     px(x+22, y+11, 6, 5, '#7ac4ff');
     px(x+w-28, y+11, 6, 5, '#7ac4ff');
     
-    // Мигалки
     const blink = (Math.sin(Date.now() * 0.01 + blinkPhase) + 1) / 2;
     ctx.fillStyle = `rgba(0, 100, 255, ${blink * 0.8 + 0.2})`;
     ctx.fillRect(x+w/2-10, y+4, 5, 5);
     ctx.fillStyle = `rgba(255, 0, 0, ${(1 - blink) * 0.8 + 0.2})`;
     ctx.fillRect(x+w/2-3, y+4, 5, 5);
     
-    // Надпись AMBULANCE
     ctx.fillStyle = '#cc0000';
     ctx.font = 'bold 4px "Courier New", monospace';
     ctx.fillText('AMBULANCE', x+12, y+29);
     
-    // Фары
     px(x+3, y+18, 4, 4, '#ffcc00');
     px(x+w-7, y+18, 4, 4, '#ffcc00');
 }
 
-// ПОЛИЦЕЙСКИЙ ВЕРТОЛЁТ (вместо самолёта на Vegas)
+// ПОЛИЦЕЙСКИЙ ВЕРТОЛЁТ (НОВЫЙ, ПО ВАШЕМУ ОБРАЗЦУ)
 function drawPoliceHelicopter(x, y, blinkPhase) {
-    // Корпус
-    px(x+10, y+8, 30, 8, '#1a3a6e');
-    px(x+8, y+12, 34, 6, '#f0f0f0');
-    
-    // Кабина
-    px(x+30, y+6, 10, 8, '#7ac4ff');
-    
-    // Лопасти (вращаются)
     const angle = Date.now() * 0.02;
     ctx.save();
-    ctx.translate(x+25, y+6);
+    ctx.translate(x + 32, y + 20);
     ctx.rotate(angle);
-    px(-25, -2, 50, 4, '#888888');
+    ctx.fillStyle = '#D2D2D2';
+    ctx.fillRect(-30, -2, 60, 4);
     ctx.restore();
     
-    // Хвостовая балка
-    px(x+42, y+10, 15, 4, '#1a3a6e');
-    px(x+55, y+11, 8, 3, '#f0f0f0');
+    px(x+45, y+25, 15, 4, '#464646');
+    px(x+52, y+23, 8, 3, '#464646');
     
-    // Мигалка
+    px(x+10, y+24, 40, 8, '#ECECEC');
+    px(x+8, y+28, 44, 6, '#ECECEC');
+    px(x+12, y+22, 36, 4, '#7D7D7D');
+    px(x+10, y+30, 40, 2, '#282828');
+    
+    px(x+35, y+26, 12, 6, '#A0B4BE');
+    px(x+37, y+24, 8, 4, '#A0B4BE');
+    
+    px(x+15, y+34, 4, 6, '#1A1A1A');
+    px(x+35, y+34, 4, 6, '#1A1A1A');
+    px(x+12, y+38, 30, 2, '#1A1A1A');
+    
     const blink = (Math.sin(Date.now() * 0.015 + blinkPhase) + 1) / 2;
-    ctx.fillStyle = `rgba(255, 0, 0, ${blink * 0.8 + 0.2})`;
-    ctx.fillRect(x+20, y+4, 6, 4);
-    ctx.fillStyle = `rgba(0, 100, 255, ${(1 - blink) * 0.8 + 0.2})`;
-    ctx.fillRect(x+28, y+4, 6, 4);
+    ctx.fillStyle = `rgba(0, 100, 255, ${blink * 0.8 + 0.2})`;
+    ctx.fillRect(x+28, y+20, 5, 4);
+    ctx.fillStyle = `rgba(255, 0, 0, ${(1 - blink) * 0.8 + 0.2})`;
+    ctx.fillRect(x+35, y+20, 5, 4);
     
-    // Надпись POLICE
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 5px "Courier New", monospace';
-    ctx.fillText('POLICE', x+15, y+18);
+    ctx.fillText('POLICE', x+18, y+33);
 }
 
 // Знак "WELCOME TO LAS VEGAS"
@@ -1781,11 +1811,14 @@ function drawWorldObject(obj) {
   }
   else if(obj.type === 'cactus' && currentMap.theme === 'desert') drawCactus(obj.x, obj.y, obj.scale||0.8);
   else if(obj.type === 'rock' && currentMap.theme === 'desert') drawRock(obj.x, obj.y, obj.scale||0.7);
-  else if(obj.type === 'colorfulBuilding') {
-    drawColorfulBuilding(obj.x, obj.y, obj.w, obj.h, obj.colorIdx, timeOfDay);
+  else if(obj.type === 'buildingWithRoof') {
+    drawBuildingWithRoof(obj.x, obj.y, obj.w, obj.h, obj.roof, obj.colorIdx, timeOfDay);
   }
-  else if(obj.type === 'palmTree') {
-    drawPalmTree(obj.x, obj.y, obj.scale || 1, timeOfDay);
+  else if(obj.type === 'tvTower') {
+    drawTVTower(obj.x, obj.y, timeOfDay);
+  }
+  else if(obj.type === 'vegasPalm') {
+    drawVegasPalm(obj.x, obj.y, timeOfDay);
   }
   else if(obj.type === 'policeCarBg') {
     drawPoliceCarBg(obj.x, obj.y, obj.w, obj.h, obj.lightBlink);
@@ -1816,8 +1849,9 @@ function updateWorldObjects() {
       else if(obj.type === 'windmill') obj.x = W + rand(100,400);
       else if(obj.type === 'cactus' && currentMap.theme === 'desert') obj.x = W + rand(30,250);
       else if(obj.type === 'rock' && currentMap.theme === 'desert') obj.x = W + rand(20,300);
-      else if(obj.type === 'colorfulBuilding') obj.x = W + rand(300, 800);
-      else if(obj.type === 'palmTree') obj.x = W + rand(150, 400);
+      else if(obj.type === 'buildingWithRoof') obj.x = W + rand(300, 800);
+      else if(obj.type === 'tvTower') obj.x = W + rand(500, 1000);
+      else if(obj.type === 'vegasPalm') obj.x = W + rand(150, 400);
       else if(obj.type === 'policeCarBg') obj.x = W + rand(1500, 2500);
       else if(obj.type === 'fireTruckBg') obj.x = W + rand(1200, 2000);
       else if(obj.type === 'welcomeSign') obj.x = W + rand(500, 1000);
@@ -1849,7 +1883,48 @@ function getSkyGrad() {
   if (h >= 18 && h < 20) return `linear-gradient(to bottom, ${gradients.sunset[0]}, ${gradients.sunset[1]})`;
   return `linear-gradient(to bottom, ${gradients.night[0]}, ${gradients.night[1]})`;
 }
-function updateSky() { if (gameRunning && !gameOver) timeOfDay = (timeOfDay + cycleSpeed) % 2400; wrapper.style.background = getSkyGrad(); }
+
+function updateSky() { 
+    if (gameRunning && !gameOver) {
+        timeOfDay = (timeOfDay + cycleSpeed) % 2400;
+        
+        const hour = timeOfDay / 100;
+        // Солнце: встаёт в 6:00, зенит в 12:00, садится в 18:00
+        if (hour >= 6 && hour <= 18) {
+            isSunVisible = true;
+            isMoonVisible = false;
+            const t = (hour - 6) / 12;
+            sunX = 80 + t * 140;
+            sunY = 80 - t * 40;
+            if (hour > 12) {
+                sunY = 40 + (hour - 12) / 6 * 40;
+            }
+        } else {
+            isSunVisible = false;
+        }
+        
+        // Луна: появляется в 18:00, пик в 0:00, исчезает в 6:00
+        if (hour >= 18 || hour <= 6) {
+            isMoonVisible = true;
+            let t;
+            if (hour >= 18) {
+                t = (hour - 18) / 12;
+            } else {
+                t = (hour + 6) / 12;
+            }
+            moonX = 80 + t * 140;
+            moonY = 80 - t * 40;
+            if (hour > 0 && hour < 6) {
+                moonY = 40 + (hour) / 6 * 40;
+            } else if (hour > 18) {
+                moonY = 40 + (hour - 18) / 6 * 40;
+            }
+        } else {
+            isMoonVisible = false;
+        }
+    }
+    wrapper.style.background = getSkyGrad();
+}
 
 function setupWorld() {
   ground.h = Math.max(140, H*0.22); ground.y = H - ground.h;
@@ -1867,11 +1942,8 @@ function setupWorld() {
     for(let b of balloons) worldObjects.push({ type:'balloon', ...b });
   }
   
-  // ОБЫЧНЫЙ САМОЛЁТ (для Farm и WildWest)
   plane = { x:-260, y:70+Math.random()*70, speed:1.2 };
-  
-  // ВЕРТОЛЁТ (для Vegas)
-  policeHeli = { x: -260, y: 60 + Math.random() * 60, speed: 1.0, lightBlink: 0, active: false };
+  policeHeli = { x: -260, y: 30 + Math.random() * 50, speed: 1.0, lightBlink: 0, active: false };
   
   if(currentMap.theme === 'desert') {
     for(let i=0;i<8;i++) worldObjects.push({ type:'cactus', x:i*280+Math.random()*120, y:ground.y-35-Math.random()*25, scale:0.6+Math.random()*0.7, speedMul:0.35 });
@@ -1881,47 +1953,50 @@ function setupWorld() {
     }
     for(let i=0;i<3;i++) worldObjects.push({ type:'windmill', x:W+i*500+Math.random()*200, y:ground.y-170-Math.random()*20, w:100+Math.random()*20, h:170, speedMul:0.22, bladeAngle:Math.random()*Math.PI*2, bladeSpeed:0.02+Math.random()*0.02 });
   } else if(currentMap.theme === 'vegas') {
-    // ЯРКИЕ РАЗНОЦВЕТНЫЕ ДОМА (разной этажности)
     const buildings = [
-        { x: 50, width: 45, height: 100, colorIdx: 0 },
-        { x: 110, width: 35, height: 70, colorIdx: 1 },
-        { x: 160, width: 55, height: 130, colorIdx: 2 },
-        { x: 230, width: 40, height: 85, colorIdx: 3 },
-        { x: 290, width: 50, height: 110, colorIdx: 4 },
-        { x: 360, width: 35, height: 65, colorIdx: 5 },
-        { x: 410, width: 60, height: 140, colorIdx: 6 },
-        { x: 490, width: 45, height: 95, colorIdx: 7 },
-        { x: 550, width: 50, height: 120, colorIdx: 0 },
-        { x: 620, width: 40, height: 80, colorIdx: 1 },
-        { x: 680, width: 55, height: 135, colorIdx: 2 },
-        { x: 750, width: 48, height: 105, colorIdx: 3 },
-        { x: 820, width: 38, height: 75, colorIdx: 4 }
+        { x: 50, width: 55, height: 100, roof: 'pointed', colorIdx: 0 },
+        { x: 120, width: 40, height: 70, roof: 'flat', colorIdx: 1 },
+        { x: 175, width: 65, height: 120, roof: 'stepped', colorIdx: 2 },
+        { x: 255, width: 45, height: 85, roof: 'pointed', colorIdx: 3 },
+        { x: 315, width: 70, height: 110, roof: 'flat', colorIdx: 4 },
+        { x: 400, width: 40, height: 65, roof: 'stepped', colorIdx: 5 },
+        { x: 455, width: 75, height: 130, roof: 'pointed', colorIdx: 6 },
+        { x: 545, width: 50, height: 95, roof: 'flat', colorIdx: 7 },
+        { x: 610, width: 60, height: 115, roof: 'stepped', colorIdx: 0 },
+        { x: 685, width: 45, height: 80, roof: 'pointed', colorIdx: 1 },
+        { x: 745, width: 70, height: 125, roof: 'flat', colorIdx: 2 },
+        { x: 830, width: 50, height: 105, roof: 'stepped', colorIdx: 3 }
     ];
     for(let i=0; i<buildings.length; i++) {
         const b = buildings[i];
         worldObjects.push({
-            type: 'colorfulBuilding',
+            type: 'buildingWithRoof',
             x: b.x,
             y: ground.y - 20,
             w: b.width,
             h: b.height,
+            roof: b.roof,
             colorIdx: b.colorIdx,
             speedMul: 0.15
         });
     }
     
-    // ПАЛЬМЫ
+    worldObjects.push({
+        type: 'tvTower',
+        x: 500,
+        y: ground.y - 20,
+        speedMul: 0.1
+    });
+    
     for(let i=0; i<10; i++) {
         worldObjects.push({
-            type: 'palmTree',
+            type: 'vegasPalm',
             x: 50 + i * 220 + Math.random() * 100,
             y: ground.y - 85,
-            scale: 0.8 + Math.random() * 0.5,
             speedMul: 0.3
         });
     }
     
-    // ПОЛИЦЕЙСКИЕ МАШИНЫ НА ФОНЕ (РЕЖЕ — 3 штуки)
     for(let i=0; i<3; i++) {
         worldObjects.push({
             type: 'policeCarBg',
@@ -1934,7 +2009,6 @@ function setupWorld() {
         });
     }
     
-    // ПОЖАРНЫЕ МАШИНЫ (НОВЫЕ, УЗНАВАЕМЫЕ)
     for(let i=0; i<2; i++) {
         worldObjects.push({
             type: 'fireTruckBg',
@@ -1947,7 +2021,6 @@ function setupWorld() {
         });
     }
     
-    // ЗНАК "WELCOME TO LAS VEGAS"
     worldObjects.push({
         type: 'welcomeSign',
         x: 80,
@@ -2000,7 +2073,6 @@ function drawFenceObstacle(x, y) {
 function spawnObstacle() {
   const currentMap = getCurrentMap();
   
-  // Начальная задержка (меньше препятствий в начале)
   let minDelay = 70, maxDelay = 110;
   if (score < 500) {
     minDelay = 100;
@@ -2031,7 +2103,6 @@ function spawnObstacle() {
     }
     obstacles.push({ type, x:W+60, y:y, w:w, h:h, counted:false });
   } else if(currentMap.theme === 'vegas') {
-    // Препятствия: скамейки, мусорные баки, контейнеры, СКОРАЯ ПОМОЩЬ
     let types = ['bench', 'trashcan', 'container', 'ambulance'];
     if (score < 500) types = ['bench', 'trashcan'];
     const type = types[Math.floor(Math.random()*types.length)];
@@ -2100,9 +2171,10 @@ function togglePause(force=null) {
 function performJump() { 
     if(!gameRunning || gameOver || gamePaused) return; 
     const currentSkin = getCurrentSkin();
+    const isAlisaSuper = (currentSkin.id === 'alisa' && alisaSuperJumpActive);
     
     if(player.grounded) { 
-        player.vy=player.jumpPower; 
+        player.vy = player.jumpPower; 
         player.grounded=false; 
         player.doubleJumpAvailable=true; 
         player.doubleJumpUsed=false;
@@ -2114,7 +2186,11 @@ function performJump() {
             player.tripleJumpUsed = false;
         }
         createDust(player.x+10, ground.y-8,6); 
-        playSound('jump'); 
+        playSound('jump');
+        
+        if (isAlisaSuper) {
+            for(let i=0; i<8; i++) addRainbowTrail(player.x, player.y);
+        }
     } 
     else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { 
         player.vy=player.jumpPower*0.85; 
@@ -2126,6 +2202,10 @@ function performJump() {
         if(currentSkin.ability === 'tripleJump' && tripleJumpAvailable) {
             player.tripleJumpAvailable = true;
         }
+        
+        if (isAlisaSuper) {
+            for(let i=0; i<10; i++) addRainbowTrail(player.x, player.y);
+        }
     } 
     else if(player.tripleJumpAvailable && !player.tripleJumpUsed && !player.grounded && getCurrentSkin().ability === 'tripleJump' && tripleJumpAvailable) { 
         player.vy=player.jumpPower*0.7; 
@@ -2135,6 +2215,10 @@ function performJump() {
         createDust(player.x+30, player.y+30,10); 
         playSound('doubleJump');
         showAchievementQueued(`✨ TRIPLE JUMP! ✨`, true);
+        
+        if (isAlisaSuper) {
+            for(let i=0; i<12; i++) addRainbowTrail(player.x, player.y);
+        }
     } 
 }
 
@@ -2142,7 +2226,6 @@ function startGame() {
   titleScr.classList.add('hidden'); gameOverScr.classList.add('hidden'); rulesModal.classList.add('hidden'); historyModal.style.display='none';
   pauseOverlay.style.display='none'; shopModal.style.display='none';
   gameRunning=false; gamePaused=false; gameOver=false; score=0; speed=6; frame=0; recBonus=false;
-  // Сброс способностей
   abilityActive = false;
   abilityTimer = 0;
   tripleJumpAvailable = false;
@@ -2152,6 +2235,10 @@ function startGame() {
   doubleCoinsActive = false;
   magnetActive = false;
   invisibilityActive = false;
+  alisaMagnetActive = false;
+  alisaTripleCoinsActive = false;
+  alisaSuperJumpActive = false;
+  rainbowTrail = [];
   scoreEl.textContent=`${t.scoreLabel} 0`; setupWorld(); flash.style.background='rgba(255,0,0,0)'; timeOfDay=800; updateSky();
   pauseBtn.classList.remove('hidden'); startCountdown();
   enableAudio();
@@ -2202,10 +2289,23 @@ window.addEventListener('pointerdown',()=>{ if(gameRunning&&!gameOver&&!gamePaus
 function rand(a,b){ return Math.random()*(b-a)+a; }
 function rectsCollide(a,b){ return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
 function createDust(x,y,c=5){ for(let i=0;i<c;i++) particles.push({x,y,vx:rand(-2,2),vy:rand(-2,-0.4),size:rand(3,5),life:rand(20,30),color:['#f2c879','#c98a3d'][Math.floor(Math.random()*2)]}); }
-function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); addCoins(2,player.x+player.w/2,player.y+player.h/2); createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } }
+function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); 
+  let value = 2;
+  if (alisaTripleCoinsActive) value = 6;
+  addCoins(value,player.x+player.w/2,player.y+player.h/2); 
+  createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; 
+    let bonus = 5;
+    if (alisaTripleCoinsActive) bonus = 15;
+    addCoins(bonus,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +${bonus} BelkaCoins 🏆`,true); } 
+  if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; 
+    let bonus = 15;
+    if (alisaTripleCoinsActive) bonus = 45;
+    addCoins(bonus,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +${bonus} BelkaCoins 🏆`,true); } 
+}
 function applyGoldenCoin(x,y) { 
   let value = 25;
   if (doubleCoinsActive) value = 50;
+  if (alisaTripleCoinsActive) value = 75;
   addCoins(value,x,y); 
   showAchievementQueued(`🪙 GOLDEN COIN! +${value} BelkaCoins 🪙`,true); 
   createDust(x,y,15); 
@@ -2214,12 +2314,12 @@ function applyGoldenCoin(x,y) {
 function applyVegasCoin(x,y) {
     let coinValue = 25;
     if (doubleCoinsActive) coinValue = 50;
+    if (alisaTripleCoinsActive) coinValue = 75;
     addCoins(coinValue, x, y);
     showAchievementQueued(`🪙 BELKACOIN! +${coinValue} BelkaCoins 🪙`, true);
     createDust(x, y, 15);
     playSound('horseshoe');
     
-    // Активация способности с задержкой, чтобы не блокировать игру
     setTimeout(() => {
         activateSkinAbility();
     }, 10);
@@ -2236,7 +2336,6 @@ function activateSkinAbility() {
         return;
     }
     
-    // Сбрасываем предыдущие способности
     tripleJumpAvailable = false;
     tripleJumpUsed = false;
     speedBoostActive = false;
@@ -2244,40 +2343,54 @@ function activateSkinAbility() {
     doubleCoinsActive = false;
     magnetActive = false;
     invisibilityActive = false;
+    alisaMagnetActive = false;
+    alisaTripleCoinsActive = false;
+    alisaSuperJumpActive = false;
     
     abilityActive = true;
     abilityTimer = abilityDuration;
     
-    switch(ability) {
-        case 'tripleJump':
-            tripleJumpAvailable = true;
-            tripleJumpUsed = false;
-            player.tripleJumpAvailable = true;
-            showAchievementQueued(`🌈 ТРОЙНОЙ ПРЫЖОК (10 сек)! 🌈`, true);
-            break;
-        case 'speedBoost':
-            speedBoostActive = true;
-            showAchievementQueued(`⚡ УСКОРЕНИЕ (10 сек)! ⚡`, true);
-            break;
-        case 'slowMotion':
-            slowMotionActive = true;
-            showAchievementQueued(`🐢 ЗАМЕДЛЕНИЕ ВРЕМЕНИ (10 сек)! 🐢`, true);
-            break;
-        case 'doubleCoins':
-            doubleCoinsActive = true;
-            showAchievementQueued(`🪙 ДВОЙНЫЕ МОНЕТЫ (10 сек)! 🪙`, true);
-            break;
-        case 'healthRegen':
-            showAchievementQueued(`💚 ВОССТАНОВЛЕНИЕ ЗДОРОВЬЯ! 💚`, true);
-            break;
-        case 'magnet':
-            magnetActive = true;
-            showAchievementQueued(`🧲 МАГНИТ (10 сек)! 🧲`, true);
-            break;
-        case 'invisibility':
-            invisibilityActive = true;
-            showAchievementQueued(`👻 НЕВИДИМОСТЬ (10 сек)! 👻`, true);
-            break;
+    if (currentSkin.id === 'alisa') {
+        tripleJumpAvailable = true;
+        tripleJumpUsed = false;
+        player.tripleJumpAvailable = true;
+        alisaMagnetActive = true;
+        alisaTripleCoinsActive = true;
+        alisaSuperJumpActive = true;
+        player.jumpPower = -18;
+        showAchievementQueued(`🌈 АЛИСА: МАГНИТ + x3 МОНЕТЫ + СУПЕР ПРЫЖОК (15 сек)! 🌈`, true);
+    } else {
+        switch(ability) {
+            case 'tripleJump':
+                tripleJumpAvailable = true;
+                tripleJumpUsed = false;
+                player.tripleJumpAvailable = true;
+                showAchievementQueued(`🌈 ТРОЙНОЙ ПРЫЖОК (10 сек)! 🌈`, true);
+                break;
+            case 'speedBoost':
+                speedBoostActive = true;
+                showAchievementQueued(`⚡ УСКОРЕНИЕ (10 сек)! ⚡`, true);
+                break;
+            case 'slowMotion':
+                slowMotionActive = true;
+                showAchievementQueued(`🐢 ЗАМЕДЛЕНИЕ ВРЕМЕНИ (10 сек)! 🐢`, true);
+                break;
+            case 'doubleCoins':
+                doubleCoinsActive = true;
+                showAchievementQueued(`🪙 ДВОЙНЫЕ МОНЕТЫ (10 сек)! 🪙`, true);
+                break;
+            case 'healthRegen':
+                showAchievementQueued(`💚 ВОССТАНОВЛЕНИЕ ЗДОРОВЬЯ! 💚`, true);
+                break;
+            case 'magnet':
+                magnetActive = true;
+                showAchievementQueued(`🧲 МАГНИТ (10 сек)! 🧲`, true);
+                break;
+            case 'invisibility':
+                invisibilityActive = true;
+                showAchievementQueued(`👻 НЕВИДИМОСТЬ (10 сек)! 👻`, true);
+                break;
+        }
     }
 }
 
@@ -2285,7 +2398,6 @@ function update() {
   if(!gameRunning || gameOver || gamePaused) return;
   frame++; 
   
-  // Эффект ускорения
   let currentSpeed = speed;
   if (speedBoostActive) currentSpeed = speed * 1.3;
   
@@ -2294,7 +2406,21 @@ function update() {
   updateFireflies();
   updateWorldObjects();
   
-  // Таймер способности
+  // Обновление радужного шлейфа
+  for(let i=0; i<rainbowTrail.length; i++) {
+      rainbowTrail[i].life--;
+      if(rainbowTrail[i].life <= 0) {
+          rainbowTrail.splice(i,1);
+          i--;
+      }
+  }
+  
+  if (!player.grounded && alisaSuperJumpActive && getCurrentSkin().id === 'alisa') {
+      if (frame % 2 === 0) {
+          addRainbowTrail(player.x, player.y);
+      }
+  }
+  
   if(abilityActive) {
       abilityTimer--;
       if(abilityTimer <= 0) {
@@ -2305,29 +2431,45 @@ function update() {
           doubleCoinsActive = false;
           magnetActive = false;
           invisibilityActive = false;
+          alisaMagnetActive = false;
+          alisaTripleCoinsActive = false;
+          alisaSuperJumpActive = false;
+          player.jumpPower = -15;
           showAchievementQueued(`⏰ Способность закончилась!`, true);
       }
   }
   
-  // Эффект магнита (притягивает монеты)
-  if (magnetActive) {
+  if (alisaMagnetActive) {
     for(let i=0;i<powerups.length;i++) {
       let p = powerups[i];
-      if (p.type === 'vegasCoin' || p.type === 'goldenCoin' || p.type === 'horseshoe') {
-        let dx = (player.x + player.w/2) - (p.x + p.w/2);
-        let dy = (player.y + player.h/2) - (p.y + p.h/2);
-        let dist = Math.hypot(dx, dy);
-        if (dist < 150) {
-          let angle = Math.atan2(dy, dx);
-          p.x += Math.cos(angle) * 5;
-          p.y += Math.sin(angle) * 5;
-        }
+      let dx = (player.x + player.w/2) - (p.x + p.w/2);
+      let dy = (player.y + player.h/2) - (p.y + p.h/2);
+      let dist = Math.hypot(dx, dy);
+      if (dist < 250) {
+        let angle = Math.atan2(dy, dx);
+        p.x += Math.cos(angle) * 7;
+        p.y += Math.sin(angle) * 7;
+        particles.push({
+            x: p.x + p.w/2,
+            y: p.y + p.h/2,
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2,
+            size: 2,
+            life: 10,
+            color: '#aa44ff'
+        });
       }
     }
   }
   
-  while(score>=last100Reward+100) { last100Reward+=100; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 +3 BelkaCoins (${score} points)`,true); }
-  while(score>=last500Reward+500) { last500Reward+=500; addCoins(8,W/2,H/2); showAchievementQueued(`🌟 +8 BelkaCoins (${score} points)`,true); }
+  while(score>=last100Reward+100) { last100Reward+=100; 
+    let value = 3;
+    if (alisaTripleCoinsActive) value = 9;
+    addCoins(value,W/2,H/2); showAchievementQueued(`🎯 +${value} BelkaCoins (${score} points)`,true); }
+  while(score>=last500Reward+500) { last500Reward+=500; 
+    let value = 8;
+    if (alisaTripleCoinsActive) value = 24;
+    addCoins(value,W/2,H/2); showAchievementQueued(`🌟 +${value} BelkaCoins (${score} points)`,true); }
   if(frame%6===0) { score++; scoreEl.textContent=`${t.scoreLabel} ${score}`; }
   player.vy+=gravity; player.y+=player.vy;
   if(player.y>=ground.y-player.h+8) {
@@ -2342,7 +2484,6 @@ function update() {
   birdTimer--; if(birdTimer<=0 && birds.length<3) { birds.push({ x:W+50, y:50+Math.random()*(H*0.25), speed:0.5+Math.random()*0.6, wingPhase:Math.random()*Math.PI*2, size:0.7+Math.random()*0.5 }); birdTimer=180+Math.random()*100; }
   for(let i=0;i<birds.length;i++) { let b=birds[i]; b.x-=b.speed; b.wingPhase+=0.12; if(b.x+30<0) { birds.splice(i,1); i--; } }
   
-  // ОБЫЧНЫЙ САМОЛЁТ (только для Farm и WildWest)
   if (getCurrentMap().theme !== 'vegas') {
       plane.x += plane.speed; 
       if(plane.x > W+200) { 
@@ -2351,11 +2492,10 @@ function update() {
         if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('plane'); 
       }
   } else {
-      // ВЕРТОЛЁТ для Vegas
       policeHeli.x += policeHeli.speed;
       if(policeHeli.x > W+200) {
-          policeHeli.x = -220;
-          policeHeli.y = 50 + Math.random() * 60;
+          policeHeli.x = -260;
+          policeHeli.y = 30 + Math.random() * 50;
           policeHeli.lightBlink = Math.random() * Math.PI * 2;
           if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('heli');
       }
@@ -2402,7 +2542,13 @@ function update() {
       if(!invincible && !invisibilityActive) { createDust(player.x+player.w/2,player.y+player.h/2,12); endGame(); break; }
     }
   }
-  for(let i=0;i<obstacles.length;i++) { if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { obstacles[i].counted=true; obsPassed++; if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } } }
+  for(let i=0;i<obstacles.length;i++) { if(obstacles[i].x+obstacles[i].w<player.x && !obstacles[i].counted) { obstacles[i].counted=true; obsPassed++; if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; 
+    let value = 3;
+    if (alisaTripleCoinsActive) value = 9;
+    addCoins(value,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +${value} BelkaCoins 🎯`,true); } if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; 
+    let value = 8;
+    if (alisaTripleCoinsActive) value = 24;
+    addCoins(value,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +${value} BelkaCoins 🎯`,true); } } }
   cloudTimer++; if(cloudTimer>=200) { cloudTimer=0; cloudHue=(cloudHue+20)%360; }
 }
 
@@ -2410,13 +2556,9 @@ function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y
 
 function drawMountainsAndForest() {
   const currentMap = getCurrentMap();
-  
-  // Для Vegas — не рисуем горы (дома уже в worldObjects)
   if (currentMap.theme === 'vegas') {
     return;
   }
-  
-  // Остальные карты — рисуем горы
   const mbY = ground.y-160;
   const hour = timeOfDay/100;
   const mCol = currentMap.mountainColors;
@@ -2455,7 +2597,6 @@ function drawMountainsAndForest() {
 function drawCloud(x,y,s){ const fs=s, hue=cloudHue; px(x+8*fs, y+10*fs, 45*fs, 18*fs, `hsl(${hue},85%,88%)`); px(x+0*fs, y+18*fs, 65*fs, 16*fs, `hsl(${hue},85%,88%)`); px(x+15*fs, y+0*fs, 28*fs, 16*fs, `hsl(${hue+10},80%,82%)`); px(x+40*fs, y+8*fs, 22*fs, 14*fs, `hsl(${hue+10},80%,82%)`); }
 function drawBird(x,y,wp,s){ let wy=Math.sin(wp)*2; px(x, y, 10*s, 5*s, '#2c2c2c'); px(x+6*s, y-2*s+wy, 5*s, 3*s, '#4a4a4a'); px(x-2*s, y-2*s+wy, 5*s, 3*s, '#4a4a4a'); px(x+8*s, y+1*s, 3*s, 2*s, '#e8a735'); }
 
-// ОБЫЧНЫЙ САМОЛЁТ (для Farm и WildWest)
 function drawPlane(x,y){ 
   px(x+10, y+18, 44, 6, '#f0f0f0');
   px(x+8, y+20, 48, 4, '#e0e0e0');
@@ -2477,7 +2618,6 @@ function drawPlane(x,y){
 }
 
 function drawBillboard(planeX, planeY) {
-    // Билборд только для самолёта (не для вертолёта)
     const billboardX = planeX + 20;
     const billboardY = planeY + 25;
     
@@ -2593,6 +2733,7 @@ function drawPlayer() {
       if(skin.ability === 'doubleCoins') glowColor = '#ffdd44';
       if(skin.ability === 'magnet') glowColor = '#ff44aa';
       if(skin.ability === 'invisibility') glowColor = '#ffffff';
+      if(skin.id === 'alisa') glowColor = '#ff88ff';
       
       ctx.fillStyle = `rgba(${parseInt(glowColor.slice(1,3),16)}, ${parseInt(glowColor.slice(3,5),16)}, ${parseInt(glowColor.slice(5,7),16)}, ${pulse * 0.5})`;
       ctx.fillRect(x-6, y-6, player.w+12, player.h+12);
@@ -2602,13 +2743,22 @@ function drawPlayer() {
       ctx.fillText(skin.abilityName, x+10, y-10);
   }
   
-  if(tripleJumpAvailable && skin.ability === 'tripleJump') {
+  if(alisaMagnetActive && skin.id === 'alisa') {
       const pulse = (Math.sin(Date.now() / 100) + 1) / 2 * 0.5 + 0.3;
-      ctx.fillStyle = `rgba(170, 68, 255, ${pulse * 0.5})`;
-      ctx.fillRect(x-6, y-6, player.w+12, player.h+12);
-      ctx.font = 'bold 10px "Courier New", monospace';
+      ctx.fillStyle = `rgba(170, 68, 255, ${pulse * 0.6})`;
+      ctx.fillRect(x-8, y-8, player.w+16, player.h+16);
+      
+      for(let i=0; i<3; i++) {
+          const angle = Date.now() * 0.02 + i * Math.PI * 2 / 3;
+          const pxOff = Math.cos(angle) * 15;
+          const pyOff = Math.sin(angle) * 15;
+          ctx.fillStyle = `rgba(170, 68, 255, 0.8)`;
+          ctx.fillRect(x + player.w/2 + pxOff - 2, y + player.h/2 + pyOff - 2, 4, 4);
+      }
+      
+      ctx.font = 'bold 7px "Courier New", monospace';
       ctx.fillStyle = '#ff88ff';
-      ctx.fillText('TRIPLE!', x+10, y-10);
+      ctx.fillText('MAGNET x3', x+15, y-15);
   }
   
   px(x+16, y+22+bounce, 38,22, skin.palette.body); 
@@ -2627,7 +2777,21 @@ function drawPlayer() {
   px(x+1, y+32+bounce, 5,8, skin.palette.leg); 
   px(x+6, y+36+bounce, 5,6, skin.palette.mane); 
   if(player.legFrame===0){ px(x+20, y+42+bounce, 6,14, skin.palette.leg); px(x+32, y+44+bounce, 6,12, skin.palette.leg); px(x+44, y+42+bounce, 6,14, skin.palette.leg); px(x+52, y+44+bounce, 6,12, skin.palette.leg); }else{ px(x+20, y+44+bounce, 6,12, skin.palette.leg); px(x+32, y+42+bounce, 6,14, skin.palette.leg); px(x+44, y+44+bounce, 6,12, skin.palette.leg); px(x+52, y+42+bounce, 6,14, skin.palette.leg); } 
-  px(x+20, y+54+bounce, 6,3, '#f1e7d2'); px(x+32, y+54+bounce, 6,3, '#f1e7d2'); px(x+44, y+54+bounce, 6,3, '#f1e7d2'); px(x+52, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+20, y+54+bounce, 6,3, '#f1e7d2'); px(x+32, y+54+bounce, 6,3, '#f1e7d2'); px(x+44, y+54+bounce, 6,3, '#f1e7d2'); px(x+52, y+54+bounce, 6,3, '#f1e7d2');
+  
+  if (skin.id === 'alisa') {
+      const hornPulse = (Math.sin(Date.now() / 150) + 1) / 2 * 0.5 + 0.5;
+      const hornColor = skin.palette.horn || '#ffdd88';
+      
+      px(x+58, y-2+bounce, 3, 8, hornColor);
+      px(x+59, y-6+bounce, 1, 6, hornColor);
+      px(x+60, y-10+bounce, 1, 4, hornColor);
+      
+      ctx.fillStyle = `rgba(255, 200, 100, ${hornPulse * 0.5})`;
+      ctx.fillRect(x+56, y-12+bounce, 8, 14);
+      
+      px(x+60, y-8+bounce, 1, 3, '#ffffff');
+  }
   
   if(invisibilityActive) {
     ctx.globalAlpha = 1;
@@ -2717,8 +2881,6 @@ function drawPowerups(){
       ctx.arc(p.x+p.w/2-3,p.y+p.h/2-3,1,0,Math.PI*2); 
       ctx.fill(); 
     } else if(p.type==='vegasCoin'){ 
-      ctx.fillStyle = `rgba(170, 68, 255, ${pulse * 0.5 + 0.3})`;
-      ctx.fillRect(p.x-6, p.y-6, p.w+12, p.h+12);
       let glow=(Math.sin(Date.now()/140)+1)/2*0.8+0.5; 
       ctx.fillStyle=`rgba(170, 68, 255, ${glow})`; 
       ctx.fillRect(p.x-8,p.y-8,p.w+16,p.h+16); 
@@ -2734,6 +2896,10 @@ function drawPowerups(){
       ctx.beginPath(); 
       ctx.arc(p.x+p.w/2-2,p.y+p.h/2-2,2,0,Math.PI*2); 
       ctx.fill(); 
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.beginPath();
+      ctx.arc(p.x+p.w/2-3, p.y+p.h/2-3, 2, 0, Math.PI*2);
+      ctx.fill();
     } 
   } 
 }
@@ -2750,7 +2916,6 @@ function render() {
   clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
   birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
   
-  // Рисуем самолёт или вертолёт в зависимости от карты
   if (getCurrentMap().theme === 'vegas') {
       drawPoliceHelicopter(policeHeli.x, policeHeli.y, policeHeli.lightBlink);
   } else {
@@ -2758,80 +2923,83 @@ function render() {
       drawBillboard(plane.x, plane.y);
   }
   
-  const currentMapSun = getCurrentMap();
-  if (currentMapSun.theme === 'desert') {
-    const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
-    const celestialX = 80, celestialY = 70;
-    if (!isNight) {
+  // Солнце и Луна (для всех карт)
+  if (isSunVisible) {
       const pulse = 0.85 + Math.sin(Date.now() / 700) * 0.1;
       const alphaPulse = 0.25 + Math.sin(Date.now() / 600) * 0.12;
+      
       ctx.beginPath();
-      ctx.arc(celestialX, celestialY, 52 * pulse, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 42 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 220, 100, ${alphaPulse * 0.6})`;
       ctx.fill();
+      
       ctx.beginPath();
-      ctx.arc(celestialX, celestialY, 44 * pulse, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 36 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 200, 80, ${alphaPulse * 0.8})`;
       ctx.fill();
+      
       ctx.beginPath();
-      ctx.arc(celestialX, celestialY, 36 * pulse, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 30 * pulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 180, 60, ${alphaPulse})`;
       ctx.fill();
-      for(let sy=0; sy<40; sy++){
-        for(let sx=0; sx<40; sx++){
-          let dx=celestialX-20+sx, dy=celestialY-20+sy;
-          let dist=Math.hypot(sx-20,sy-20);
-          if(dist<16) ctx.fillStyle='#ffdd66';
-          else if(dist<20) ctx.fillStyle='#ffcc33';
+      
+      for(let sy=0; sy<34; sy++){
+          for(let sx=0; sx<34; sx++){
+              let dx=sunX-17+sx, dy=sunY-17+sy;
+              let dist=Math.hypot(sx-17,sy-17);
+              if(dist<14) ctx.fillStyle='#ffdd66';
+              else if(dist<17) ctx.fillStyle='#ffcc33';
+              else continue;
+              ctx.fillRect(dx,dy,1,1);
+          }
+      }
+      
+      for(let bx=0; bx<5; bx++) for(let by=0; by<5; by++){
+          if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffdd';
           else continue;
-          ctx.fillRect(dx,dy,1,1);
-        }
+          ctx.fillRect(sunX-2+bx, sunY-2+by, 1,1);
       }
-      for(let bx=0; bx<6; bx++) for(let by=0; by<6; by++){
-        if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffdd';
-        else continue;
-        ctx.fillRect(celestialX-3+bx, celestialY-3+by, 1,1);
-      }
-    } else {
+  }
+  
+  if (isMoonVisible) {
       const moonPulse = 0.88 + Math.sin(Date.now() / 900) * 0.08;
       const moonAlphaPulse = 0.2 + Math.sin(Date.now() / 800) * 0.1;
+      
       ctx.beginPath();
-      ctx.arc(celestialX, celestialY, 48 * moonPulse, 0, Math.PI * 2);
+      ctx.arc(moonX, moonY, 38 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(200, 220, 255, ${moonAlphaPulse * 0.5})`;
       ctx.fill();
+      
       ctx.beginPath();
-      ctx.arc(celestialX, celestialY, 40 * moonPulse, 0, Math.PI * 2);
+      ctx.arc(moonX, moonY, 32 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(180, 200, 240, ${moonAlphaPulse * 0.7})`;
       ctx.fill();
+      
       ctx.beginPath();
-      ctx.arc(celestialX, celestialY, 32 * moonPulse, 0, Math.PI * 2);
+      ctx.arc(moonX, moonY, 26 * moonPulse, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(160, 180, 220, ${moonAlphaPulse})`;
       ctx.fill();
-      for(let sy=0; sy<36; sy++){
-        for(let sx=0; sx<36; sx++){
-          let dx=celestialX-18+sx, dy=celestialY-18+sy;
-          let dist=Math.hypot(sx-18,sy-18);
-          if(dist<14) ctx.fillStyle='#f0f4ff';
-          else if(dist<17) ctx.fillStyle='#e0e8fc';
-          else continue;
-          ctx.fillRect(dx,dy,1,1);
-        }
+      
+      for(let sy=0; sy<30; sy++){
+          for(let sx=0; sx<30; sx++){
+              let dx=moonX-15+sx, dy=moonY-15+sy;
+              let dist=Math.hypot(sx-15,sy-15);
+              if(dist<12) ctx.fillStyle='#e0e8fc';
+              else if(dist<14) ctx.fillStyle='#d0d8f0';
+              else continue;
+              ctx.fillRect(dx,dy,1,1);
+          }
       }
-      for(let bx=0; bx<5; bx++) for(let by=0; by<5; by++){
-        if((bx===2||bx===3) && (by===2||by===3)) ctx.fillStyle='#ffffff';
-        else continue;
-        ctx.fillRect(celestialX-2+bx, celestialY-2+by, 1,1);
-      }
-    }
   }
+  
   const currentMapLayer = getCurrentMap();
   let layerColor1, layerColor2;
   if (currentMapLayer.theme === 'desert') {
     layerColor1 = '#d4a373';
     layerColor2 = '#c9945e';
   } else if (currentMapLayer.theme === 'vegas') {
-    layerColor1 = '#d4a373';
-    layerColor2 = '#4a4a4a';
+    layerColor1 = '#98d45f';
+    layerColor2 = '#7ec347';
   } else {
     layerColor1 = '#98d45f';
     layerColor2 = '#7ec347';
@@ -2840,12 +3008,25 @@ function render() {
   ctx.fillRect(0, ground.y - 140, W, 140);
   ctx.fillStyle = layerColor2;
   ctx.fillRect(0, ground.y - 110, W, 70);
+  
   worldObjects.forEach(obj=>drawWorldObject(obj));
   drawGround();
   obstacles.forEach(drawObstacle);
+  
+  for(let i=0; i<rainbowTrail.length; i++) {
+      const t = rainbowTrail[i];
+      const alpha = t.life / 25;
+      const size = 4 + (1 - alpha) * 2;
+      ctx.fillStyle = t.color;
+      ctx.globalAlpha = alpha * 0.8;
+      ctx.fillRect(t.x - size/2, t.y - size/2, size, size);
+  }
+  ctx.globalAlpha = 1;
+  
   drawPowerups();
   drawPlayer();
   drawParticles();
+  
   ctx.fillStyle='rgba(0,0,0,0.05)';
   for(let y=0;y<H;y+=6) ctx.fillRect(0,y,W,1);
   let grd=ctx.createRadialGradient(W/2,H/2,H*0.15,W/2,H/2,H*0.8);
@@ -2859,9 +3040,6 @@ function loop(){ update(); render(); requestAnimationFrame(loop); }
 checkReg().then(()=>{ loadLeaderboard("gameOverLeaderboard",false); loadLeaderboard("leaderboardList",true); renderShop(); });
 loop();
 
-// ============================================================
-// ПРИНУДИТЕЛЬНАЯ ПРИВЯЗКА ВСЕХ КНОПОК
-// ============================================================
 setTimeout(() => {
     const muteBtnFix = document.getElementById('muteBtn');
     if (muteBtnFix) {
