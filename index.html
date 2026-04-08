@@ -485,7 +485,7 @@
         <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
       </div>
       <div id="userStatusMain" class="register-hint"></div>
-      <div class="version">✨ v.04.1 — Las Vegas: неон, полиция, высотные дома, пальмы! ✨</div>
+      <div class="version">✨ v.04.2 — Лидерборд, скорая помощь, вертолёт! ✨</div>
     </div>
   </div>
 
@@ -648,7 +648,7 @@ const maps = {
     decoColor: '#c3f267'
   },
   wildWest: { 
-    id: 'wildWest', name: '🤠 Wild West', price: 0, owned: false, theme: 'desert',
+    id: 'wildWest', name: '🤠 Wild West', price: 500, owned: false, theme: 'desert',
     groundColor: '#d4a373', groundDetail1: '#c9945e', groundDetail2: '#b87a4a', groundShadow: '#9b6a3a',
     skyGradient: { day: ['#e9c46a', '#f4a261'], dawn: ['#e76f51', '#f4a261'], sunset: ['#e63946', '#d4a373'], night: ['#2b2d42', '#3a3e5a'] },
     mountainColors: { day: ['#b87a5a', '#d49c7a'], dawn: ['#c47a5a', '#e4aa8a'], sunset: ['#9a5a4a', '#ba7a6a'], night: ['#4a3a3a', '#6a5a5a'] },
@@ -656,7 +656,7 @@ const maps = {
     decoColor: '#e9c46a'
   },
   lasVegas: { 
-    id: 'lasVegas', name: '🎰 Las Vegas', price: 0, owned: false, theme: 'vegas',
+    id: 'lasVegas', name: '🎰 Las Vegas', price: 1000, owned: false, theme: 'vegas',
     groundColor: '#d4a373', groundDetail1: '#c9945e', groundDetail2: '#b87a4a', groundShadow: '#9b6a3a',
     skyGradient: { 
       day: ['#ff6b9d', '#c44b8b', '#8b3a62'], 
@@ -848,7 +848,7 @@ window.handleBackgroundAction = function(bgId) {
   selectedBackground = bgId;
   saveBackgrounds();
   renderBackgroundsGrid();
-  applySelectedBackground();
+    applySelectedBackground();
   playSound('skinPurchase', 0.25);
   showAchievementQueued(`🎨 Background changed: ${bg.name}`, false);
 };
@@ -1004,7 +1004,7 @@ if (isNaN(ambientVolume) || ambientVolume === null) {
     localStorage.setItem('pixelFarmAmbientVolume', ambientVolume);
 }
 
-// Билборд для самолёта
+// Билборд для самолёта (только для Farm и WildWest)
 let billboardText = localStorage.getItem('billboardText') || "PIXEL FARM";
 let billboardSway = 0;
 let billboardSwaySpeed = 0.04;
@@ -1012,10 +1012,13 @@ let billboardSwayAmount = 4;
 let textShake = 0;
 let textShakeSpeed = 0.05;
 
+// ВЕРТОЛЁТ для Vegas
+let policeHeli = { x: -200, y: 60, speed: 1.0, lightBlink: 0, active: false };
+
 // Переменные для способностей скинов
 let abilityActive = false;
 let abilityTimer = 0;
-let abilityDuration = 600; // 10 секунд (60fps × 10)
+let abilityDuration = 600;
 let tripleJumpAvailable = false;
 let tripleJumpUsed = false;
 let speedBoostActive = false;
@@ -1024,7 +1027,6 @@ let doubleCoinsActive = false;
 let magnetActive = false;
 let invisibilityActive = false;
 
-// Таймер для монет Vegas
 let vegasCoinTimer = 0;
 
 function updateVolumeSliders() {
@@ -1110,6 +1112,7 @@ function playSound(type, volume = 0.2) {
   else if (type === 'horseshoe') { oscType = 'triangle'; freq = 880 + (Math.random() - 0.5) * 20; baseVol = 0.3; }
   else if (type === 'bird') { oscType = 'sine'; freq = 1400 + (Math.random() - 0.5) * 150; baseVol = 0.16; volumeGroup = 'ambient'; }
   else if (type === 'plane') { oscType = 'sawtooth'; freq = 220 + (Math.random() - 0.5) * 20; baseVol = 0.2; volumeGroup = 'ambient'; }
+  else if (type === 'heli') { oscType = 'sawtooth'; freq = 180 + (Math.random() - 0.5) * 15; baseVol = 0.22; volumeGroup = 'ambient'; }
   else if (type === 'chicken') { oscType = 'square'; freq = 520 + (Math.random() - 0.5) * 30; baseVol = 0.24; volumeGroup = 'ambient'; }
   else if (type === 'cow') { oscType = 'sawtooth'; freq = 160 + (Math.random() - 0.5) * 10; baseVol = 0.32; volumeGroup = 'ambient'; }
   else if (type === 'pig') { oscType = 'triangle'; freq = 280 + (Math.random() - 0.5) * 20; baseVol = 0.26; volumeGroup = 'ambient'; }
@@ -1152,9 +1155,10 @@ function startAmbientLoop() {
       else if (rand < 0.18 && hour >= 6 && hour < 19) playSound('bird');
       else if (rand < 0.24 && (hour >= 19 || hour < 6)) playSound('cricket');
     } else if (currentMap.theme === 'vegas') {
-      if (rand < 0.15) playSound('bird');
-      else if (rand < 0.25) playSound('cricket');
-      else if (rand < 0.32) playSound('wind');
+      if (rand < 0.12) playSound('wind');
+      else if (rand < 0.18) playSound('bird');
+      else if (rand < 0.24) playSound('cricket');
+      else if (rand < 0.3) playSound('heli');
     } else {
       if (hour >= 6 && hour < 19) {
         if (rand < 0.1) playSound('chicken');
@@ -1240,7 +1244,51 @@ window.addEventListener('beforeunload', () => {
 async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
 async function checkReg() { const status = document.getElementById("userStatusMain"); if (!userNick) { status.innerHTML = t.register; isUserRegistered = false; makeLinks(); updateUserNameDisplay(); return false; } const ok = await ensureUser(); if (ok && isUserRegistered) { const best = Math.max(localBestScore, userFirebaseScore); status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; makeLinks(); updateUserNameDisplay(); return true; } return false; }
 async function saveBest(score) { if (!isUserRegistered || !userDocId) return false; const ref = doc(db, "userbellariofilms", userDocId); try { await runTransaction(db, async (t) => { const docSnap = await t.get(ref); if (!docSnap.exists()) return; const cur = docSnap.data().bestScore || 0; if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); else t.update(ref, { lastPlayed: serverTimestamp() }); }); return true; } catch (e) { return false; } }
-async function loadLeaderboard(contId, showRank = true) { const cont = document.getElementById(contId); if (!cont) return; try { const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"), limit(10)); const snap = await getDocs(q); let html = '', rank = 1, userRank = null; for (const docSnap of snap.docs) { const data = docSnap.data(); const sc = data.bestScore || 0; if (sc === 0) continue; const isYou = data.nickname === userNick && isUserRegistered; if (isYou) userRank = rank; html += `<div class="leaderboard-item ${isYou ? 'you' : ''}"><span class="rank">${rank}</span><span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span><span class="score">${sc} pts</span></div>`; rank++; } if (!html) html = '<div style="text-align:center;">No results yet</div>'; cont.innerHTML = html; if (showRank && contId === "leaderboardList") { const rankDiv = document.getElementById("yourRank"); if (rankDiv) { if (isUserRegistered) { if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-10 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; } else rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; makeLinks(); } } } catch (e) { cont.innerHTML = '<div style="text-align:center;">Load error</div>'; } }
+
+// НОВАЯ ФУНКЦИЯ ЛИДЕРБОРДА — ВСЕ ЗАРЕГИСТРИРОВАННЫЕ ИГРОКИ (БЕЗ ЛИМИТА 10)
+async function loadLeaderboard(contId, showRank = true) {
+    const cont = document.getElementById(contId);
+    if (!cont) return;
+    try {
+        // Получаем всех пользователей, отсортированных по убыванию очков
+        const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"));
+        const snap = await getDocs(q);
+        let html = '', rank = 1, userRank = null;
+        for (const docSnap of snap.docs) {
+            const data = docSnap.data();
+            const sc = data.bestScore || 0;
+            if (sc === 0) continue; // пропускаем нулевые результаты
+            const isYou = data.nickname === userNick && isUserRegistered;
+            if (isYou) userRank = rank;
+            html += `<div class="leaderboard-item ${isYou ? 'you' : ''}">
+                        <span class="rank">${rank}</span>
+                        <span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span>
+                        <span class="score">${sc} pts</span>
+                     </div>`;
+            rank++;
+            if (rank > 50) break; // ограничиваем 50 для производительности
+        }
+        if (!html) html = '<div style="text-align:center;">Нет зарегистрированных игроков</div>';
+        cont.innerHTML = html;
+        
+        if (showRank && contId === "leaderboardList") {
+            const rankDiv = document.getElementById("yourRank");
+            if (rankDiv) {
+                if (isUserRegistered) {
+                    if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`;
+                    else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-50 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`;
+                } else {
+                    rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`;
+                    makeLinks();
+                }
+            }
+        }
+    } catch (e) {
+        cont.innerHTML = '<div style="text-align:center;">Load error</div>';
+        console.error('Leaderboard error:', e);
+    }
+}
+
 function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]||m)) : s; }
 function updateMenuCoins() { const span = document.getElementById('menuCoinsValue'); if (span) span.textContent = coins; }
 function updateUserNameDisplay() {
@@ -1310,69 +1358,71 @@ let obsTimer = 0, powTimer = 0, goldTimer = 0;
 // НОВЫЕ ФУНКЦИИ ДЛЯ КАРТЫ VEGAS
 // ============================================================
 
-// Высотные дома (Нью-Йорк стиль)
-function drawTallBuilding(x, y, width, height, buildingType, timeOfDay) {
+// ЯРКИЕ РАЗНОЦВЕТНЫЕ ДОМА (разной этажности)
+const buildingColors = ['#4a7ad9', '#d94a7a', '#4ad97a', '#d9a34a', '#7a4ad9', '#d94a4a', '#4ad9d9', '#d9d94a', '#d94ad9'];
+
+function drawColorfulBuilding(x, y, width, height, colorIdx, timeOfDay) {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
+    const mainColor = buildingColors[colorIdx % buildingColors.length];
     
-    ctx.fillStyle = '#2a2a3a';
+    // Основное здание
+    ctx.fillStyle = mainColor;
     ctx.fillRect(x, y - height, width, height);
     
-    if (buildingType === 'skyscraper') {
-        const stepHeight = Math.min(15, height * 0.2);
-        ctx.fillStyle = '#3a3a4a';
-        ctx.fillRect(x + width/4, y - height - stepHeight, width/2, stepHeight);
-        ctx.fillStyle = '#c0c0c0';
-        ctx.fillRect(x + width/2 - 2, y - height - stepHeight - 8, 4, 10);
-    }
-    
-    const windowW = 4;
-    const windowH = 5;
-    const startY = y - height + 8;
-    
+    // Окна
     for(let wy = 0; wy < Math.floor(height / 12); wy++) {
         for(let wx = 0; wx < Math.floor(width / 10); wx++) {
-            if (Math.random() > 0.65) continue;
+            if (Math.random() > 0.7) continue;
             const windowX = x + 6 + wx * 10;
-            const windowY = startY + wy * 12;
+            const windowY = y - height + 8 + wy * 12;
             if (isNight) {
-                const blink = Math.sin(Date.now() * 0.003 + windowX * 0.1) > 0 ? 0.9 : 0.5;
+                const blink = Math.sin(Date.now() * 0.003 + windowX) > 0 ? 0.9 : 0.5;
                 ctx.fillStyle = `rgba(255, 220, 100, ${blink})`;
             } else {
-                ctx.fillStyle = '#4a4a5a';
+                ctx.fillStyle = '#ffdd88';
             }
-            ctx.fillRect(windowX, windowY, windowW, windowH);
+            ctx.fillRect(windowX, windowY, 5, 7);
         }
     }
     
+    // Крыша
+    ctx.fillStyle = '#cc4444';
+    ctx.fillRect(x - 3, y - height - 5, width + 6, 5);
+    
+    // Неоновая вывеска (ночью)
     if (isNight && width > 40) {
         const neonBlink = (Math.sin(Date.now() * 0.005) + 1) / 2;
         ctx.fillStyle = `rgba(255, 68, 204, ${neonBlink * 0.8 + 0.2})`;
-        ctx.fillRect(x + 5, y - height - 5, width - 10, 6);
+        ctx.fillRect(x + 5, y - height - 5, width - 10, 5);
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 5px "Courier New", monospace';
-        ctx.fillText('HOTEL', x + width/2 - 12, y - height - 1);
+        ctx.font = 'bold 4px "Courier New", monospace';
+        ctx.fillText('HOTEL', x + width/2 - 10, y - height - 2);
     }
 }
 
-// Пальма (с гирляндами)
+// ЯРКИЕ ПАЛЬМЫ (салатовые листья)
 function drawPalmTree(x, y, s, timeOfDay) {
     const isNight = (timeOfDay >= 2000 || timeOfDay < 600);
     
+    // Ствол
     px(x+22*s, y+40*s, 8*s, 50*s, '#8B5A2B');
     px(x+24*s, y+35*s, 6*s, 10*s, '#A06B3A');
     px(x+20*s, y+85*s, 12*s, 8*s, '#6B3E1A');
     
-    px(x+0*s, y+15*s, 18*s, 12*s, '#2d6a4f');
-    px(x+28*s, y+15*s, 18*s, 12*s, '#2d6a4f');
-    px(x+5*s, y+8*s, 15*s, 10*s, '#40916c');
-    px(x+26*s, y+8*s, 15*s, 10*s, '#40916c');
-    px(x+8*s, y+0*s, 12*s, 10*s, '#52b788');
-    px(x+26*s, y+0*s, 12*s, 10*s, '#52b788');
-    px(x+15*s, y-5*s, 16*s, 8*s, '#74c69d');
+    // ЯРКИЕ САЛАТОВЫЕ ЛИСТЬЯ
+    px(x+0*s, y+15*s, 18*s, 12*s, '#a4f07a');
+    px(x+28*s, y+15*s, 18*s, 12*s, '#a4f07a');
+    px(x+5*s, y+8*s, 15*s, 10*s, '#b8ff8a');
+    px(x+26*s, y+8*s, 15*s, 10*s, '#b8ff8a');
+    px(x+8*s, y+0*s, 12*s, 10*s, '#c8ff9a');
+    px(x+26*s, y+0*s, 12*s, 10*s, '#c8ff9a');
+    px(x+15*s, y-5*s, 16*s, 8*s, '#d8ffaa');
     
+    // Кокосы
     px(x+20*s, y+30*s, 4*s, 4*s, '#8B5A2B');
     px(x+24*s, y+32*s, 4*s, 4*s, '#8B5A2B');
     
+    // Гирлянды (ночью)
     if (isNight || (timeOfDay >= 1800 && timeOfDay < 2000)) {
         for(let i=0; i<5; i++) {
             const lightX = x + 10*s + i*8*s;
@@ -1392,7 +1442,7 @@ function drawPalmTree(x, y, s, timeOfDay) {
     }
 }
 
-// Полицейская машина (по вашему изображению)
+// ПОЛИЦЕЙСКАЯ МАШИНА (фон, реже)
 function drawPoliceCarBg(x, y, w, h, blinkPhase) {
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x+3, y+h-3, w-6, 5);
@@ -1435,21 +1485,133 @@ function drawPoliceCarBg(x, y, w, h, blinkPhase) {
     }
 }
 
-// Пожарная машина на фоне (боком)
+// НОВАЯ ПОЖАРНАЯ МАШИНА (узнаваемая, с лестницей)
 function drawFireTruckBg(x, y, w, h, blinkPhase) {
-    px(x+2, y+8, w-4, h-14, '#cc0000');
-    px(x+4, y+4, w-8, 6, '#ff4444');
-    px(x+8, y+h-8, 8, 5, '#333333');
-    px(x+w-16, y+h-8, 8, 5, '#333333');
+    // Тень
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(x+3, y+h-3, w-6, 5);
     
-    px(x+10, y+3, w-20, 3, '#ffcc00');
-    for(let i=0; i<4; i++) {
-        px(x+15+i*12, y+2, 2, 4, '#ffcc00');
+    // Кузов (красный)
+    px(x+4, y+8, w-8, h-14, '#cc0000');
+    px(x+6, y+4, w-12, 6, '#ff4444');
+    
+    // Жёлтая полоса
+    px(x+4, y+24, w-8, 3, '#ffcc00');
+    
+    // Колёса
+    px(x+8, y+h-8, 10, 6, '#333333');
+    px(x+w-18, y+h-8, 10, 6, '#333333');
+    px(x+10, y+h-7, 6, 4, '#888888');
+    px(x+w-16, y+h-7, 6, 4, '#888888');
+    
+    // Кабина
+    px(x+4, y+6, 15, 20, '#aa0000');
+    px(x+6, y+9, 10, 7, '#7ac4ff');
+    
+    // ЛЕСТНИЦА на крыше
+    px(x+20, y+3, w-24, 4, '#ffcc00');
+    for(let i=0; i<5; i++) {
+        px(x+22 + i*8, y+2, 2, 6, '#ffcc00');
     }
     
+    // Цистерна
+    ctx.fillStyle = '#dd2222';
+    ctx.fillRect(x+22, y+12, w-26, 18);
+    
+    // Шланг
+    px(x+w-12, y+20, 8, 4, '#888888');
+    
+    // Мигалки
     const blink = (Math.sin(Date.now() * 0.015 + blinkPhase) + 1) / 2;
     ctx.fillStyle = `rgba(255, 0, 0, ${blink * 0.8 + 0.2})`;
-    ctx.fillRect(x+w/2-4, y+2, 8, 4);
+    ctx.fillRect(x+w/2-6, y+2, 5, 4);
+    ctx.fillStyle = `rgba(255, 100, 0, ${(1 - blink) * 0.8 + 0.2})`;
+    ctx.fillRect(x+w/2, y+2, 5, 4);
+    
+    // Надпись FIRE
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 5px "Courier New", monospace';
+    ctx.fillText('FIRE', x+30, y+28);
+}
+
+// СКОРАЯ ПОМОЩЬ (активное препятствие)
+function drawAmbulance(x, y, w, h, blinkPhase) {
+    // Тень
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(x+3, y+h-3, w-6, 5);
+    
+    // Кузов (белый)
+    px(x+5, y+6, w-10, h-14, '#ffffff');
+    px(x+3, y+16, w-6, h-20, '#f0f0f0');
+    
+    // Красная полоса
+    px(x+5, y+22, w-10, 4, '#cc0000');
+    
+    // КРАСНЫЙ КРЕСТ на боку
+    px(x+15, y+18, 12, 4, '#cc0000');
+    px(x+19, y+14, 4, 12, '#cc0000');
+    
+    // Колёса
+    px(x+8, y+h-8, 10, 6, '#333333');
+    px(x+w-18, y+h-8, 10, 6, '#333333');
+    px(x+10, y+h-7, 6, 4, '#888888');
+    px(x+w-16, y+h-7, 6, 4, '#888888');
+    
+    // Окна
+    px(x+8, y+9, 10, 7, '#7ac4ff');
+    px(x+w-18, y+9, 10, 7, '#7ac4ff');
+    px(x+22, y+11, 6, 5, '#7ac4ff');
+    px(x+w-28, y+11, 6, 5, '#7ac4ff');
+    
+    // Мигалки
+    const blink = (Math.sin(Date.now() * 0.01 + blinkPhase) + 1) / 2;
+    ctx.fillStyle = `rgba(0, 100, 255, ${blink * 0.8 + 0.2})`;
+    ctx.fillRect(x+w/2-10, y+4, 5, 5);
+    ctx.fillStyle = `rgba(255, 0, 0, ${(1 - blink) * 0.8 + 0.2})`;
+    ctx.fillRect(x+w/2-3, y+4, 5, 5);
+    
+    // Надпись AMBULANCE
+    ctx.fillStyle = '#cc0000';
+    ctx.font = 'bold 4px "Courier New", monospace';
+    ctx.fillText('AMBULANCE', x+12, y+29);
+    
+    // Фары
+    px(x+3, y+18, 4, 4, '#ffcc00');
+    px(x+w-7, y+18, 4, 4, '#ffcc00');
+}
+
+// ПОЛИЦЕЙСКИЙ ВЕРТОЛЁТ (вместо самолёта на Vegas)
+function drawPoliceHelicopter(x, y, blinkPhase) {
+    // Корпус
+    px(x+10, y+8, 30, 8, '#1a3a6e');
+    px(x+8, y+12, 34, 6, '#f0f0f0');
+    
+    // Кабина
+    px(x+30, y+6, 10, 8, '#7ac4ff');
+    
+    // Лопасти (вращаются)
+    const angle = Date.now() * 0.02;
+    ctx.save();
+    ctx.translate(x+25, y+6);
+    ctx.rotate(angle);
+    px(-25, -2, 50, 4, '#888888');
+    ctx.restore();
+    
+    // Хвостовая балка
+    px(x+42, y+10, 15, 4, '#1a3a6e');
+    px(x+55, y+11, 8, 3, '#f0f0f0');
+    
+    // Мигалка
+    const blink = (Math.sin(Date.now() * 0.015 + blinkPhase) + 1) / 2;
+    ctx.fillStyle = `rgba(255, 0, 0, ${blink * 0.8 + 0.2})`;
+    ctx.fillRect(x+20, y+4, 6, 4);
+    ctx.fillStyle = `rgba(0, 100, 255, ${(1 - blink) * 0.8 + 0.2})`;
+    ctx.fillRect(x+28, y+4, 6, 4);
+    
+    // Надпись POLICE
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 5px "Courier New", monospace';
+    ctx.fillText('POLICE', x+15, y+18);
 }
 
 // Знак "WELCOME TO LAS VEGAS"
@@ -1619,8 +1781,8 @@ function drawWorldObject(obj) {
   }
   else if(obj.type === 'cactus' && currentMap.theme === 'desert') drawCactus(obj.x, obj.y, obj.scale||0.8);
   else if(obj.type === 'rock' && currentMap.theme === 'desert') drawRock(obj.x, obj.y, obj.scale||0.7);
-  else if(obj.type === 'tallBuilding') {
-    drawTallBuilding(obj.x, obj.y, obj.w, obj.h, obj.buildingType, timeOfDay);
+  else if(obj.type === 'colorfulBuilding') {
+    drawColorfulBuilding(obj.x, obj.y, obj.w, obj.h, obj.colorIdx, timeOfDay);
   }
   else if(obj.type === 'palmTree') {
     drawPalmTree(obj.x, obj.y, obj.scale || 1, timeOfDay);
@@ -1654,9 +1816,9 @@ function updateWorldObjects() {
       else if(obj.type === 'windmill') obj.x = W + rand(100,400);
       else if(obj.type === 'cactus' && currentMap.theme === 'desert') obj.x = W + rand(30,250);
       else if(obj.type === 'rock' && currentMap.theme === 'desert') obj.x = W + rand(20,300);
-      else if(obj.type === 'tallBuilding') obj.x = W + rand(300, 800);
+      else if(obj.type === 'colorfulBuilding') obj.x = W + rand(300, 800);
       else if(obj.type === 'palmTree') obj.x = W + rand(150, 400);
-      else if(obj.type === 'policeCarBg') obj.x = W + rand(800, 1500);
+      else if(obj.type === 'policeCarBg') obj.x = W + rand(1500, 2500);
       else if(obj.type === 'fireTruckBg') obj.x = W + rand(1200, 2000);
       else if(obj.type === 'welcomeSign') obj.x = W + rand(500, 1000);
     }
@@ -1704,7 +1866,13 @@ function setupWorld() {
     for(let i=0;i<4;i++) balloons.push({ type:'balloon', x:W*0.5+i*220+Math.random()*120, y:90+Math.random()*120, size:0.7+Math.random()*0.6, bob:Math.random()*Math.PI*2, speedMul:0.4+Math.random()*0.5, colors:[['#ff3838','#fff4d6'],['#3fd96f','#ffd83d']][Math.floor(Math.random()*2)] });
     for(let b of balloons) worldObjects.push({ type:'balloon', ...b });
   }
+  
+  // ОБЫЧНЫЙ САМОЛЁТ (для Farm и WildWest)
   plane = { x:-260, y:70+Math.random()*70, speed:1.2 };
+  
+  // ВЕРТОЛЁТ (для Vegas)
+  policeHeli = { x: -260, y: 60 + Math.random() * 60, speed: 1.0, lightBlink: 0, active: false };
+  
   if(currentMap.theme === 'desert') {
     for(let i=0;i<8;i++) worldObjects.push({ type:'cactus', x:i*280+Math.random()*120, y:ground.y-35-Math.random()*25, scale:0.6+Math.random()*0.7, speedMul:0.35 });
     for(let i=0;i<3;i++) {
@@ -1713,48 +1881,51 @@ function setupWorld() {
     }
     for(let i=0;i<3;i++) worldObjects.push({ type:'windmill', x:W+i*500+Math.random()*200, y:ground.y-170-Math.random()*20, w:100+Math.random()*20, h:170, speedMul:0.22, bladeAngle:Math.random()*Math.PI*2, bladeSpeed:0.02+Math.random()*0.02 });
   } else if(currentMap.theme === 'vegas') {
-    // Высотные дома
+    // ЯРКИЕ РАЗНОЦВЕТНЫЕ ДОМА (разной этажности)
     const buildings = [
-        { x: 50, width: 45, height: 120, type: 'skyscraper' },
-        { x: 110, width: 35, height: 90, type: 'building' },
-        { x: 160, width: 55, height: 150, type: 'skyscraper' },
-        { x: 230, width: 40, height: 100, type: 'building' },
-        { x: 290, width: 50, height: 130, type: 'skyscraper' },
-        { x: 360, width: 35, height: 85, type: 'building' },
-        { x: 410, width: 60, height: 160, type: 'skyscraper' },
-        { x: 490, width: 45, height: 110, type: 'building' },
-        { x: 550, width: 50, height: 140, type: 'skyscraper' },
-        { x: 620, width: 40, height: 95, type: 'building' },
-        { x: 680, width: 55, height: 155, type: 'skyscraper' }
+        { x: 50, width: 45, height: 100, colorIdx: 0 },
+        { x: 110, width: 35, height: 70, colorIdx: 1 },
+        { x: 160, width: 55, height: 130, colorIdx: 2 },
+        { x: 230, width: 40, height: 85, colorIdx: 3 },
+        { x: 290, width: 50, height: 110, colorIdx: 4 },
+        { x: 360, width: 35, height: 65, colorIdx: 5 },
+        { x: 410, width: 60, height: 140, colorIdx: 6 },
+        { x: 490, width: 45, height: 95, colorIdx: 7 },
+        { x: 550, width: 50, height: 120, colorIdx: 0 },
+        { x: 620, width: 40, height: 80, colorIdx: 1 },
+        { x: 680, width: 55, height: 135, colorIdx: 2 },
+        { x: 750, width: 48, height: 105, colorIdx: 3 },
+        { x: 820, width: 38, height: 75, colorIdx: 4 }
     ];
-    for(let b of buildings) {
+    for(let i=0; i<buildings.length; i++) {
+        const b = buildings[i];
         worldObjects.push({
-            type: 'tallBuilding',
+            type: 'colorfulBuilding',
             x: b.x,
             y: ground.y - 20,
             w: b.width,
             h: b.height,
-            buildingType: b.type,
+            colorIdx: b.colorIdx,
             speedMul: 0.15
         });
     }
     
-    // Пальмы
-    for(let i=0; i<12; i++) {
+    // ПАЛЬМЫ
+    for(let i=0; i<10; i++) {
         worldObjects.push({
             type: 'palmTree',
-            x: 50 + i * 180 + Math.random() * 80,
+            x: 50 + i * 220 + Math.random() * 100,
             y: ground.y - 85,
             scale: 0.8 + Math.random() * 0.5,
             speedMul: 0.3
         });
     }
     
-    // Полицейские машины на фоне
-    for(let i=0; i<5; i++) {
+    // ПОЛИЦЕЙСКИЕ МАШИНЫ НА ФОНЕ (РЕЖЕ — 3 штуки)
+    for(let i=0; i<3; i++) {
         worldObjects.push({
             type: 'policeCarBg',
-            x: 200 + i * 1000 + Math.random() * 200,
+            x: 300 + i * 1800 + Math.random() * 300,
             y: ground.y - 38,
             w: 58,
             h: 36,
@@ -1763,11 +1934,11 @@ function setupWorld() {
         });
     }
     
-    // Пожарные машины на фоне
+    // ПОЖАРНЫЕ МАШИНЫ (НОВЫЕ, УЗНАВАЕМЫЕ)
     for(let i=0; i<2; i++) {
         worldObjects.push({
             type: 'fireTruckBg',
-            x: 500 + i * 1500 + Math.random() * 300,
+            x: 500 + i * 2000 + Math.random() * 400,
             y: ground.y - 42,
             w: 70,
             h: 38,
@@ -1776,7 +1947,7 @@ function setupWorld() {
         });
     }
     
-    // Знак "WELCOME TO LAS VEGAS"
+    // ЗНАК "WELCOME TO LAS VEGAS"
     worldObjects.push({
         type: 'welcomeSign',
         x: 80,
@@ -1860,8 +2031,8 @@ function spawnObstacle() {
     }
     obstacles.push({ type, x:W+60, y:y, w:w, h:h, counted:false });
   } else if(currentMap.theme === 'vegas') {
-    // Только понятные препятствия: скамейки, мусорные баки, контейнеры
-    let types = ['bench', 'trashcan', 'container'];
+    // Препятствия: скамейки, мусорные баки, контейнеры, СКОРАЯ ПОМОЩЬ
+    let types = ['bench', 'trashcan', 'container', 'ambulance'];
     if (score < 500) types = ['bench', 'trashcan'];
     const type = types[Math.floor(Math.random()*types.length)];
     let w, h, y;
@@ -1874,6 +2045,9 @@ function spawnObstacle() {
     } else if (type === 'container') {
       w = 48; h = 44; y = ground.y - h + 4;
       obstacles.push({ type, x:W+60, y: y, w: w, h: h, counted: false });
+    } else if (type === 'ambulance') {
+      w = 55; h = 36; y = ground.y - h + 4;
+      obstacles.push({ type: 'ambulance', x: W+60, y: y, w: w, h: h, counted: false, lightBlink: Math.random() * Math.PI * 2 });
     }
   } else {
     const types = ['hay','fence','sheep','cart','well','pond','stone','sheep_well','well_pond','bucket_well'];
@@ -2037,7 +2211,75 @@ function applyGoldenCoin(x,y) {
   createDust(x,y,15); 
   playSound('horseshoe'); 
 }
+function applyVegasCoin(x,y) {
+    let coinValue = 25;
+    if (doubleCoinsActive) coinValue = 50;
+    addCoins(coinValue, x, y);
+    showAchievementQueued(`🪙 BELKACOIN! +${coinValue} BelkaCoins 🪙`, true);
+    createDust(x, y, 15);
+    playSound('horseshoe');
+    
+    // Активация способности с задержкой, чтобы не блокировать игру
+    setTimeout(() => {
+        activateSkinAbility();
+    }, 10);
+}
+
 function splashEffect(x,y) { for(let i=0;i<8;i++) particles.push({x:x+rand(-10,30), y:y+rand(-5,15), vx:rand(-2,2), vy:rand(-1,3), size:rand(2,4), life:rand(15,25), color:'#7ac4ff'}); playSound('horseshoe'); }
+
+function activateSkinAbility() {
+    const currentSkin = getCurrentSkin();
+    const ability = currentSkin.ability;
+    
+    if (ability === 'none') {
+        showAchievementQueued(`✨ Нет способности у ${currentSkin.name} ✨`, true);
+        return;
+    }
+    
+    // Сбрасываем предыдущие способности
+    tripleJumpAvailable = false;
+    tripleJumpUsed = false;
+    speedBoostActive = false;
+    slowMotionActive = false;
+    doubleCoinsActive = false;
+    magnetActive = false;
+    invisibilityActive = false;
+    
+    abilityActive = true;
+    abilityTimer = abilityDuration;
+    
+    switch(ability) {
+        case 'tripleJump':
+            tripleJumpAvailable = true;
+            tripleJumpUsed = false;
+            player.tripleJumpAvailable = true;
+            showAchievementQueued(`🌈 ТРОЙНОЙ ПРЫЖОК (10 сек)! 🌈`, true);
+            break;
+        case 'speedBoost':
+            speedBoostActive = true;
+            showAchievementQueued(`⚡ УСКОРЕНИЕ (10 сек)! ⚡`, true);
+            break;
+        case 'slowMotion':
+            slowMotionActive = true;
+            showAchievementQueued(`🐢 ЗАМЕДЛЕНИЕ ВРЕМЕНИ (10 сек)! 🐢`, true);
+            break;
+        case 'doubleCoins':
+            doubleCoinsActive = true;
+            showAchievementQueued(`🪙 ДВОЙНЫЕ МОНЕТЫ (10 сек)! 🪙`, true);
+            break;
+        case 'healthRegen':
+            showAchievementQueued(`💚 ВОССТАНОВЛЕНИЕ ЗДОРОВЬЯ! 💚`, true);
+            break;
+        case 'magnet':
+            magnetActive = true;
+            showAchievementQueued(`🧲 МАГНИТ (10 сек)! 🧲`, true);
+            break;
+        case 'invisibility':
+            invisibilityActive = true;
+            showAchievementQueued(`👻 НЕВИДИМОСТЬ (10 сек)! 👻`, true);
+            break;
+    }
+}
 
 function update() {
   if(!gameRunning || gameOver || gamePaused) return;
@@ -2100,12 +2342,24 @@ function update() {
   birdTimer--; if(birdTimer<=0 && birds.length<3) { birds.push({ x:W+50, y:50+Math.random()*(H*0.25), speed:0.5+Math.random()*0.6, wingPhase:Math.random()*Math.PI*2, size:0.7+Math.random()*0.5 }); birdTimer=180+Math.random()*100; }
   for(let i=0;i<birds.length;i++) { let b=birds[i]; b.x-=b.speed; b.wingPhase+=0.12; if(b.x+30<0) { birds.splice(i,1); i--; } }
   
-  // НОВЫЙ БЕЛЫЙ ПАССАЖИРСКИЙ САМОЛЁТ
-  plane.x+=plane.speed; 
-  if(plane.x>W+200) { 
-    plane.x=-220; 
-    plane.y=60+Math.random()*70; 
-    if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('plane'); 
+  // ОБЫЧНЫЙ САМОЛЁТ (только для Farm и WildWest)
+  if (getCurrentMap().theme !== 'vegas') {
+      plane.x += plane.speed; 
+      if(plane.x > W+200) { 
+        plane.x = -220; 
+        plane.y = 60+Math.random()*70; 
+        if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('plane'); 
+      }
+  } else {
+      // ВЕРТОЛЁТ для Vegas
+      policeHeli.x += policeHeli.speed;
+      if(policeHeli.x > W+200) {
+          policeHeli.x = -220;
+          policeHeli.y = 50 + Math.random() * 60;
+          policeHeli.lightBlink = Math.random() * Math.PI * 2;
+          if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('heli');
+      }
+      policeHeli.lightBlink += 0.05;
   }
   
   obsTimer--; if(obsTimer<=0) { spawnObstacle(); 
@@ -2157,13 +2411,12 @@ function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y
 function drawMountainsAndForest() {
   const currentMap = getCurrentMap();
   
-  // Для Vegas — не рисуем горы, рисуем высотные дома (они уже добавлены в worldObjects)
+  // Для Vegas — не рисуем горы (дома уже в worldObjects)
   if (currentMap.theme === 'vegas') {
-    // Ничего не рисуем здесь, дома уже в worldObjects
     return;
   }
   
-  // Остальные карты — рисуем горы как было
+  // Остальные карты — рисуем горы
   const mbY = ground.y-160;
   const hour = timeOfDay/100;
   const mCol = currentMap.mountainColors;
@@ -2202,7 +2455,7 @@ function drawMountainsAndForest() {
 function drawCloud(x,y,s){ const fs=s, hue=cloudHue; px(x+8*fs, y+10*fs, 45*fs, 18*fs, `hsl(${hue},85%,88%)`); px(x+0*fs, y+18*fs, 65*fs, 16*fs, `hsl(${hue},85%,88%)`); px(x+15*fs, y+0*fs, 28*fs, 16*fs, `hsl(${hue+10},80%,82%)`); px(x+40*fs, y+8*fs, 22*fs, 14*fs, `hsl(${hue+10},80%,82%)`); }
 function drawBird(x,y,wp,s){ let wy=Math.sin(wp)*2; px(x, y, 10*s, 5*s, '#2c2c2c'); px(x+6*s, y-2*s+wy, 5*s, 3*s, '#4a4a4a'); px(x-2*s, y-2*s+wy, 5*s, 3*s, '#4a4a4a'); px(x+8*s, y+1*s, 3*s, 2*s, '#e8a735'); }
 
-// НОВЫЙ БЕЛЫЙ ПАССАЖИРСКИЙ ЛАЙНЕР
+// ОБЫЧНЫЙ САМОЛЁТ (для Farm и WildWest)
 function drawPlane(x,y){ 
   px(x+10, y+18, 44, 6, '#f0f0f0');
   px(x+8, y+20, 48, 4, '#e0e0e0');
@@ -2224,6 +2477,7 @@ function drawPlane(x,y){
 }
 
 function drawBillboard(planeX, planeY) {
+    // Билборд только для самолёта (не для вертолёта)
     const billboardX = planeX + 20;
     const billboardY = planeY + 25;
     
@@ -2409,6 +2663,8 @@ function drawObstacle(ob){
       px(ob.x+10, ob.y+30, 8, 6, '#1b5e20');
       px(ob.x+30, ob.y+30, 8, 6, '#1b5e20');
       px(ob.x+2, ob.y, 44, 4, '#1b5e20');
+    } else if (ob.type === 'ambulance') {
+      drawAmbulance(ob.x, ob.y, ob.w, ob.h, ob.lightBlink || 0);
     }
   } else {
     if(ob.type==='hay'){ px(ob.x, ob.y+10, ob.w,26,'#d9a92e'); px(ob.x+3, ob.y+3, ob.w-6,12,'#f3c84d'); px(ob.x+8, ob.y+14,3,18,'#c18a1c'); px(ob.x+19, ob.y+12,3,20,'#c18a1c'); px(ob.x+28, ob.y+16,3,16,'#c18a1c'); }
@@ -2426,7 +2682,10 @@ function drawObstacle(ob){
 
 function drawPowerups(){ 
   for(let p of powerups){ 
+    const pulse = (Math.sin(Date.now() * 0.01) + 1) / 2;
     if(p.type==='horseshoe'){ 
+      ctx.fillStyle = `rgba(255, 100, 50, ${pulse * 0.5 + 0.3})`;
+      ctx.fillRect(p.x-6, p.y-6, p.w+12, p.h+12);
       let glow=(Math.sin(Date.now()/140)+1)/2*0.4+0.3; 
       ctx.fillStyle=`rgba(255,200,50,${glow})`; 
       ctx.fillRect(p.x-5,p.y-5,p.w+10,p.h+10); 
@@ -2436,6 +2695,8 @@ function drawPowerups(){
       px(p.x+14,p.y+10,5,6,'#a87a4a'); 
       for(let i=0;i<3;i++) px(p.x+3+i*5,p.y+17,2,3,'#f5e5b5'); 
     } else if(p.type==='goldenCoin'){ 
+      ctx.fillStyle = `rgba(255, 215, 0, ${pulse * 0.5 + 0.3})`;
+      ctx.fillRect(p.x-6, p.y-6, p.w+12, p.h+12);
       let glow=(Math.sin(Date.now()/140)+1)/2*0.8+0.5; 
       ctx.fillStyle=`rgba(255,215,0,${glow})`; 
       ctx.fillRect(p.x-8,p.y-8,p.w+16,p.h+16); 
@@ -2456,6 +2717,8 @@ function drawPowerups(){
       ctx.arc(p.x+p.w/2-3,p.y+p.h/2-3,1,0,Math.PI*2); 
       ctx.fill(); 
     } else if(p.type==='vegasCoin'){ 
+      ctx.fillStyle = `rgba(170, 68, 255, ${pulse * 0.5 + 0.3})`;
+      ctx.fillRect(p.x-6, p.y-6, p.w+12, p.h+12);
       let glow=(Math.sin(Date.now()/140)+1)/2*0.8+0.5; 
       ctx.fillStyle=`rgba(170, 68, 255, ${glow})`; 
       ctx.fillRect(p.x-8,p.y-8,p.w+16,p.h+16); 
@@ -2486,8 +2749,14 @@ function render() {
   
   clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
   birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
-  drawPlane(plane.x,plane.y);
-  drawBillboard(plane.x, plane.y);
+  
+  // Рисуем самолёт или вертолёт в зависимости от карты
+  if (getCurrentMap().theme === 'vegas') {
+      drawPoliceHelicopter(policeHeli.x, policeHeli.y, policeHeli.lightBlink);
+  } else {
+      drawPlane(plane.x, plane.y);
+      drawBillboard(plane.x, plane.y);
+  }
   
   const currentMapSun = getCurrentMap();
   if (currentMapSun.theme === 'desert') {
@@ -2691,7 +2960,6 @@ setTimeout(() => {
         });
     }
     
-    // Дополнительная привязка для Vegas
     const toggleMusicBtn = document.getElementById('toggleMusicBtn');
     const toggleSfxBtn = document.getElementById('toggleSfxBtn');
     const toggleAmbientBtn = document.getElementById('toggleAmbientBtn');
