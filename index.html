@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,55 +101,10 @@
     .ui-pause-btn:active {
       transform: translate(2px, 2px);
     }
-    #userPanel {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 10;
-      background: #0a0a0a;
-      padding: 8px 14px;
-      color: white;
-      font-size: 11px;
-      font-weight: bold;
-      border: 2px solid #ffd93b;
-      pointer-events: none;
-      text-align: right;
-      min-width: 160px;
-    }
-    #userName, #userStats, #coinsDisplay { display: block; }
-    #coinsDisplay {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 6px;
-      background: #1a1a1a;
-      padding: 3px 8px;
-      border: 1px solid #ffd93b;
-      margin-top: 4px;
-    }
-    .coin-icon-real {
-      width: 18px;
-      height: 18px;
-      background: radial-gradient(circle at 35% 35%, #ffd966, #d4a017, #b8860b);
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,200,0.6);
-      border: 1px solid #b84eff;
-      display: inline-block;
-      position: relative;
-    }
-    .coin-icon-real::after {
-      content: "🪙";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 10px;
-      opacity: 0.7;
-    }
-    #titleScreen, #gameOverScreen, #rulesModal, #leaderboardModal, #historyModal {
+    #titleScreen, #gameOverScreen, #rulesModal, #leaderboardModal {
       position: absolute;
       inset: 0;
-      z-index: 20;
+      z-index:20;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -158,7 +112,7 @@
       backdrop-filter: blur(4px);
       padding: 20px;
     }
-    #historyModal, #leaderboardModal, #rulesModal { display: none; }
+    #rulesModal, #leaderboardModal { display: none; }
     .panel {
       width: min(92vw, 520px);
       background: #0f0f12;
@@ -169,7 +123,7 @@
       font-family: 'Courier New', monospace;
       position: relative;
       overflow: visible;
-      box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+      box-shadow: 6px 6px 0 #000000;
     }
     .scrollable-panel {
       max-height: 85vh;
@@ -221,11 +175,9 @@
       0%, 100% { transform: translateX(-50%) translateY(0px); opacity: 0.7; }
       50% { transform: translateX(-50%) translateY(6px); opacity: 1; }
     }
-    .rules-list, .history-text { text-align: left; margin: 12px 0; font-size: 14px; line-height: 1.5; }
-    .rules-list li, .history-text p { margin: 10px 0; }
-    .rules-list strong, .history-text strong { color: #ffd93b; }
-    .logo-banner { margin-top: -65px; margin-bottom: 15px; text-align: center; }
-    .game-logo { max-width: 90%; width: 460px; filter: drop-shadow(4px 4px 0 #000); }
+    .rules-list { text-align: left; margin: 12px 0; font-size: 14px; line-height: 1.5; }
+    .rules-list li { margin: 10px 0; }
+    .rules-list strong { color: #ffd93b; }
     .online-corner { position: absolute; top: 20px; left: 20px; z-index: 15; }
     .online-pixel-box {
       display: inline-flex;
@@ -238,6 +190,20 @@
       font-weight: bold;
       color: #ffd93b;
       box-shadow: 3px 3px 0 #000;
+    }
+    .user-name-corner {
+      position: absolute;
+      top: 52px;
+      left: 20px;
+      z-index: 15;
+      background: #0a0a0a;
+      padding: 4px 12px;
+      border: 2px solid #ffd93b;
+      font-size: 11px;
+      font-weight: bold;
+      color: #ffd93b;
+      box-shadow: 3px 3px 0 #000;
+      text-align: left;
     }
     .pixel-dot {
       width: 10px;
@@ -267,6 +233,30 @@
     .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
     .btn.small { padding: 10px 22px; font-size: 18px; min-width: 120px; }
     .btn.daily { background: linear-gradient(135deg, #b04eff, #ff66cc); color: #fff; border-color: #fff3b0; }
+    .btn-icon {
+      width: 48px;
+      height: 48px;
+      border: 3px solid #000;
+      background: #ffd93b;
+      color: #1a1a1a;
+      font-weight: bold;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #000;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: none;
+      flex-shrink: 0;
+    }
+    .btn-icon:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 #000;
+    }
+    .btn-icon .pixel-note {
+      margin-right: 0;
+    }
     #startBtn {
       background: linear-gradient(135deg, #ffd93b, #ffaa1a);
       box-shadow: 0 0 12px rgba(255, 217, 59, 0.6), 4px 4px 0 #000;
@@ -328,19 +318,18 @@
       position: relative;
     }
     .menu-coins .coin-icon::after { content: "🪙"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; opacity: 0.7; }
-    #pauseBtn {
-      position: absolute; top: 12px; left: 12px; z-index: 12;
-      background: #0a0a0a; color: #ffd93b; border: 2px solid #ffd93b;
-      padding: 8px 12px; font-size: 14px; font-family: monospace; font-weight: bold;
-      cursor: pointer; box-shadow: 3px 3px 0 #000;
-    }
-    #pauseBtn.hidden { display: none !important; }
     #countdownOverlay, #pauseOverlay, #shopModal {
       position: absolute; inset: 0; z-index: 30;
       display: none; align-items: center; justify-content: center;
       background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); padding: 20px;
     }
-    #shopModal .panel { position: relative; max-height: 85vh; overflow-y: auto; padding: 20px 24px 48px 24px; }
+    #shopModal .panel {
+      width: min(92vw, 560px);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 24px 24px 24px;
+    }
     #countdownText {
       font-size: clamp(80px, 18vw, 180px); color: #ffd93b;
       text-shadow: 6px 6px 0 #000; font-family: monospace;
@@ -377,18 +366,32 @@
     .shop-grid-container {
       flex: 1;
       overflow-y: auto;
-      position: relative;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      margin: 12px 0;
+      min-height: 200px;
+      max-height: 380px;
+      padding-right: 4px;
+      margin: 8px 0;
+      scrollbar-width: thin;
+      scrollbar-color: #ffd93b #1a1a1a;
+    }
+    .shop-grid-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .shop-grid-container::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 3px;
+    }
+    .shop-grid-container::-webkit-scrollbar-thumb {
+      background: #ffd93b;
+      border-radius: 3px;
     }
     .shop-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      margin-top: 14px;
-      margin-bottom: 16px;
-      transition: none;
+      padding-bottom: 4px;
+    }
+    #shopModal .scroll-hint {
+      display: none;
     }
     .shop-card {
       background: #151515;
@@ -400,37 +403,6 @@
       position: relative;
     }
     .shop-card.active { border-color: #3cff8b; box-shadow: 0 0 0 2px #3cff8b inset, 4px 4px 0 #000; }
-    .shop-card.legendary {
-      border: 2px solid transparent;
-      background: linear-gradient(#151515, #151515) padding-box,
-                  linear-gradient(135deg, #ff44cc, #aa44ff, #ff44cc) border-box;
-      animation: legendaryPulse 1.5s infinite ease;
-    }
-    .shop-card.legendary.active {
-      border: 2px solid transparent;
-      background: linear-gradient(#151515, #151515) padding-box,
-                  linear-gradient(135deg, #ff44cc, #aa44ff, #ff44cc) border-box;
-      box-shadow: 0 0 0 2px #ff44cc inset, 4px 4px 0 #000;
-      animation: legendaryPulse 0.8s infinite ease;
-    }
-    @keyframes legendaryPulse {
-      0%, 100% { filter: drop-shadow(0 0 2px #ff44cc); }
-      50% { filter: drop-shadow(0 0 8px #aa44ff); }
-    }
-    .legendary-badge {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: linear-gradient(135deg, #ff44cc, #aa44ff);
-      color: white;
-      font-size: 10px;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 4px;
-      box-shadow: 2px 2px 0 #000;
-      font-family: monospace;
-      z-index: 5;
-    }
     .shop-skin-preview { width: 72px; height: 72px; margin: 0 auto 10px; border: 2px solid #000; background: #2a2a2a; position: relative; }
     .shop-skin-name { font-size: 12px; color: #ffd93b; margin-bottom: 6px; font-weight: bold; }
     .shop-skin-price { font-size: 11px; margin-bottom: 8px; }
@@ -440,6 +412,35 @@
       width: 100%; font-family: monospace; box-shadow: 3px 3px 0 #000;
     }
     .shop-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #000; }
+    .close-cross {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      background: #cc2222;
+      border: 3px solid #000;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      z-index: 35;
+      transition: none;
+      font-family: monospace;
+    }
+    .close-cross:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 #000;
+    }
+    .close-cross:hover {
+      background: #ee3333;
+    }
     .coin-pop {
       position: absolute; z-index: 40; color: #ffd93b; font-weight: bold;
       font-size: 18px; text-shadow: 2px 2px 0 #000; pointer-events: none;
@@ -448,7 +449,7 @@
     @keyframes coinPopAnim { 0% { opacity: 0; transform: translateY(10px) scale(0.7); } 20% { opacity: 1; transform: translateY(0px) scale(1); } 100% { opacity: 0; transform: translateY(-40px) scale(1.1); } }
     .pollen { position: absolute; width: 2px; height: 2px; background: #ffeb99; border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0; animation: pollenFloat 6s infinite linear; }
     @keyframes pollenFloat { 0% { transform: translateY(0px) translateX(0px); opacity: 0; } 20% { opacity: 0.5; } 80% { opacity: 0.4; } 100% { transform: translateY(-150px) translateX(30px); opacity: 0; } }
-    .pixel-note { display: inline-block; width: 20px; height: 20px; position: relative; vertical-align: middle; margin-right: 8px; }
+    .pixel-note { display: inline-block; width: 20px; height: 20px; position: relative; vertical-align: middle; }
     .pixel-note .note-head { position: absolute; width: 8px; height: 8px; background: #ffd93b; left: 4px; top: 4px; box-shadow: 2px 2px 0 #000; }
     .pixel-note .note-stem { position: absolute; width: 3px; height: 14px; background: #ffd93b; left: 10px; top: -2px; box-shadow: 1px 1px 0 #000; }
     .pixel-note.muted .note-head, .pixel-note.muted .note-stem { background: #ff6666; }
@@ -472,6 +473,75 @@
       border-top: 2px solid #ffd93b;
       padding-top: 12px;
     }
+    /* Стили для экрана загрузки */
+    #loadingScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+    .loading-panel {
+      text-align: center;
+      max-width: 400px;
+      padding: 20px;
+    }
+    .loading-image {
+      max-width: 100%;
+      width: 300px;
+      image-rendering: pixelated;
+      margin-bottom: 24px;
+    }
+    .game-studio-container {
+      margin: 16px 0 8px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 4px;
+      text-shadow: 4px 4px 0 #000;
+      min-height: 50px;
+    }
+    .game-studio-letter {
+      display: inline-block;
+      color: #ffd93b;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.15s ease, transform 0.2s ease;
+      text-shadow: 3px 3px 0 #000;
+    }
+    .game-studio-letter.visible {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+    .game-studio-letter.visible-settled {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .loading-bar-container {
+      width: 100%;
+      height: 20px;
+      background: #1a1a1a;
+      border: 3px solid #ffd93b;
+      box-shadow: 4px 4px 0 #000;
+      margin: 16px 0;
+    }
+    .loading-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ffd93b, #ffaa1a);
+      transition: width 0.1s ease;
+    }
+    .loading-text {
+      color: #ffd93b;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      text-shadow: 2px 2px 0 #000;
+      letter-spacing: 2px;
+    }
     @media (max-width: 640px) {
       #ui { padding: 4px 12px; font-size: 12px; bottom: 65px; gap: 8px; }
       #score { font-size: 28px; }
@@ -480,32 +550,31 @@
       .ui-online-dot { width: 8px; height: 8px; }
       #uiOnlineCount { font-size: 10px; }
       .ui-pause-btn { font-size: 14px; padding: 2px 8px; margin-left: 8px; }
-      .game-logo { width: 320px; margin-top: -50px; }
       .btn { font-size: 18px; padding: 10px 24px; min-width: 130px; }
       .btn.small { font-size: 15px; padding: 8px 18px; }
+      .btn-icon { width: 40px; height: 40px; }
       #startBtn { transform: scale(1); }
-      #userPanel { top: 6px; right: 6px; padding: 5px 10px; min-width: 130px; }
       .achievement { font-size: 10px; padding: 3px 8px; top: 35%; }
       .menu-coins { padding: 4px 10px; font-size: 12px; }
       .coin-icon-real { width: 14px; height: 14px; }
-      #pauseBtn { top: 6px; left: 6px; font-size: 12px; padding: 6px 10px; }
-      .pixel-note { width: 16px; height: 16px; margin-right: 6px; }
+      .pixel-note { width: 16px; height: 16px; }
       .pixel-note .note-head { width: 6px; height: 6px; left: 3px; top: 3px; }
       .pixel-note .note-stem { width: 2px; height: 10px; left: 8px; top: -1px; }
-      .shop-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+      .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .shop-skin-preview { width: 60px; height: 60px; }
       .shop-skin-name { font-size: 10px; }
       .scroll-hint span { font-size: 8px; }
       .online-pixel-box { padding: 2px 8px; font-size: 10px; gap: 4px; }
       .pixel-dot { width: 8px; height: 8px; }
       .online-corner { top: 10px; left: 10px; }
+      .user-name-corner { top: 42px; left: 10px; padding: 2px 8px; font-size: 9px; }
       .volume-sliders { padding: 6px 8px; }
       .shop-section-title { font-size: 14px; margin: 15px 0 5px; }
       .shop-tab { padding: 5px 10px; font-size: 11px; }
-      #closeShopCross {
-        width: 28px;
-        height: 28px;
-        font-size: 16px;
+      .close-cross {
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
         top: 8px;
         right: 8px;
       }
@@ -514,10 +583,38 @@
         padding: 8px 12px;
         min-width: auto;
       }
+      .game-studio-container {
+        font-size: 22px;
+        letter-spacing: 2px;
+      }
     }
   </style>
 </head>
 <body>
+<!-- ЭКРАН ЗАГРУЗКИ -->
+<div id="loadingScreen">
+  <div class="loading-panel">
+    <img src="https://static.tildacdn.com/tild6535-3964-4065-b865-313733666163/IMG_6944.PNG" class="loading-image" alt="Loading" style="filter: drop-shadow(6px 6px 0 #000);">
+    <div class="game-studio-container">
+      <span class="game-studio-letter" id="letter1">G</span>
+      <span class="game-studio-letter" id="letter2">A</span>
+      <span class="game-studio-letter" id="letter3">M</span>
+      <span class="game-studio-letter" id="letter4">E</span>
+      <span class="game-studio-letter" id="letter5"> </span>
+      <span class="game-studio-letter" id="letter6">S</span>
+      <span class="game-studio-letter" id="letter7">T</span>
+      <span class="game-studio-letter" id="letter8">U</span>
+      <span class="game-studio-letter" id="letter9">D</span>
+      <span class="game-studio-letter" id="letter10">I</span>
+      <span class="game-studio-letter" id="letter11">O</span>
+    </div>
+    <div class="loading-bar-container">
+      <div class="loading-bar-fill" id="loadingBarFill"></div>
+    </div>
+    <div class="loading-text" id="loadingText">LOADING... 0%</div>
+  </div>
+</div>
+
 <div id="gameWrapper">
   <div id="ui">
     <div class="ui-online-indicator">
@@ -528,11 +625,6 @@
     <span id="best">BEST: 0</span>
     <button id="pauseBtnUi" class="ui-pause-btn">⏸</button>
   </div>
-  <div id="userPanel">
-    <span id="userName">👤 Guest</span>
-    <span id="userStats"></span>
-    <div id="coinsDisplay"><div class="coin-icon-real"></div><span id="coinsValue">0</span><span>BelkaCoins</span></div>
-  </div>
 
   <!-- ГЛАВНОЕ МЕНЮ -->
   <div id="titleScreen">
@@ -540,16 +632,22 @@
       <div class="online-corner">
         <div id="menuOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="menuOnlineCount">0</span><span id="onlineLabel">online</span></div>
       </div>
-      <div class="logo-banner"><img src="https://static.tildacdn.com/tild3765-3965-4262-b936-633832306661/D20207C3-EB3E-4239-B.PNG" class="game-logo" alt="Pixel Farm Runner"></div>
+      <div class="user-name-corner">
+        <span id="menuUserName">👤 Guest</span>
+      </div>
       <div class="menu-coins" id="menuCoinsDisplay"><div class="coin-icon"></div><span id="menuCoinsValue">0</span> BelkaCoins</div>
       <button class="btn" id="startBtn">START GAME</button>
       <div class="daily-bonus-area"><button class="btn daily small" id="dailyBonusBtn">✨ DAILY BONUS ✨</button><div id="dailyBonusInfo" class="small"></div></div>
       <div class="button-group">
-        <button class="btn small" id="historyBtnMain">📜 HISTORY</button>
         <button class="btn small" id="rulesBtnMain">📜 RULES</button>
         <button class="btn small" id="leaderboardBtnMain">🏆 LEADERBOARD</button>
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
-        <button class="btn small" id="muteBtn"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span><span id="muteText">SOUND ON</span></button>
+        <button class="btn-icon" id="muteBtn" title="Toggle Sound">
+          <span class="pixel-note" id="muteIcon">
+            <span class="note-head"></span>
+            <span class="note-stem"></span>
+          </span>
+        </button>
         <button class="btn small" id="exitBtn">🚪 EXIT</button>
       </div>
       <div id="userStatusMain" class="register-hint"></div>
@@ -560,7 +658,6 @@
   <!-- ЭКРАН GAME OVER -->
   <div id="gameOverScreen" class="hidden">
     <div class="panel">
-      <div class="logo-banner"><img src="https://static.tildacdn.com/tild3765-3965-4262-b936-633832306661/D20207C3-EB3E-4239-B.PNG" class="game-logo" style="width:80%; margin-top:-55px;"></div>
       <h1 style="font-size:26px;">💥 GAME OVER</h1>
       <p id="finalScoreText">Your score: 0</p>
       <div class="leaderboard-title">🏆 TOP PLAYERS 🏆</div>
@@ -572,12 +669,10 @@
   </div>
   
   <!-- МОДАЛЬНЫЕ ОКНА -->
-  <div id="rulesModal" class="hidden"><div class="panel scrollable-panel" style="position: relative;"><h2>📜 GAME RULES</h2><div class="rules-list" id="rulesList"></div><div class="sponsor-line" id="sponsorLine"></div><button class="btn small" id="closeRulesBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
-  <div id="historyModal" class="hidden"><div class="panel scrollable-panel" style="position: relative;"><h2 id="historyTitle">📜 HISTORY</h2><div class="history-text" id="historyText"></div><button class="btn small" id="closeHistoryBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
+  <div id="rulesModal"><div class="panel scrollable-panel" style="position: relative;"><h2>📜 GAME RULES</h2><div class="rules-list" id="rulesList"></div><div class="sponsor-line" id="sponsorLine"></div><button class="btn small" id="closeRulesBtn">CLOSE</button><div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div></div></div>
   <div id="leaderboardModal"><div class="panel small"><h2>🏆 LEADERBOARD</h2><div id="leaderboardList" class="leaderboard-list"><div>Loading...</div></div><div id="yourRank" style="margin:6px 0; font-size:10px;"></div><div class="online-wrapper" style="margin-top:8px;"><div id="leaderboardOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="leaderboardOnlineCount">0</span><span>online</span></div></div><button class="btn small" id="closeLeaderboardBtn">CLOSE</button></div></div>
 
   <div id="gameOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="gameOnlineCount">0</span><span>online</span></div>
-  <button id="pauseBtn" class="hidden">⏸ PAUSE</button>
   <div id="countdownOverlay"><div id="countdownText">3</div></div>
   <div id="pauseOverlay"><div class="panel small"><h2>⏸ PAUSED</h2><p>Game is paused</p>
     <div class="sound-toggle-buttons">
@@ -591,8 +686,9 @@
     </div>
   </div></div>
   
-  <!-- МАГАЗИН С ВКЛАДКАМИ -->
-  <div id="shopModal"><div class="panel scrollable-panel" style="position: relative;">
+  <!-- МАГАЗИН -->
+  <div id="shopModal"><div class="panel">
+    <button id="closeShopCross" class="close-cross" title="Close">✕</button>
     <h2>🛒 SHOP</h2>
     <div class="menu-coins"><div class="coin-icon"></div><span id="shopCoinsValue">0</span> BelkaCoins</div>
     <div class="shop-tabs">
@@ -600,11 +696,12 @@
       <button class="shop-tab" data-tab="maps">🗺️ MAPS</button>
       <button class="shop-tab" data-tab="backgrounds">🌄 BACKGROUNDS</button>
     </div>
-    <div id="shopSkinsGrid" class="shop-grid"></div>
-    <div id="shopMapsGrid" class="shop-grid shop-section-hidden"></div>
-    <div id="shopBackgroundsGrid" class="shop-grid shop-section-hidden"></div>
+    <div class="shop-grid-container">
+      <div id="shopSkinsGrid" class="shop-grid"></div>
+      <div id="shopMapsGrid" class="shop-grid shop-section-hidden"></div>
+      <div id="shopBackgroundsGrid" class="shop-grid shop-section-hidden"></div>
+    </div>
     <div class="button-group"><button class="btn small" id="closeShopBtn">CLOSE</button></div>
-    <div class="scroll-hint"><div class="pixel-arrow"></div><span>▼ SCROLL ▼</span></div>
   </div></div>
 
   <canvas id="game"></canvas>
@@ -617,12 +714,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, collection, query, where, getDocs, doc, setDoc, orderBy, limit, serverTimestamp, runTransaction, onSnapshot } from "firebase/firestore";
 
 const translations = {
-  en: { startGame: "START GAME", rules: "RULES", leaderboard: "LEADERBOARD", register: "✨ Register at <span class='register-link'>bellariofilms.com</span> to compete! ✨", registerSave: "✨ Register at <span class='register-link'>bellariofilms.com</span> to save your score! ✨", gameOver: "GAME OVER", yourScore: "Your score:", topPlayers: "🏆 TOP PLAYERS 🏆", restart: "RESTART", menu: "MENU", rulesTitle: "📜 GAME RULES", scoreLabel: "SCORE:", bestLabel: "BEST:", rulesSponsor: "🏆 Your results at bellariofilms.com\nThanks to Dzioniso Bellario 🙏", dailyBonus: "✨ DAILY BONUS ✨", dailyBonusClaimed: "✓ Already claimed!", dailyBonusAvailable: "🎁 +10 BelkaCoins available!", coinsInfo: "Earn: 100 pts → +3, 500 pts → +8, bucket +1, horseshoe +2 + invinc, golden coin +25, new record +15", newObstacles: "Sheep by well, Well+pond (restores double jump), Bucket well (+1 coin)", historyTitle: "📜 GAME HISTORY", closeBtn: "CLOSE", onlineLabel: "online", shop: "SHOP", historyBtn: "HISTORY" },
-  ru: { startGame: "НАЧАТЬ ИГРУ", rules: "ПРАВИЛА", leaderboard: "ТАБЛИЦА", register: "✨ Зарегистрируйтесь на <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Зарегистрируйтесь на <span class='register-link'>bellariofilms.com</span> чтобы сохранить результат! ✨", gameOver: "ИГРА ОКОНЧЕНА", yourScore: "Ваш счёт:", topPlayers: "🏆 ЛУЧШИЕ ИГРОКИ 🏆", restart: "ЗАНОВО", menu: "МЕНЮ", rulesTitle: "📜 ПРАВИЛА ИГРЫ", scoreLabel: "СЧЁТ:", bestLabel: "РЕКОРД:", rulesSponsor: "🏆 Результаты на bellariofilms.com\nСпасибо Dzioniso Bellario 🙏", dailyBonus: "✨ ЕЖЕДНЕВНЫЙ БОНУС ✨", dailyBonusClaimed: "✓ Уже получен!", dailyBonusAvailable: "🎁 +10 BelkaCoins доступно!", coinsInfo: "100 очков → +3, 500 очков → +8, ведро +1, подкова +2 + неуязвимость, золотая монета +25, рекорд +15", newObstacles: "Овечка у колодца, Колодец+пруд (восстанавливает двойной прыжок), Колодец с ведром (+1 монета)", historyTitle: "📜 ИСТОРИЯ ИГРЫ", closeBtn: "ЗАКРЫТЬ", onlineLabel: "онлайн", shop: "МАГАЗИН", historyBtn: "ИСТОРИЯ" },
-  be: { startGame: "ПАЧАЦЬ ГУЛЬНЮ", rules: "ПРАВІЛЫ", leaderboard: "ТАБЛІЦА", gameOver: "ГУЛЬНЯ СКОНЧАНА", yourScore: "Ваш лік:", topPlayers: "🏆 ЛЕПШЫЯ ГУЛЬЦЫ 🏆", restart: "ЗАНАВА", menu: "МЕНЮ", rulesTitle: "📜 ПРАВІЛЫ ГУЛЬНІ", scoreLabel: "ЛІК:", bestLabel: "РЭКОРД:", dailyBonus: "✨ ШТОДЗЁННЫ БОНУС ✨", dailyBonusClaimed: "✓ Ужо атрымана!", dailyBonusAvailable: "🎁 +10 BelkaCoins даступна!", register: "✨ Зарэгіструйцеся на <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Зарэгіструйцеся на <span class='register-link'>bellariofilms.com</span> каб захаваць вынік! ✨", historyTitle: "📜 ГІСТОРЫЯ ГУЛЬНІ", closeBtn: "ЗАКРЫЦЬ", onlineLabel: "анлайн", shop: "КРАМА", historyBtn: "ГІСТОРЫЯ" },
-  it: { startGame: "INIZIA GIOCO", rules: "REGOLE", leaderboard: "CLASSIFICA", gameOver: "GAME OVER", yourScore: "Il tuo punteggio:", topPlayers: "🏆 MIGLIORI GIOCATORI 🏆", restart: "RICOMINCIA", menu: "MENU", rulesTitle: "📜 REGOLE DEL GIOCO", scoreLabel: "PUNTEGGIO:", bestLabel: "RECORD:", dailyBonus: "✨ BONUS GIORNALIERO ✨", dailyBonusClaimed: "✓ Già ritirato!", dailyBonusAvailable: "🎁 +10 BelkaCoins disponibili!", register: "✨ Registrati su <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Registrati su <span class='register-link'>bellariofilms.com</span> per salvare il punteggio! ✨", historyTitle: "📜 STORIA DEL GIOCO", closeBtn: "CHIUDI", onlineLabel: "online", shop: "NEGOZIO", historyBtn: "STORIA" },
-  pl: { startGame: "ROZPOCZNIJ GRĘ", rules: "ZASADY", leaderboard: "TABELA WYNIKÓW", gameOver: "KONIEC GRY", yourScore: "Twój wynik:", topPlayers: "🏆 NAJLEPSI GRACZE 🏆", restart: "OD NOWA", menu: "MENU", rulesTitle: "📜 ZASADY GRY", scoreLabel: "WYNIK:", bestLabel: "REKORD:", dailyBonus: "✨ DZIENNY BONUS ✨", dailyBonusClaimed: "✓ Odebrany!", dailyBonusAvailable: "🎁 +10 BelkaCoins dostępne!", register: "✨ Zarejestruj się na <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Zarejestruj się na <span class='register-link'>bellariofilms.com</span> by zapisać wynik! ✨", historyTitle: "📜 HISTORIA GRY", closeBtn: "ZAMKNIJ", onlineLabel: "online", shop: "SKLEP", historyBtn: "HISTORIA" },
-  uk: { startGame: "РОЗПОЧАТИ ГРУ", rules: "ПРАВИЛА", leaderboard: "ТАБЛИЦЯ", gameOver: "ГРА ЗАКІНЧЕНА", yourScore: "Ваш рахунок:", topPlayers: "🏆 НАЙКРАЩІ ГРАВЦІ 🏆", restart: "ЗАНОВО", menu: "МЕНЮ", rulesTitle: "📜 ПРАВИЛА ГРИ", scoreLabel: "РАХУНОК:", bestLabel: "РЕКОРД:", dailyBonus: "✨ ЩОДЕННИЙ БОНУС ✨", dailyBonusClaimed: "✓ Вже отримано!", dailyBonusAvailable: "🎁 +10 BelkaCoins доступно!", register: "✨ Зареєструйтесь на <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Зареєструйтесь на <span class='register-link'>bellariofilms.com</span> щоб зберегти результат! ✨", historyTitle: "📜 ІСТОРІЯ ГРИ", closeBtn: "ЗАКРИТИ", onlineLabel: "онлайн", shop: "МАГАЗИН", historyBtn: "ІСТОРІЯ" }
+  en: { startGame: "START GAME", rules: "RULES", leaderboard: "LEADERBOARD", register: "✨ Register at <span class='register-link'>bellariofilms.com</span> to compete! ✨", registerSave: "✨ Register at <span class='register-link'>bellariofilms.com</span> to save your score! ✨", gameOver: "GAME OVER", yourScore: "Your score:", topPlayers: "🏆 TOP PLAYERS 🏆", restart: "RESTART", menu: "MENU", rulesTitle: "📜 GAME RULES", scoreLabel: "SCORE:", bestLabel: "BEST:", rulesSponsor: "🏆 Your results at bellariofilms.com\nThanks to Dzioniso Bellario 🙏", dailyBonus: "✨ DAILY BONUS ✨", dailyBonusClaimed: "✓ Already claimed!", dailyBonusAvailable: "🎁 +10 BelkaCoins available!", coinsInfo: "Earn: 100 pts → +3, 500 pts → +8, bucket +1, horseshoe +2 + invinc, golden coin +25, new record +15", newObstacles: "Sheep by well, Well+pond (restores double jump), Bucket well (+1 coin)", closeBtn: "CLOSE", onlineLabel: "online", shop: "SHOP" },
+  ru: { startGame: "НАЧАТЬ ИГРУ", rules: "ПРАВИЛА", leaderboard: "ТАБЛИЦА", register: "✨ Зарегистрируйтесь на <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Зарегистрируйтесь на <span class='register-link'>bellariofilms.com</span> чтобы сохранить результат! ✨", gameOver: "ИГРА ОКОНЧЕНА", yourScore: "Ваш счёт:", topPlayers: "🏆 ЛУЧШИЕ ИГРОКИ 🏆", restart: "ЗАНОВО", menu: "МЕНЮ", rulesTitle: "📜 ПРАВИЛА ИГРЫ", scoreLabel: "СЧЁТ:", bestLabel: "РЕКОРД:", rulesSponsor: "🏆 Результаты на bellariofilms.com\nСпасибо Dzioniso Bellario 🙏", dailyBonus: "✨ ЕЖЕДНЕВНЫЙ БОНУС ✨", dailyBonusClaimed: "✓ Уже получен!", dailyBonusAvailable: "🎁 +10 BelkaCoins доступно!", coinsInfo: "100 очков → +3, 500 очков → +8, ведро +1, подкова +2 + неуязвимость, золотая монета +25, рекорд +15", newObstacles: "Овечка у колодца, Колодец+пруд (восстанавливает двойной прыжок), Колодец с ведром (+1 монета)", closeBtn: "ЗАКРЫТЬ", onlineLabel: "онлайн", shop: "МАГАЗИН" },
+  be: { startGame: "ПАЧАЦЬ ГУЛЬНЮ", rules: "ПРАВІЛЫ", leaderboard: "ТАБЛІЦА", gameOver: "ГУЛЬНЯ СКОНЧАНА", yourScore: "Ваш лік:", topPlayers: "🏆 ЛЕПШЫЯ ГУЛЬЦЫ 🏆", restart: "ЗАНАВА", menu: "МЕНЮ", rulesTitle: "📜 ПРАВІЛЫ ГУЛЬНІ", scoreLabel: "ЛІК:", bestLabel: "РЭКОРД:", dailyBonus: "✨ ШТОДЗЁННЫ БОНУС ✨", dailyBonusClaimed: "✓ Ужо атрымана!", dailyBonusAvailable: "🎁 +10 BelkaCoins даступна!", register: "✨ Зарэгіструйцеся на <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Зарэгіструйцеся на <span class='register-link'>bellariofilms.com</span> каб захаваць вынік! ✨", closeBtn: "ЗАКРЫЦЬ", onlineLabel: "анлайн", shop: "КРАМА" },
+  it: { startGame: "INIZIA GIOCO", rules: "REGOLE", leaderboard: "CLASSIFICA", gameOver: "GAME OVER", yourScore: "Il tuo punteggio:", topPlayers: "🏆 MIGLIORI GIOCATORI 🏆", restart: "RICOMINCIA", menu: "MENU", rulesTitle: "📜 REGOLE DEL GIOCO", scoreLabel: "PUNTEGGIO:", bestLabel: "RECORD:", dailyBonus: "✨ BONUS GIORNALIERO ✨", dailyBonusClaimed: "✓ Già ritirato!", dailyBonusAvailable: "🎁 +10 BelkaCoins disponibili!", register: "✨ Registrati su <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Registrati su <span class='register-link'>bellariofilms.com</span> per salvare il punteggio! ✨", closeBtn: "CHIUDI", onlineLabel: "online", shop: "NEGOZIO" },
+  pl: { startGame: "ROZPOCZNIJ GRĘ", rules: "ZASADY", leaderboard: "TABELA WYNIKÓW", gameOver: "KONIEC GRY", yourScore: "Twój wynik:", topPlayers: "🏆 NAJLEPSI GRACZE 🏆", restart: "OD NOWA", menu: "MENU", rulesTitle: "📜 ZASADY GRY", scoreLabel: "WYNIK:", bestLabel: "REKORD:", dailyBonus: "✨ DZIENNY BONUS ✨", dailyBonusClaimed: "✓ Odebrany!", dailyBonusAvailable: "🎁 +10 BelkaCoins dostępne!", register: "✨ Zarejestruj się na <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Zarejestruj się na <span class='register-link'>bellariofilms.com</span> by zapisać wynik! ✨", closeBtn: "ZAMKNIJ", onlineLabel: "online", shop: "SKLEP" },
+  uk: { startGame: "РОЗПОЧАТИ ГРУ", rules: "ПРАВИЛА", leaderboard: "ТАБЛИЦЯ", gameOver: "ГРА ЗАКІНЧЕНА", yourScore: "Ваш рахунок:", topPlayers: "🏆 НАЙКРАЩІ ГРАВЦІ 🏆", restart: "ЗАНОВО", menu: "МЕНЮ", rulesTitle: "📜 ПРАВИЛА ГРИ", scoreLabel: "РАХУНОК:", bestLabel: "РЕКОРД:", dailyBonus: "✨ ЩОДЕННИЙ БОНУС ✨", dailyBonusClaimed: "✓ Вже отримано!", dailyBonusAvailable: "🎁 +10 BelkaCoins доступно!", register: "✨ Зареєструйтесь на <span class='register-link'>bellariofilms.com</span>! ✨", registerSave: "✨ Зареєструйтесь на <span class='register-link'>bellariofilms.com</span> щоб зберегти результат! ✨", closeBtn: "ЗАКРИТИ", onlineLabel: "онлайн", shop: "МАГАЗИН" }
 };
 function detectLang() { const l = (navigator.language || 'en').split('-')[0]; return translations[l] ? l : 'en'; }
 const lang = detectLang(), t = translations[lang];
@@ -657,10 +754,6 @@ const closeLeader = document.getElementById('closeLeaderboardBtn');
 const leaderModal = document.getElementById('leaderboardModal');
 const dailyBtn = document.getElementById('dailyBonusBtn');
 const muteBtn = document.getElementById('muteBtn');
-const historyBtnMain = document.getElementById('historyBtnMain');
-const historyModal = document.getElementById('historyModal');
-const closeHistoryBtn = document.getElementById('closeHistoryBtn');
-const pauseBtn = document.getElementById('pauseBtn');
 const pauseBtnUi = document.getElementById('pauseBtnUi');
 const countdownOverlay = document.getElementById('countdownOverlay');
 const countdownText = document.getElementById('countdownText');
@@ -751,9 +844,6 @@ function addCoins(a, x = typeof W !== 'undefined' && W ? W/2 : window.innerWidth
   coins += a;
   updateCoins();
   showCoinPop(a, x, y);
-  // Вспышка при сборе монеты
-  flash.style.background = 'rgba(255, 215, 0, 0.3)';
-  setTimeout(() => { flash.style.background = 'rgba(255,0,0,0)'; }, 100);
   if (a > 0 && soundEnabled && audioCtx && audioAllowed) { vibrate(40); playSound('coinCollect', 0.25); }
   return coins;
 }
@@ -900,7 +990,6 @@ let sfxVolume = parseFloat(localStorage.getItem('pixelFarmSfxVolume')) || 0.35;
 let ambientVolume = parseFloat(localStorage.getItem('pixelFarmAmbientVolume')) || 0.15;
 let musicGain = null;
 
-// НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ БОНУСОВ И ЭФФЕКТОВ
 let abilityActive = false;
 let abilityTimer = 0;
 let abilityDuration = 600;
@@ -941,14 +1030,11 @@ function setVolume(type, value) {
 }
 function setSoundIcon() {
   const icon = document.getElementById('muteIcon');
-  const text = document.getElementById('muteText');
-  if (!icon || !text) return;
+  if (!icon) return;
   if (soundEnabled) {
     icon.classList.remove('muted');
-    text.textContent = 'SOUND ON';
   } else {
     icon.classList.add('muted');
-    text.textContent = 'SOUND OFF';
   }
 }
 function initAudio() {
@@ -1111,6 +1197,24 @@ async function toggleSound() {
   if (gameRunning && !gameOver) startAmbientLoop();
 }
 
+function applyMagnet() { magnetBonusActive = true; bonusTimers.magnet = 300; showAchievementQueued(`🧲 MAGNET (5 sec)!`, true); }
+function applyShield() { shieldActive = true; bonusTimers.shield = 300; showAchievementQueued(`💚 SHIELD (5 sec)!`, true); }
+function applySlowTime() { slowTimeActive = true; bonusTimers.slowTime = 300; showAchievementQueued(`🐢 SLOW TIME (5 sec)!`, true); }
+function applyLightning() { 
+  lightningActive = true; 
+  showAchievementQueued(`⚡ LIGHTNING! +50 BelkaCoins ⚡`, true); 
+  addCoins(50, W/2, H/2);
+  lightningActive = false;
+}
+function applyLuck() { 
+  luckActive = true; 
+  const random = Math.random();
+  if (random < 0.33) { addCoins(50, W/2, H/2); showAchievementQueued(`🍀 LUCK! x2 coins! 🍀`, true); }
+  else if (random < 0.66) { addCoins(75, W/2, H/2); showAchievementQueued(`🍀 LUCK! x3 coins! 🍀`, true); }
+  else { showAchievementQueued(`🍀 LUCK! x5 coins! 🍀`, true); addCoins(125, W/2, H/2); }
+  luckActive = false;
+}
+
 window.addEventListener('pointerdown', enableAudio);
 document.addEventListener('keydown', enableAudio);
 document.addEventListener('touchstart', enableAudio, { passive: true });
@@ -1152,7 +1256,26 @@ window.addEventListener('beforeunload', () => {
 });
 
 async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
-async function checkReg() { const status = document.getElementById("userStatusMain"); const nameSpan = document.getElementById("userName"); const statsSpan = document.getElementById("userStats"); if (!userNick) { status.innerHTML = t.register; nameSpan.innerHTML = "👤 Guest"; statsSpan.innerHTML = '<span class="register-link-small">Register at bellariofilms.com</span> to compete!'; isUserRegistered = false; makeLinks(); return false; } const ok = await ensureUser(); if (ok && isUserRegistered) { const best = Math.max(localBestScore, userFirebaseScore); status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; nameSpan.innerHTML = `👤 ${userNick}`; statsSpan.innerHTML = `Best: ${best} | <span class="register-link">bellariofilms.com</span>`; makeLinks(); return true; } return false; }
+async function checkReg() { 
+  const status = document.getElementById("userStatusMain"); 
+  const menuUserName = document.getElementById('menuUserName');
+  if (!userNick) { 
+    status.innerHTML = t.register; 
+    if (menuUserName) menuUserName.innerHTML = "👤 Guest";
+    isUserRegistered = false; 
+    makeLinks(); 
+    return false; 
+  } 
+  const ok = await ensureUser(); 
+  if (ok && isUserRegistered) { 
+    const best = Math.max(localBestScore, userFirebaseScore); 
+    status.innerHTML = `👤 ${userNick} | Best: ${best} | <span class="register-link">bellariofilms.com</span> ✨`; 
+    if (menuUserName) menuUserName.innerHTML = `👤 ${userNick}`;
+    makeLinks(); 
+    return true; 
+  } 
+  return false; 
+}
 async function saveBest(score) { if (!isUserRegistered || !userDocId) return false; const ref = doc(db, "userbellariofilms", userDocId); try { await runTransaction(db, async (t) => { const docSnap = await t.get(ref); if (!docSnap.exists()) return; const cur = docSnap.data().bestScore || 0; if (score > cur) t.update(ref, { bestScore: score, lastPlayed: serverTimestamp() }); else t.update(ref, { lastPlayed: serverTimestamp() }); }); return true; } catch (e) { return false; } }
 async function loadLeaderboard(contId, showRank = true) { const cont = document.getElementById(contId); if (!cont) return; try { const q = query(collection(db, "userbellariofilms"), orderBy("bestScore", "desc"), limit(10)); const snap = await getDocs(q); let html = '', rank = 1, userRank = null; for (const docSnap of snap.docs) { const data = docSnap.data(); const sc = data.bestScore || 0; if (sc === 0) continue; const isYou = data.nickname === userNick && isUserRegistered; if (isYou) userRank = rank; html += `<div class="leaderboard-item ${isYou ? 'you' : ''}"><span class="rank">${rank}</span><span class="nick">${escapeHtml(data.nickname || 'Unknown')}</span><span class="score">${sc} pts</span></div>`; rank++; } if (!html) html = '<div style="text-align:center;">No results yet</div>'; cont.innerHTML = html; if (showRank && contId === "leaderboardList") { const rankDiv = document.getElementById("yourRank"); if (rankDiv) { if (isUserRegistered) { if (userRank) rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Rank: #${userRank} | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; else rankDiv.innerHTML = `🏆 Your best: ${userFirebaseScore} pts | Outside top-10 | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; } else rankDiv.innerHTML = `✨ <span class="register-link">Register at bellariofilms.com</span> ✨ | <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 4px -2px 0;"></div> ${coins} BelkaCoins`; makeLinks(); } } } catch (e) { cont.innerHTML = '<div style="text-align:center;">Load error</div>'; } }
 function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]||m)) : s; }
@@ -1174,12 +1297,7 @@ function applyTranslations() {
   document.getElementById('best').innerHTML = `${t.bestLabel} ${localStorage.getItem('pixelFarmBest') || 0}`;
   const gameOverH1 = document.querySelector('#gameOverScreen h1'); if (gameOverH1) gameOverH1.textContent = t.gameOver;
   const leaderTitleOver = document.querySelector('#gameOverScreen .leaderboard-title'); if (leaderTitleOver) leaderTitleOver.textContent = t.topPlayers;
-  const historyTitle = document.getElementById('historyTitle'); if (historyTitle) historyTitle.textContent = t.historyTitle;
-  const closeHistory = document.getElementById('closeHistoryBtn'); if (closeHistory) closeHistory.textContent = t.closeBtn;
-  const historyBtn = document.getElementById('historyBtnMain'); if (historyBtn) historyBtn.textContent = t.historyBtn;
   const shopBtn = document.getElementById('shopBtnMain'); if (shopBtn) shopBtn.textContent = t.shop;
-  const historyDiv = document.getElementById('historyText');
-  if (historyDiv) historyDiv.innerHTML = `<p>Welcome to Pixel Farm Runner! Collect BelkaCoins, buy skins, backgrounds and maps, and set new records. Good luck!</p>`;
   const rulesDiv = document.getElementById('rulesList');
   if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 4 backgrounds!</li></ul>`;
   const sponsor = document.getElementById('sponsorLine');
@@ -1189,30 +1307,6 @@ function applyTranslations() {
   updateMenuCoins();
 }
 applyTranslations(); updateCoins(); checkDaily(); setSoundIcon(); updateVolumeSliders(); applySelectedBackground();
-
-// НОВЫЕ ФУНКЦИИ ДЛЯ БОНУСОВ
-function applyMagnet() { magnetBonusActive = true; bonusTimers.magnet = 300; showAchievementQueued(`🧲 МАГНИТ (5 сек)!`, true); }
-function applyShield() { shieldActive = true; bonusTimers.shield = 300; showAchievementQueued(`💚 ЩИТ (5 сек)!`, true); }
-function applySlowTime() { slowTimeActive = true; bonusTimers.slowTime = 300; showAchievementQueued(`🐢 ЗАМЕДЛЕНИЕ (5 сек)!`, true); }
-function applyLightning() { 
-  lightningActive = true; 
-  showAchievementQueued(`⚡ МОЛНИЯ! +50 BelkaCoins ⚡`, true); 
-  addCoins(50, W/2, H/2);
-  for(let p of powerups) { 
-    if(p.type !== 'vegasCoin' && p.type !== 'goldenCoin' && p.type !== 'horseshoe') continue;
-    addCoins(25, p.x+p.w/2, p.y+p.h/2); 
-  }
-  powerups = powerups.filter(p => p.type === 'vegasCoin' || p.type === 'goldenCoin' || p.type === 'horseshoe');
-  lightningActive = false;
-}
-function applyLuck() { 
-  luckActive = true; 
-  const random = Math.random();
-  if (random < 0.33) { addCoins(50, W/2, H/2); showAchievementQueued(`🍀 УДАЧА! x2 монеты! 🍀`, true); }
-  else if (random < 0.66) { addCoins(75, W/2, H/2); showAchievementQueued(`🍀 УДАЧА! x3 монеты! 🍀`, true); }
-  else { showAchievementQueued(`🍀 УДАЧА! x5 монет! 🍀`, true); addCoins(125, W/2, H/2); }
-  luckActive = false;
-}
 
 let W, H, dpr = Math.max(1, Math.min(devicePixelRatio||1,2));
 function resize() { W = innerWidth; H = innerHeight; canvas.width = Math.floor(W*dpr); canvas.height = Math.floor(H*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); }
@@ -1233,9 +1327,6 @@ let last100Reward = 0, last500Reward = 0;
 let worldObjects = [];
 let obsTimer = 0, powTimer = 0, goldTimer = 0;
 
-// СОЛНЦЕ И ЛУНА
-let sunX = 80, sunY = 70;
-let moonX = 80, moonY = 70;
 let isSunVisible = true;
 let isMoonVisible = false;
 
@@ -1407,25 +1498,14 @@ function updateSky() {
   if (gameRunning && !gameOver) {
     timeOfDay = (timeOfDay + cycleSpeed) % 2400;
     const hour = timeOfDay / 100;
-    const horizonY = ground.y - 30;
     if (hour >= 6 && hour <= 18) {
       isSunVisible = true;
       isMoonVisible = false;
-      sunX = 60 + ((hour - 6) / 12) * 160;
-      const t = (hour - 6) / 12;
-      const parabolaHeight = 4 * t * (1 - t);
-      sunY = horizonY - parabolaHeight * 160;
     } else {
       isSunVisible = false;
     }
     if (hour >= 18 || hour <= 6) {
       isMoonVisible = true;
-      let t;
-      if (hour >= 18) t = (hour - 18) / 12;
-      else t = (hour + 6) / 12;
-      moonX = 60 + t * 160;
-      const parabolaHeight = 4 * t * (1 - t);
-      moonY = horizonY - parabolaHeight * 160;
     } else {
       isMoonVisible = false;
     }
@@ -1440,7 +1520,24 @@ function setupWorld() {
   mountOff = 0; forestOff = 0; invincible = false; invTimer = 0; invBar = 0; horseCount = 0; obsPassed = 0; achShown = {obs10:false,obs25:false,hs3:false,hs10:false}; recBonus = false;
   last100Reward = 0; last500Reward = 0;
   birdTimer = 60;
-  for(let i=0;i<12;i++) clouds.push({ x:Math.random()*W, y:40+Math.random()*(H*0.3), s:0.6+Math.random()*1.2, speed:0.2+Math.random()*0.35 });
+  for(let i=0;i<6;i++) {
+    clouds.push({ 
+      x: Math.random()*W, 
+      y: 40 + Math.random()*(H*0.2), 
+      s: 0.8 + Math.random()*1.0, 
+      speed: 0.1 + Math.random()*0.15,
+      layer: 'back' 
+    });
+  }
+  for(let i=0;i<6;i++) {
+    clouds.push({ 
+      x: Math.random()*W, 
+      y: 60 + Math.random()*(H*0.25), 
+      s: 1.2 + Math.random()*1.4, 
+      speed: 0.35 + Math.random()*0.45,
+      layer: 'front' 
+    });
+  }
   for(let i=0;i<3;i++) birds.push({ x:Math.random()*W, y:60+Math.random()*(H*0.25), speed:0.5+Math.random()*0.6, wingPhase:Math.random()*Math.PI*2, size:0.8+Math.random()*0.4 });
   const currentMap = getCurrentMap();
   if(currentMap.theme !== 'desert') {
@@ -1556,25 +1653,23 @@ function togglePause(force=null) {
   if(force===true || (!gamePaused && force===null)) {
     gamePaused=true; gameRunning=false; pauseOverlay.style.display='flex';
     if (pauseBtnUi) pauseBtnUi.textContent = '▶';
-    pauseBtn.textContent = '▶ RESUME';
     stopAmbientLoop();
   } else {
     gamePaused=false; gameRunning=true; pauseOverlay.style.display='none';
     if (pauseBtnUi) pauseBtnUi.textContent = '⏸';
-    pauseBtn.textContent = '⏸ PAUSE';
     startAmbientLoop();
   }
 }
 function performJump() { if(!gameRunning || gameOver || gamePaused) return; if(player.grounded) { player.vy=player.jumpPower; player.grounded=false; player.doubleJumpAvailable=true; player.doubleJumpUsed=false; createDust(player.x+10, ground.y-8,6); playSound('jump'); } else if(player.doubleJumpAvailable && !player.doubleJumpUsed && !player.grounded) { player.vy=player.jumpPower*0.85; player.doubleJumpUsed=true; player.doubleJumpAvailable=false; player.doubleJumpAnim=6; createDust(player.x+20, player.y+20,8); playSound('doubleJump'); } }
 function startGame() {
-  titleScr.classList.add('hidden'); gameOverScr.classList.add('hidden'); rulesModal.classList.add('hidden'); historyModal.style.display='none';
+  titleScr.classList.add('hidden'); gameOverScr.classList.add('hidden'); rulesModal.style.display='none';
   pauseOverlay.style.display='none'; shopModal.style.display='none';
   gameRunning=false; gamePaused=false; gameOver=false; score=0; speed=6; frame=0; recBonus=false;
   abilityActive = false; abilityTimer = 0; tripleJumpAvailable = false; speedBoostActive = false; slowMotionActive = false; doubleCoinsActive = false; magnetActive = false; invisibilityActive = false;
   shieldActive = false; magnetBonusActive = false; slowTimeActive = false; lightningActive = false; luckActive = false;
   combo = 0; maxCombo = 0; newRecordEffect = 0;
   scoreEl.textContent=`${t.scoreLabel} 0`; setupWorld(); flash.style.background='rgba(255,0,0,0)'; timeOfDay=800; updateSky();
-  pauseBtn.classList.remove('hidden'); stopMenuMusic(); startCountdown();
+  stopMenuMusic(); startCountdown();
   enableAudio();
 }
 function endGame() {
@@ -1584,18 +1679,17 @@ function endGame() {
     newRecordEffect = 60;
     if(!recBonus) { addCoins(15,W/2,H/2); showAchievementQueued(`🏆 NEW RECORD! +15 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins 🏆`,true); recBonus=true; } 
   }
-  if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic();
+  if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; if(soundEnabled && audioAllowed) playMenuMusic();
 }
 startBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
 restartBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); startGame(); });
-menuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); gameOverScr.classList.add('hidden'); titleScr.classList.remove('hidden'); timeOfDay=800; updateSky(); pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic(); });
-rulesBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesModal.classList.remove('hidden'); });
-closeRules.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesModal.classList.add('hidden'); });
+menuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); gameOverScr.classList.add('hidden'); titleScr.classList.remove('hidden'); timeOfDay=800; updateSky(); if(soundEnabled && audioAllowed) playMenuMusic(); });
+rulesBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesModal.style.display='flex'; });
+closeRules.addEventListener('click',()=>{ playSound('buttonClick',0.25); rulesModal.style.display='none'; });
 leaderBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); loadLeaderboard("leaderboardList",true); leaderModal.style.display='flex'; });
 closeLeader.addEventListener('click',()=>{ playSound('buttonClick',0.25); leaderModal.style.display='none'; });
 resumeBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); });
-pauseMenuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); gameOverScr.classList.remove('hidden'); titleScr.classList.add('hidden'); gameRunning=false; gameOver=true; pauseBtn.classList.add('hidden'); if(soundEnabled && audioAllowed) playMenuMusic(); });
-pauseBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(); });
+pauseMenuBtn.addEventListener('click',()=>{ playSound('buttonClick',0.25); togglePause(false); gameOverScr.classList.remove('hidden'); titleScr.classList.add('hidden'); gameRunning=false; gameOver=true; if(soundEnabled && audioAllowed) playMenuMusic(); });
 if (pauseBtnUi) {
     pauseBtnUi.addEventListener('click', (e) => {
         e.preventDefault();
@@ -1643,12 +1737,10 @@ function update() {
   
   speed+=0.001; updateSky(); updateFireflies(); updateWorldObjects();
   
-  // Таймеры новых бонусов
   if(bonusTimers.magnet > 0) { bonusTimers.magnet--; if(bonusTimers.magnet <= 0) magnetBonusActive = false; }
   if(bonusTimers.shield > 0) { bonusTimers.shield--; if(bonusTimers.shield <= 0) shieldActive = false; }
   if(bonusTimers.slowTime > 0) { bonusTimers.slowTime--; if(bonusTimers.slowTime <= 0) slowTimeActive = false; }
   
-  // След от копыт
   if(player.grounded && frame % 4 === 0) {
     particles.push({
       x: player.x + 20 + Math.random() * 40,
@@ -1661,7 +1753,6 @@ function update() {
     });
   }
   
-  // Эффект магнита
   if (magnetBonusActive) {
     for(let i=0;i<powerups.length;i++) {
       let p = powerups[i];
@@ -1688,7 +1779,7 @@ function update() {
   if(player.doubleJumpAnim>0) player.doubleJumpAnim--;
   if(invincible) { invTimer--; invBar=(invTimer/invMax)*55; if(invTimer<=0) { invincible=false; invBar=0; } }
   mountOff+=currentSpeed*0.08; forestOff+=currentSpeed*0.12;
-  clouds.forEach(c=>{ c.x-=c.speed; if(c.x<-180) { c.x=W+80; c.y=40+Math.random()*(H*0.3); } });
+  clouds.forEach(c=>{ c.x-=c.speed; if(c.x<-180) { c.x=W+80; c.y=(c.layer==='back'?40:60)+Math.random()*(H*0.25); } });
   birdTimer--; if(birdTimer<=0 && birds.length<3) { birds.push({ x:W+50, y:50+Math.random()*(H*0.25), speed:0.5+Math.random()*0.6, wingPhase:Math.random()*Math.PI*2, size:0.7+Math.random()*0.5 }); birdTimer=180+Math.random()*100; }
   for(let i=0;i<birds.length;i++) { let b=birds[i]; b.x-=b.speed; b.wingPhase+=0.12; if(b.x+30<0) { birds.splice(i,1); i--; } }
   plane.x+=plane.speed; if(plane.x>W+200) { plane.x=-220; plane.y=60+Math.random()*70; if(audioAllowed && gameRunning && !gameOver && Math.random()<0.5) playSound('plane'); }
@@ -1730,7 +1821,7 @@ function update() {
       if(shieldActive) { 
         shieldActive = false; 
         bonusTimers.shield = 0; 
-        showAchievementQueued(`🛡️ ЩИТ ПОГЛОТИЛ УДАР! 🛡️`, true);
+        showAchievementQueued(`🛡️ SHIELD ABSORBED HIT! 🛡️`, true);
         obstacles.splice(obstacles.indexOf(ob),1);
         continue; 
       }
@@ -1815,7 +1906,6 @@ function drawPlayer() {
   if(player.doubleJumpAnim>0){ ctx.fillStyle='rgba(255,255,200,0.5)'; ctx.fillRect(x-2,y+36,player.w+4,10); } 
   if(invincible && invBar>0){ const barX=x+player.w/2-invBar/2, barY=y-10; ctx.fillStyle='#ffd966'; ctx.fillRect(barX,barY,invBar,3); ctx.strokeStyle='#b8860b'; ctx.strokeRect(barX,barY,invBar,3); } 
   
-  // Индикатор способности (полоска сверху)
   if(abilityActive) {
     const percent = abilityTimer / abilityDuration;
     ctx.fillStyle = '#aa44ff';
@@ -1934,12 +2024,7 @@ function render() {
   const skyGrad=getSkyGrad();
   ctx.fillStyle=skyGrad;
   ctx.fillRect(0,0,W,ground.y);
-  drawMountainsAndForest();
-  clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
-  birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
-  drawPlane(plane.x,plane.y);
   
-  // СОЛНЦЕ И ЛУНА
   const currentMapSun = getCurrentMap();
   if (currentMapSun.theme === 'desert') {
     const hour = timeOfDay / 100;
@@ -1948,24 +2033,34 @@ function render() {
     else if (hour < 8 || hour > 16) sizeMultiplier = 0.8;
     else sizeMultiplier = 1;
     
+    const travelWidth = W * 0.7;
+    const startX = W * 0.1;
+    
     if (isSunVisible) {
+      const t = (hour - 6) / 12;
+      const parabolaHeight = 4 * t * (1 - t);
+      const currentSunX = startX + t * travelWidth;
+      const currentSunY = ground.y - 160 - parabolaHeight * 130;
+      
       const pulse = 0.85 + Math.sin(Date.now() / 700) * 0.1;
       const alphaPulse = 0.25 + Math.sin(Date.now() / 600) * 0.12;
+      
       ctx.beginPath();
-      ctx.arc(sunX, sunY, 42 * pulse * sizeMultiplier, 0, Math.PI * 2);
+      ctx.arc(currentSunX, currentSunY, 42 * pulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 220, 100, ${alphaPulse * 0.6})`;
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(sunX, sunY, 36 * pulse * sizeMultiplier, 0, Math.PI * 2);
+      ctx.arc(currentSunX, currentSunY, 36 * pulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 200, 80, ${alphaPulse * 0.8})`;
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(sunX, sunY, 30 * pulse * sizeMultiplier, 0, Math.PI * 2);
+      ctx.arc(currentSunX, currentSunY, 30 * pulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255, 180, 60, ${alphaPulse})`;
       ctx.fill();
+      
       for(let sy=0; sy<34 * sizeMultiplier; sy++){
         for(let sx=0; sx<34 * sizeMultiplier; sx++){
-          let dx=sunX-17*sizeMultiplier+sx, dy=sunY-17*sizeMultiplier+sy;
+          let dx=currentSunX-17*sizeMultiplier+sx, dy=currentSunY-17*sizeMultiplier+sy;
           let dist=Math.hypot(sx-17*sizeMultiplier,sy-17*sizeMultiplier);
           if(dist<14*sizeMultiplier) ctx.fillStyle='#ffdd66';
           else if(dist<17*sizeMultiplier) ctx.fillStyle='#ffcc33';
@@ -1973,30 +2068,36 @@ function render() {
           ctx.fillRect(dx,dy,1,1);
         }
       }
-      for(let bx=0; bx<5*sizeMultiplier; bx++) for(let by=0; by<5*sizeMultiplier; by++){
-        if((bx===2*sizeMultiplier||bx===3*sizeMultiplier) && (by===2*sizeMultiplier||by===3*sizeMultiplier)) ctx.fillStyle='#ffffdd';
-        else continue;
-        ctx.fillRect(sunX-2*sizeMultiplier+bx, sunY-2*sizeMultiplier+by, 1,1);
-      }
     }
+    
     if (isMoonVisible) {
+      let t;
+      if (hour >= 18) t = (hour - 18) / 12;
+      else t = (hour + 6) / 12;
+      
+      const parabolaHeight = 4 * t * (1 - t);
+      const currentMoonX = startX + t * travelWidth;
+      const currentMoonY = ground.y - 160 - parabolaHeight * 130;
+      
       const moonPulse = 0.88 + Math.sin(Date.now() / 900) * 0.08;
       const moonAlphaPulse = 0.2 + Math.sin(Date.now() / 800) * 0.1;
+      
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 38 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
+      ctx.arc(currentMoonX, currentMoonY, 38 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(200, 220, 255, ${moonAlphaPulse * 0.5})`;
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 32 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
+      ctx.arc(currentMoonX, currentMoonY, 32 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(180, 200, 240, ${moonAlphaPulse * 0.7})`;
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 26 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
+      ctx.arc(currentMoonX, currentMoonY, 26 * moonPulse * sizeMultiplier, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(160, 180, 220, ${moonAlphaPulse})`;
       ctx.fill();
+      
       for(let sy=0; sy<30 * sizeMultiplier; sy++){
         for(let sx=0; sx<30 * sizeMultiplier; sx++){
-          let dx=moonX-15*sizeMultiplier+sx, dy=moonY-15*sizeMultiplier+sy;
+          let dx=currentMoonX-15*sizeMultiplier+sx, dy=currentMoonY-15*sizeMultiplier+sy;
           let dist=Math.hypot(sx-15*sizeMultiplier,sy-15*sizeMultiplier);
           if(dist<12*sizeMultiplier) ctx.fillStyle='#e0e8fc';
           else if(dist<14*sizeMultiplier) ctx.fillStyle='#d0d8f0';
@@ -2006,6 +2107,19 @@ function render() {
       }
     }
   }
+
+  drawMountainsAndForest();
+  
+  clouds.forEach(c => {
+    if (c.layer === 'back') drawCloud(c.x, c.y, c.s * 0.8);
+  });
+  
+  birds.forEach(b=>drawBird(b.x,b.y,b.wingPhase,b.size));
+  drawPlane(plane.x,plane.y);
+  
+  clouds.forEach(c => {
+    if (c.layer !== 'back') drawCloud(c.x, c.y, c.s);
+  });
   
   const currentMapLayer = getCurrentMap();
   let layerColor1, layerColor2;
@@ -2027,7 +2141,6 @@ function render() {
   drawPlayer();
   drawParticles();
   
-  // Эффект ускорения (линии по бокам)
   if(speedBoostActive) {
     for(let i=0;i<3;i++) {
       ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(Date.now() * 0.02) * 0.2})`;
@@ -2036,7 +2149,6 @@ function render() {
     }
   }
   
-  // Комбо
   if(combo >= 3) {
     ctx.font = 'bold 14px monospace';
     ctx.fillStyle = '#ff88ff';
@@ -2044,7 +2156,6 @@ function render() {
     ctx.fillText(`x${combo} COMBO!`, W/2 - 40, 80);
   }
   
-  // Эффект "NEW RECORD!"
   if(newRecordEffect > 0) {
     newRecordEffect--;
     ctx.font = 'bold 20px monospace';
@@ -2062,7 +2173,123 @@ function render() {
 }
 function loop(){ update(); render(); requestAnimationFrame(loop); }
 
-// ПРИНУДИТЕЛЬНАЯ ПРИВЯЗКА КНОПОК
+// ЭКРАН ЗАГРУЗКИ
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingBarFill = document.getElementById('loadingBarFill');
+const loadingText = document.getElementById('loadingText');
+
+const letters = [
+  document.getElementById('letter1'),
+  document.getElementById('letter2'),
+  document.getElementById('letter3'),
+  document.getElementById('letter4'),
+  document.getElementById('letter5'),
+  document.getElementById('letter6'),
+  document.getElementById('letter7'),
+  document.getElementById('letter8'),
+  document.getElementById('letter9'),
+  document.getElementById('letter10'),
+  document.getElementById('letter11')
+];
+
+let loadProgress = 0;
+let letterIndex = 0;
+
+function playLetterSound() {
+  if (!audioCtx) {
+    try { 
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+    } catch(e) { 
+      return; 
+    }
+  }
+  
+  if (audioCtx.state !== 'running') {
+    audioCtx.resume().then(() => {
+      playTone();
+    }).catch(() => {});
+  } else {
+    playTone();
+  }
+}
+
+function playTone() {
+  if (!audioCtx) return;
+  
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  const freqs = [523, 587, 659, 698, 784, 880, 932, 1046, 1174, 1318, 1396];
+  const freq = freqs[letterIndex] || 800;
+  
+  osc.type = 'square';
+  osc.frequency.value = freq;
+  
+  gain.gain.setValueAtTime(0.12, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc.start(now);
+  osc.stop(now + 0.1);
+}
+
+function showNextLetter() {
+  if (letterIndex < letters.length) {
+    const letter = letters[letterIndex];
+    if (letter) {
+      letter.classList.add('visible');
+      
+      if (soundEnabled) {
+        playLetterSound();
+      }
+      
+      setTimeout(() => {
+        letter.classList.add('visible-settled');
+      }, 100);
+      
+      letterIndex++;
+      
+      setTimeout(showNextLetter, 180);
+    }
+  }
+}
+
+function updateLoadingProgress(percent) {
+  loadProgress = Math.min(100, percent);
+  loadingBarFill.style.width = loadProgress + '%';
+  loadingText.textContent = `LOADING... ${loadProgress}%`;
+}
+
+function hideLoadingScreen() {
+  loadingScreen.style.opacity = '0';
+  setTimeout(() => {
+    loadingScreen.style.display = 'none';
+  }, 500);
+}
+
+setTimeout(() => {
+  showNextLetter();
+}, 200);
+
+const loadInterval = setInterval(() => {
+  loadProgress += Math.floor(Math.random() * 12) + 8;
+  if (loadProgress >= 100) {
+    loadProgress = 100;
+    updateLoadingProgress(100);
+    clearInterval(loadInterval);
+    
+    setTimeout(() => {
+      hideLoadingScreen();
+    }, 800);
+  } else {
+    updateLoadingProgress(loadProgress);
+  }
+}, 120);
+
+// Привязка кнопок
 setTimeout(() => {
     const muteBtnFix = document.getElementById('muteBtn');
     if (muteBtnFix) {
@@ -2078,8 +2305,9 @@ setTimeout(() => {
     if (rulesBtnFix && rulesModalFix) {
         rulesBtnFix.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            rulesModalFix.classList.remove('hidden');
+            rulesModalFix.style.display = 'flex';
         });
     }
     const leaderBtnFix = document.getElementById('leaderboardBtnMain');
@@ -2090,23 +2318,6 @@ setTimeout(() => {
             if (typeof playSound === 'function') playSound('buttonClick', 0.25);
             if (typeof loadLeaderboard === 'function') loadLeaderboard("leaderboardList", true);
             leaderModalFix.style.display = 'flex';
-        });
-    }
-    const historyBtnFix = document.getElementById('historyBtnMain');
-    const historyModalFix = document.getElementById('historyModal');
-    if (historyBtnFix && historyModalFix) {
-        historyBtnFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            historyModalFix.style.display = 'flex';
-        });
-    }
-    const closeHistoryFix = document.getElementById('closeHistoryBtn');
-    if (closeHistoryFix && historyModalFix) {
-        closeHistoryFix.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            historyModalFix.style.display = 'none';
         });
     }
     const closeLeaderFix = document.getElementById('closeLeaderboardBtn');
@@ -2122,7 +2333,7 @@ setTimeout(() => {
         closeRulesFix.addEventListener('click', (e) => {
             e.preventDefault();
             if (typeof playSound === 'function') playSound('buttonClick', 0.25);
-            rulesModalFix.classList.add('hidden');
+            rulesModalFix.style.display = 'none';
         });
     }
     const dailyBtnFix = document.getElementById('dailyBonusBtn');
@@ -2159,8 +2370,6 @@ setTimeout(() => {
         toggleMusicBtn.addEventListener('click', () => {
             musicVolume = musicVolume > 0 ? 0 : 0.25;
             localStorage.setItem('pixelFarmMusicVolume', musicVolume);
-            const bgm = document.getElementById('bgm');
-            if (bgm) bgm.volume = musicVolume;
             if (toggleMusicBtn) {
                 toggleMusicBtn.textContent = musicVolume > 0 ? '🎵 MUSIC: ON' : '🎵 MUSIC: OFF';
                 toggleMusicBtn.style.background = musicVolume > 0 ? '#ffd93b' : '#555555';
