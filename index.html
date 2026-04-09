@@ -653,7 +653,7 @@
         <button class="btn small" id="exitBtn">🚪 EXIT</button>
       </div>
       <div id="userStatusMain" class="register-hint"></div>
-      <div class="version">✨ v.4.0 — Wild West: египетские блоки, заборы, солнце/луна ✨</div>
+      <div class="version">✨ v.5.0 — Амбар, экономика, Alisa-единорог ✨</div>
     </div>
   </div>
 
@@ -705,7 +705,6 @@
   <canvas id="game"></canvas>
   <div id="flashOverlay"></div>
 </div>
-
 <script type="importmap">{ "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js" } }</script>
 <script type="module">
 import { initializeApp } from "firebase/app";
@@ -763,15 +762,18 @@ const shopBtnMain = document.getElementById('shopBtnMain');
 const closeShopBtn = document.getElementById('closeShopBtn');
 const exitBtn = document.getElementById('exitBtn');
 
+// ============================================================
+// ОБНОВЛЁННЫЕ ЦЕНЫ И СКИНЫ (Alisa = 1500)
+// ============================================================
 const skins = {
   aurelia: { id: 'aurelia', name: 'Aurelia', price: 0, owned: true, palette: { body: '#b86a22', body2: '#d17c2d', mane: '#5b2d15', leg: '#7a3c17', face: '#f1d09a' } },
-  nocturna: { id: 'nocturna', name: 'Nocturna', price: 35, owned: false, palette: { body: '#2b2b2b', body2: '#3a3a3a', mane: '#0d0d0d', leg: '#1c1c1c', face: '#cfcfcf' } },
-  azurea: { id: 'azurea', name: 'Azurea', price: 50, owned: false, palette: { body: '#6f4dff', body2: '#8a6bff', mane: '#2d145b', leg: '#41218b', face: '#f2d8ff' } },
-  aurea: { id: 'aurea', name: 'Aurea', price: 80, owned: false, palette: { body: '#d4a017', body2: '#ffd966', mane: '#8a5f00', leg: '#9c7300', face: '#fff0b0' } },
-  viridia: { id: 'viridia', name: 'Viridia', price: 110, owned: false, palette: { body: '#3cb371', body2: '#2e8b57', mane: '#1e5a3a', leg: '#267c4a', face: '#c6ffb0' } },
-  rosalia: { id: 'rosalia', name: 'Rosalia', price: 140, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#b34e6e', leg: '#d96f8a', face: '#ffe0e6' } },
-  amethysta: { id: 'amethysta', name: 'Amethysta', price: 180, owned: false, palette: { body: '#aa6ff9', body2: '#8b4ee5', mane: '#4a1a8a', leg: '#6a32c2', face: '#e5ccff' } },
-  alisa: { id: 'alisa', name: 'Alisa', price: 250, owned: false, palette: { body: '#c084fc', body2: '#f9a8d4', mane: '#7e22ce', leg: '#c2410c', face: '#ffe6f0' } }
+  nocturna: { id: 'nocturna', name: 'Nocturna', price: 50, owned: false, palette: { body: '#2b2b2b', body2: '#3a3a3a', mane: '#0d0d0d', leg: '#1c1c1c', face: '#cfcfcf' } },
+  azurea: { id: 'azurea', name: 'Azurea', price: 100, owned: false, palette: { body: '#6f4dff', body2: '#8a6bff', mane: '#2d145b', leg: '#41218b', face: '#f2d8ff' } },
+  viridia: { id: 'viridia', name: 'Viridia', price: 180, owned: false, palette: { body: '#3cb371', body2: '#2e8b57', mane: '#1e5a3a', leg: '#267c4a', face: '#c6ffb0' } },
+  rosalia: { id: 'rosalia', name: 'Rosalia', price: 300, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#b34e6e', leg: '#d96f8a', face: '#ffe0e6' } },
+  amethysta: { id: 'amethysta', name: 'Amethysta', price: 450, owned: false, palette: { body: '#aa6ff9', body2: '#8b4ee5', mane: '#4a1a8a', leg: '#6a32c2', face: '#e5ccff' } },
+  aurea: { id: 'aurea', name: 'Aurea', price: 700, owned: false, palette: { body: '#d4a017', body2: '#ffd966', mane: '#8a5f00', leg: '#9c7300', face: '#fff0b0' } },
+  alisa: { id: 'alisa', name: 'Alisa', price: 1500, owned: false, palette: { body: '#ffb7c5', body2: '#ff8da1', mane: '#ff66cc', leg: '#ffd700', face: '#ffe6f0' } }
 };
 let ownedSkins = JSON.parse(localStorage.getItem('pixelFarmOwnedSkins') || '["aurelia"]');
 let selectedSkin = localStorage.getItem('pixelFarmSelectedSkin') || 'aurelia';
@@ -779,11 +781,14 @@ Object.keys(skins).forEach(id => { skins[id].owned = ownedSkins.includes(id); })
 function saveSkins() { localStorage.setItem('pixelFarmOwnedSkins', JSON.stringify(ownedSkins)); localStorage.setItem('pixelFarmSelectedSkin', selectedSkin); }
 function getCurrentSkin() { return skins[selectedSkin] || skins.aurelia; }
 
+// ============================================================
+// ОБНОВЛЁННЫЕ ЦЕНЫ НА ФОНЫ
+// ============================================================
 const backgrounds = {
   day: { id: 'day', name: '🌞 Day', price: 0, owned: true, style: 'linear-gradient(135deg, #4a77ff, #6fa7ff)' },
-  dawn: { id: 'dawn', name: '🌅 Dawn', price: 50, owned: false, style: 'linear-gradient(135deg, #ffb87a, #ff9a6e)' },
-  sunset: { id: 'sunset', name: '🌇 Sunset', price: 80, owned: false, style: 'linear-gradient(135deg, #ff6fb5, #9b4dff)' },
-  night: { id: 'night', name: '🌙 Night', price: 120, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' }
+  dawn: { id: 'dawn', name: '🌅 Dawn', price: 80, owned: false, style: 'linear-gradient(135deg, #ffb87a, #ff9a6e)' },
+  sunset: { id: 'sunset', name: '🌇 Sunset', price: 150, owned: false, style: 'linear-gradient(135deg, #ff6fb5, #9b4dff)' },
+  night: { id: 'night', name: '🌙 Night', price: 250, owned: false, style: 'linear-gradient(135deg, #1a2a4a, #0a1a3a)' }
 };
 let ownedBackgrounds = JSON.parse(localStorage.getItem('pixelFarmOwnedBackgrounds') || '["day"]');
 let selectedBackground = localStorage.getItem('pixelFarmSelectedBackground') || 'day';
@@ -796,6 +801,9 @@ function applySelectedBackground() {
   if (gameOverPanel && backgrounds[selectedBackground]) gameOverPanel.style.background = backgrounds[selectedBackground].style;
 }
 
+// ============================================================
+// ОБНОВЛЁННЫЕ ЦЕНЫ НА КАРТЫ
+// ============================================================
 const maps = {
   farm: { 
     id: 'farm', name: '🌾 Farm', price: 0, owned: true, theme: 'farm',
@@ -806,7 +814,7 @@ const maps = {
     decoColor: '#c3f267'
   },
   wildWest: { 
-    id: 'wildWest', name: '🤠 Wild West', price: 150, owned: false, theme: 'desert',
+    id: 'wildWest', name: '🤠 Wild West', price: 350, owned: false, theme: 'desert',
     groundColor: '#d4a373', groundDetail1: '#c9945e', groundDetail2: '#b87a4a', groundShadow: '#9b6a3a',
     skyGradient: { day: ['#e9c46a', '#f4a261'], dawn: ['#e76f51', '#f4a261'], sunset: ['#e63946', '#d4a373'], night: ['#2b2d42', '#3a3e5a'] },
     mountainColors: { day: ['#b87a5a', '#d49c7a'], dawn: ['#c47a5a', '#e4aa8a'], sunset: ['#9a5a4a', '#ba7a6a'], night: ['#4a3a3a', '#6a5a5a'] },
@@ -964,10 +972,48 @@ window.handleBackgroundAction = function(bgId) {
   showAchievementQueued(`🎨 Background changed: ${bg.name}`, false);
 };
 
+// ============================================================
+// РАСТУЩИЙ ЕЖЕДНЕВНЫЙ БОНУС
+// ============================================================
 let dailyClaimed = false;
-function checkDaily() { const last = localStorage.getItem('dailyBonusClaim'); const today = new Date().toDateString(); dailyClaimed = (last === today); updateDailyUI(); }
-function updateDailyUI() { const info = document.getElementById('dailyBonusInfo'); if (info) info.innerHTML = dailyClaimed ? t.dailyBonusClaimed : t.dailyBonusAvailable; }
-function claimDaily() { if (!dailyClaimed) { addCoins(10); dailyClaimed = true; localStorage.setItem('dailyBonusClaim', new Date().toDateString()); showAchievementQueued(`✨ Daily Bonus +10 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins ✨`, true); updateDailyUI(); } }
+let dailyStreak = parseInt(localStorage.getItem('dailyStreak') || '0');
+
+function checkDaily() { 
+  const last = localStorage.getItem('dailyBonusClaim'); 
+  const today = new Date().toDateString(); 
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  dailyClaimed = (last === today); 
+  if (last && last !== today && last !== yesterday) {
+    dailyStreak = 0;
+    localStorage.setItem('dailyStreak', '0');
+  }
+  updateDailyUI(); 
+}
+
+function updateDailyUI() { 
+  const info = document.getElementById('dailyBonusInfo'); 
+  if (info) {
+    const bonus = 15 + dailyStreak * 5;
+    if (dailyClaimed) {
+      info.innerHTML = `✓ Day ${dailyStreak}/7 claimed!`;
+    } else {
+      info.innerHTML = `🎁 Day ${dailyStreak+1}/7: +${bonus} 🪙 available!`;
+    }
+  }
+}
+
+function claimDaily() { 
+  if (!dailyClaimed) { 
+    const bonus = 15 + dailyStreak * 5;
+    addCoins(bonus); 
+    dailyClaimed = true; 
+    dailyStreak = Math.min(7, dailyStreak + 1);
+    localStorage.setItem('dailyBonusClaim', new Date().toDateString()); 
+    localStorage.setItem('dailyStreak', dailyStreak);
+    showAchievementQueued(`✨ Daily Bonus Day ${dailyStreak}! +${bonus} 🪙 ✨`, true); 
+    updateDailyUI(); 
+  } 
+}
 
 let achQueue = [], achShowing = false;
 function showAchievementQueued(text, sound = true) {
@@ -1378,8 +1424,7 @@ let last100Reward = 0, last500Reward = 0;
 let worldObjects = [];
 let obsTimer = 0, powTimer = 0, goldTimer = 0;
 let isSunVisible = true, isMoonVisible = false;
-
-function drawEgyptianBlock(x, y, size = 1) {
+  function drawEgyptianBlock(x, y, size = 1) {
   px(x + 0, y + 0, 32 * size, 28 * size, '#c9b68b');
   px(x + 2*size, y + 2*size, 28*size, 24*size, '#b89f6a');
   px(x + 4*size, y + 4*size, 24*size, 20*size, '#a88952');
@@ -1474,6 +1519,43 @@ function drawBalloon(x, y, sc, cA, cB, bob) {
   px(xx + 5*sc, yy + 4*sc, 7*sc, 42*sc, cB);
   px(xx + 18*sc, yy + 4*sc, 7*sc, 42*sc, cB);
 }
+
+// ============================================================
+// НОВЫЙ АМБАР (ДОБАВЛЕН, НИЧЕГО НЕ УДАЛЕНО)
+// ============================================================
+function drawBarn(x, y, scale = 1) {
+  const s = scale;
+  px(x + 4*s, y + 72*s, 72*s, 8*s, '#666666');
+  px(x + 2*s, y + 76*s, 76*s, 4*s, '#555555');
+  px(x + 4*s, y + 24*s, 72*s, 50*s, '#cc2222');
+  for (let i = 0; i < 9; i++) { px(x + 4*s + i*8*s, y + 24*s, 2*s, 50*s, '#aa1111'); }
+  px(x + 4*s, y + 48*s, 72*s, 3*s, '#991111');
+  ctx.beginPath(); ctx.moveTo(x + 40*s, y + 4*s); ctx.lineTo(x + 8*s, y + 28*s); ctx.lineTo(x + 72*s, y + 28*s); ctx.fillStyle = '#eeeeee'; ctx.fill();
+  px(x + 30*s, y + 12*s, 20*s, 14*s, '#88bbee'); px(x + 28*s, y + 10*s, 24*s, 18*s, '#ffffff');
+  px(x + 38*s, y + 10*s, 4*s, 18*s, '#ffffff'); px(x + 28*s, y + 16*s, 24*s, 4*s, '#ffffff');
+  ctx.beginPath(); ctx.moveTo(x + 40*s, y - 8*s); ctx.lineTo(x, y + 28*s); ctx.lineTo(x + 80*s, y + 28*s); ctx.fillStyle = '#555555'; ctx.fill();
+  for (let i = 0; i < 5; i++) { const roofY = y + 8*s + i*4*s; const roofWidth = 60 - i*12; px(x + 10*s + i*6*s, roofY, roofWidth*s, 2*s, '#444444'); }
+  px(x + 38*s, y - 10*s, 4*s, 4*s, '#777777'); px(x + 2*s, y + 26*s, 76*s, 4*s, '#eeeeee');
+  px(x + 20*s, y + 36*s, 40*s, 38*s, '#dddddd'); px(x + 22*s, y + 38*s, 36*s, 34*s, '#eeeeee');
+  px(x + 38*s, y + 36*s, 4*s, 38*s, '#cccccc');
+  px(x + 24*s, y + 42*s, 12*s, 2*s, '#444444'); px(x + 24*s, y + 56*s, 12*s, 2*s, '#444444');
+  px(x + 24*s, y + 42*s, 2*s, 16*s, '#444444'); px(x + 34*s, y + 42*s, 2*s, 16*s, '#444444');
+  px(x + 44*s, y + 42*s, 12*s, 2*s, '#444444'); px(x + 44*s, y + 56*s, 12*s, 2*s, '#444444');
+  px(x + 44*s, y + 42*s, 2*s, 16*s, '#444444'); px(x + 54*s, y + 42*s, 2*s, 16*s, '#444444');
+  px(x + 35*s, y + 52*s, 2*s, 3*s, '#ffd700'); px(x + 43*s, y + 52*s, 2*s, 3*s, '#ffd700');
+  px(x + 8*s, y + 40*s, 10*s, 12*s, '#88bbee'); px(x + 6*s, y + 38*s, 14*s, 16*s, '#ffffff');
+  px(x + 12*s, y + 38*s, 2*s, 16*s, '#ffffff'); px(x + 6*s, y + 44*s, 14*s, 2*s, '#ffffff');
+  px(x + 62*s, y + 40*s, 10*s, 12*s, '#88bbee'); px(x + 60*s, y + 38*s, 14*s, 16*s, '#ffffff');
+  px(x + 66*s, y + 38*s, 2*s, 16*s, '#ffffff'); px(x + 60*s, y + 44*s, 14*s, 2*s, '#ffffff');
+  px(x + 39*s, y - 14*s, 2*s, 6*s, '#aaaaaa'); px(x + 37*s, y - 16*s, 6*s, 3*s, '#aaaaaa');
+  px(x + 42*s, y - 17*s, 2*s, 4*s, '#aaaaaa'); px(x + 43*s, y - 18*s, 1*s, 1*s, '#ff0000'); px(x + 44*s, y - 15*s, 3*s, 1*s, '#aaaaaa');
+  px(x + 82*s, y + 20*s, 24*s, 60*s, '#999999'); px(x + 82*s, y + 20*s, 6*s, 60*s, '#777777');
+  ctx.beginPath(); ctx.ellipse(x + 94*s, y + 20*s, 12*s, 6*s, 0, 0, Math.PI*2); ctx.fillStyle = '#aaaaaa'; ctx.fill();
+  for (let i = 0; i < 6; i++) { px(x + 82*s, y + 28*s + i*10*s, 24*s, 2*s, '#777777'); }
+  px(x + 80*s, y + 30*s, 2*s, 40*s, '#666666');
+  for (let i = 0; i < 5; i++) { px(x + 80*s, y + 30*s + i*8*s, 6*s, 2*s, '#666666'); }
+}
+
 function drawWorldObject(obj) {
   const currentMap = getCurrentMap();
   if(obj.type === 'house') {
@@ -1497,7 +1579,9 @@ function drawWorldObject(obj) {
   }
   else if(obj.type === 'cactus' && currentMap.theme === 'desert') drawCactus(obj.x, obj.y, obj.scale||0.8);
   else if(obj.type === 'rock' && currentMap.theme === 'desert') drawRock(obj.x, obj.y, obj.scale||0.7);
+  else if(obj.type === 'barn') drawBarn(obj.x, obj.y, obj.scale||1); // ДОБАВЛЕНО
 }
+
 function updateWorldObjects() {
   for(let i=0;i<worldObjects.length;i++) {
     const obj = worldObjects[i];
@@ -1516,6 +1600,7 @@ function updateWorldObjects() {
       else if(obj.type === 'windmill') obj.x = W + rand(100,400);
       else if(obj.type === 'cactus' && currentMap.theme === 'desert') obj.x = W + rand(30,250);
       else if(obj.type === 'rock' && currentMap.theme === 'desert') obj.x = W + rand(20,300);
+      else if(obj.type === 'barn') obj.x = W + rand(400, 600); // ДОБАВЛЕНО
     }
   }
 }
@@ -1597,6 +1682,16 @@ function setupWorld() {
     for(let i=0;i<12;i++) worldObjects.push({ type:'tree', x:i*170+Math.random()*80, y:ground.y-110-Math.random()*20, scale:0.7+Math.random()*0.8, speedMul:0.4 });
     for(let i=0;i<25;i++) worldObjects.push({ type:'flower', x:Math.random()*(W*2), y:ground.y-6-Math.random()*20, c:['#ff4040','#ffd93b','#ffffff'][Math.floor(Math.random()*3)], speedMul:0.4 });
     for(let i=0;i<3;i++) worldObjects.push({ type:'windmill', x:W+i*500+Math.random()*200, y:ground.y-170-Math.random()*20, w:100+Math.random()*20, h:170, speedMul:0.22, bladeAngle:Math.random()*Math.PI*2, bladeSpeed:0.02+Math.random()*0.02 });
+    // ДОБАВЛЕНЫ АМБАРЫ НА КАРТУ FARM
+    for(let i=0;i<3;i++) {
+      worldObjects.push({ 
+        type:'barn', 
+        x: W + i*450 + 200 + Math.random()*100, 
+        y: ground.y - 130 - Math.random()*15, 
+        scale: 0.85 + Math.random()*0.25, 
+        speedMul: 0.15 
+      });
+    }
   }
 }
 setupWorld(); createFireflyCont(); startPollen();
@@ -1723,7 +1818,7 @@ function endGame() {
   if(score>bestScore) { 
     bestScore=score; localStorage.setItem('pixelFarmBest',bestScore); bestEl.textContent=`${t.bestLabel} ${bestScore}`; 
     newRecordEffect = 60;
-    if(!recBonus) { addCoins(15,W/2,H/2); showAchievementQueued(`🏆 NEW RECORD! +15 <div class="coin-icon-real" style="display:inline-block; width:12px; height:12px; margin:0 2px -2px 0;"></div> BelkaCoins 🏆`,true); recBonus=true; } 
+    if(!recBonus) { addCoins(10,W/2,H/2); showAchievementQueued(`🏆 NEW RECORD! +10 🪙`,true); recBonus=true; } 
   }
   if(isUserRegistered) saveBest(score); finalScore.textContent=`${t.yourScore} ${score}`; loadLeaderboard("gameOverLeaderboard",false); gameOverScr.classList.remove('hidden'); playSound('crash'); fireflies.forEach(f=>f.remove()); fireflies=[]; stopAmbientLoop(); if(soundEnabled && audioAllowed) playMenuMusic();
 }
@@ -1779,12 +1874,12 @@ window.addEventListener('pointerdown',()=>{ if(gameRunning&&!gameOver&&!gamePaus
 function rand(a,b){ return Math.random()*(b-a)+a; }
 function rectsCollide(a,b){ return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
 function createDust(x,y,c=5){ for(let i=0;i<c;i++) particles.push({x,y,vx:rand(-2,2),vy:rand(-2,-0.4),size:rand(3,5),life:rand(20,30),color:['#f2c879','#c98a3d'][Math.floor(Math.random()*2)]}); }
-function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); addCoins(2,player.x+player.w/2,player.y+player.h/2); createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(5,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +5 BelkaCoins 🏆`,true); } if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(15,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +15 BelkaCoins 🏆`,true); } }
+function applyHorseshoe() { invincible=true; invTimer=180; invMax=180; invBar=55; playSound('horseshoe'); addCoins(2,player.x+player.w/2,player.y+player.h/2); createDust(player.x+player.w/2,player.y+player.h/2,10); horseCount++; if(!achShown.hs3 && horseCount>=3) { achShown.hs3=true; addCoins(3,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 3 HORSESHOES! +3 🪙`,true); } if(!achShown.hs10 && horseCount>=10) { achShown.hs10=true; addCoins(10,player.x+player.w/2,player.y+player.h/2); showAchievementQueued(`🏆 10 HORSESHOES! +10 🪙`,true); } }
 function applyGoldenCoin(x,y) { 
-  let value = 25;
-  if (doubleCoinsActive) value = 50;
+  let value = 15;
+  if (doubleCoinsActive) value = 30;
   addCoins(value,x,y); 
-  showAchievementQueued(`🪙 GOLDEN COIN! +${value} BelkaCoins 🪙`,true); 
+  showAchievementQueued(`🪙 GOLDEN COIN! +${value} 🪙`,true); 
   createDust(x,y,15); 
   playSound('horseshoe'); 
 }
@@ -1830,8 +1925,8 @@ function update() {
     }
   }
   
-  while(score>=last100Reward+100) { last100Reward+=100; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 +3 BelkaCoins (${score} points)`,true); }
-  while(score>=last500Reward+500) { last500Reward+=500; addCoins(8,W/2,H/2); showAchievementQueued(`🌟 +8 BelkaCoins (${score} points)`,true); }
+  while(score>=last100Reward+100) { last100Reward+=100; addCoins(1,W/2,H/2); showAchievementQueued(`🎯 +1 🪙 (${score} pts)`,true); }
+  while(score>=last500Reward+500) { last500Reward+=500; addCoins(3,W/2,H/2); showAchievementQueued(`🌟 +3 🪙 (${score} pts)`,true); }
   if(frame%6===0) { score++; scoreEl.textContent=`${t.scoreLabel} ${score}`; }
   player.vy+=gravity; player.y+=player.vy;
   if(player.y>=ground.y-player.h+8) {
@@ -1901,12 +1996,12 @@ function update() {
       obstacles[i].counted=true; obsPassed++; 
       combo++;
       if(combo > maxCombo) maxCombo = combo;
-      if(combo >= 5) { addCoins(5, W/2, H/2); showAchievementQueued(`🔥 x${combo} COMBO! +5 BelkaCoins 🔥`, true); }
-      if(combo >= 10) { addCoins(10, W/2, H/2); showAchievementQueued(`💥 x${combo} COMBO! +10 BelkaCoins 💥`, true); }
-      if(combo >= 15) { addCoins(15, W/2, H/2); showAchievementQueued(`🌈 x${combo} COMBO! +15 BelkaCoins 🌈`, true); }
+      if(combo >= 5) { addCoins(3, W/2, H/2); showAchievementQueued(`🔥 x${combo} COMBO! +3 🪙`, true); }
+      if(combo >= 10) { addCoins(5, W/2, H/2); showAchievementQueued(`💥 x${combo} COMBO! +5 🪙`, true); }
+      if(combo >= 15) { addCoins(8, W/2, H/2); showAchievementQueued(`🌈 x${combo} COMBO! +8 🪙`, true); }
       
-      if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(3,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +3 BelkaCoins 🎯`,true); } 
-      if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(8,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +8 BelkaCoins 🎯`,true); } 
+      if(!achShown.obs10 && obsPassed>=10) { achShown.obs10=true; addCoins(2,W/2,H/2); showAchievementQueued(`🎯 10 OBSTACLES! +2 🪙`,true); } 
+      if(!achShown.obs25 && obsPassed>=25) { achShown.obs25=true; addCoins(5,W/2,H/2); showAchievementQueued(`🎯 25 OBSTACLES! +5 🪙`,true); } 
     } 
   }
   cloudTimer++; if(cloudTimer>=200) { cloudTimer=0; cloudHue=(cloudHue+20)%360; }
@@ -1962,6 +2057,10 @@ function drawGround() {
   for(let i=0;i<W;i+=28){ px(i+((frame+i)%6), ground.y+80, 12,8, currentMap.groundShadow); px(i+6, ground.y+98, 16,8, currentMap.groundDetail1); }
   if(ground.y+ground.h<H) px(0, ground.y+ground.h, W, H-(ground.y+ground.h), currentMap.groundShadow);
 }
+
+// ============================================================
+// ОБНОВЛЁННЫЙ СПРАЙТ ALISA (ЕДИНОРОГ) - ДОБАВЛЕН, НИЧЕГО НЕ УДАЛЕНО
+// ============================================================
 function drawPlayer() { 
   const skin=getCurrentSkin(); 
   const x=player.x, y=player.y, bounce=player.grounded?Math.sin(frame*0.3)*1:0; 
@@ -1982,19 +2081,54 @@ function drawPlayer() {
   px(x+48, y+12+bounce, 14,12, skin.palette.body); 
   px(x+56, y+8+bounce, 14,16, skin.palette.body); 
   px(x+62, y+14+bounce, 8,6, skin.palette.face); 
-  px(x+50, y+6+bounce, 6,10, skin.palette.mane); 
-  px(x+44, y+8+bounce, 6,8, skin.palette.mane); 
-  px(x+40, y+10+bounce, 5,8, skin.palette.mane); 
-  px(x+54, y+4+bounce, 5,10, skin.palette.mane); 
+  
+  // РОГ И ЗВЁЗДОЧКА ДЛЯ ALISA
+  if (selectedSkin === 'alisa') {
+    px(x+56, y-2+bounce, 4, 12, '#ffffff');
+    px(x+54, y-4+bounce, 6, 4, '#ffd700');
+    px(x+55, y-6+bounce, 4, 3, '#ffed4e');
+    px(x+57, y+0+bounce, 2, 2, '#ffd700');
+    px(x+55, y+4+bounce, 2, 2, '#ffd700');
+    px(x+24, y+36+bounce, 6, 6, '#ffd700');
+    px(x+26, y+34+bounce, 2, 10, '#ffd700');
+    px(x+22, y+38+bounce, 10, 2, '#ffd700');
+    px(x+25, y+35+bounce, 4, 4, '#ffffff');
+    px(x+50, y+6+bounce, 4, 10, '#ff66cc');
+    px(x+46, y+8+bounce, 4, 8, '#aa44ff');
+    px(x+42, y+10+bounce, 4, 8, '#44ccff');
+    px(x+62, y+14+bounce, 3, 3, '#4488ff');
+    px(x+63, y+15+bounce, 1, 1, '#ffffff');
+    px(x+60, y+12+bounce, 1, 2, '#ff6699');
+  } else {
+    px(x+50, y+6+bounce, 6,10, skin.palette.mane); 
+    px(x+44, y+8+bounce, 6,8, skin.palette.mane); 
+    px(x+40, y+10+bounce, 5,8, skin.palette.mane); 
+    px(x+54, y+4+bounce, 5,10, skin.palette.mane);
+  }
+  
   px(x+62, y+2+bounce, 3,6, skin.palette.leg); 
   px(x+66, y+3+bounce, 3,6, skin.palette.leg); 
   px(x+62, y+14+bounce, 3,3, '#111'); 
   px(x+5, y+28+bounce, 6,10, skin.palette.mane); 
   px(x+1, y+32+bounce, 5,8, skin.palette.leg); 
   px(x+6, y+36+bounce, 5,6, skin.palette.mane); 
-  if(player.legFrame===0){ px(x+20, y+42+bounce, 6,14, skin.palette.leg); px(x+32, y+44+bounce, 6,12, skin.palette.leg); px(x+44, y+42+bounce, 6,14, skin.palette.leg); px(x+52, y+44+bounce, 6,12, skin.palette.leg); }else{ px(x+20, y+44+bounce, 6,12, skin.palette.leg); px(x+32, y+42+bounce, 6,14, skin.palette.leg); px(x+44, y+44+bounce, 6,12, skin.palette.leg); px(x+52, y+42+bounce, 6,14, skin.palette.leg); } 
-  px(x+20, y+54+bounce, 6,3, '#f1e7d2'); px(x+32, y+54+bounce, 6,3, '#f1e7d2'); px(x+44, y+54+bounce, 6,3, '#f1e7d2'); px(x+52, y+54+bounce, 6,3, '#f1e7d2'); 
+  if(player.legFrame===0){ 
+    px(x+20, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+32, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+44, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+52, y+44+bounce, 6,12, skin.palette.leg); 
+  } else { 
+    px(x+20, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+32, y+42+bounce, 6,14, skin.palette.leg); 
+    px(x+44, y+44+bounce, 6,12, skin.palette.leg); 
+    px(x+52, y+42+bounce, 6,14, skin.palette.leg); 
+  } 
+  px(x+20, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+32, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+44, y+54+bounce, 6,3, '#f1e7d2'); 
+  px(x+52, y+54+bounce, 6,3, '#f1e7d2'); 
 }
+
 function drawObstacle(ob){
   ctx.fillStyle='rgba(0,0,0,0.25)'; ctx.fillRect(ob.x+3, ob.y+ob.h-3, ob.w-6,4);
   const currentMap=getCurrentMap();
