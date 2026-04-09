@@ -8,589 +8,80 @@
     /* ============================================================
        ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ)
        ============================================================ */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #0a0a0a;
-      font-family: 'Courier New', monospace;
-      touch-action: manipulation;
-    }
-    #gameWrapper {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      transition: background 1.5s ease;
-    }
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      image-rendering: crisp-edges;
-      image-rendering: pixelated;
-    }
-    #ui {
-      position: absolute;
-      bottom: 75px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      text-align: center;
-      background: #0a0a0a;
-      padding: 6px 20px;
-      color: #ffd93b;
-      text-shadow: 2px 2px 0 #000;
-      font-weight: bold;
-      user-select: none;
-      pointer-events: none;
-      white-space: nowrap;
-      border: 3px solid #ffd93b;
-      font-family: 'Courier New', monospace;
-      font-size: 18px;
-      letter-spacing: 2px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .ui-online-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #1a1a1a;
-      padding: 4px 10px;
-      border: 1px solid #ffd93b;
-      border-radius: 4px;
-    }
-    .ui-online-dot {
-      width: 10px;
-      height: 10px;
-      background: #4caf50;
-      border-radius: 2px;
-      box-shadow: 0 0 4px #4caf50;
-      animation: pixelPulse 1.2s infinite ease;
-    }
-    #uiOnlineCount {
-      font-size: 14px;
-      font-weight: bold;
-      color: #ffd93b;
-    }
-    #score, #best { display: inline-block; }
-    #score { font-size: 34px; }
-    #best { font-size: 16px; margin-left: 20px; }
-    .ui-pause-btn {
-      background: #1a1a1a;
-      border: 2px solid #ffd93b;
-      color: #ffd93b;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 4px 12px;
-      cursor: pointer;
-      font-family: monospace;
-      margin-left: 16px;
-      border-radius: 4px;
-      transition: none;
-      pointer-events: auto;
-    }
-    .ui-pause-btn:active {
-      transform: translate(2px, 2px);
-    }
-    #titleScreen, #gameOverScreen, #rulesModal, #leaderboardModal {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(4px);
-      padding: 20px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; font-family: 'Courier New', monospace; touch-action: manipulation; }
+    #gameWrapper { position: relative; width: 100vw; height: 100vh; overflow: hidden; transition: background 1.5s ease; }
+    canvas { display: block; width: 100%; height: 100%; image-rendering: crisp-edges; image-rendering: pixelated; }
+    #ui { position: absolute; bottom: 75px; left: 50%; transform: translateX(-50%); z-index: 10; text-align: center; background: #0a0a0a; padding: 6px 20px; color: #ffd93b; text-shadow: 2px 2px 0 #000; font-weight: bold; user-select: none; pointer-events: none; white-space: nowrap; border: 3px solid #ffd93b; font-family: 'Courier New', monospace; font-size: 18px; letter-spacing: 2px; display: flex; align-items: center; gap: 16px; }
+    .ui-online-indicator { display: inline-flex; align-items: center; gap: 6px; background: #1a1a1a; padding: 4px 10px; border: 1px solid #ffd93b; border-radius: 4px; }
+    .ui-online-dot { width: 10px; height: 10px; background: #4caf50; border-radius: 2px; box-shadow: 0 0 4px #4caf50; animation: pixelPulse 1.2s infinite ease; }
+    #uiOnlineCount { font-size: 14px; font-weight: bold; color: #ffd93b; }
+    #score, #best { display: inline-block; } #score { font-size: 34px; } #best { font-size: 16px; margin-left: 20px; }
+    .ui-pause-btn { background: #1a1a1a; border: 2px solid #ffd93b; color: #ffd93b; font-size: 18px; font-weight: bold; padding: 4px 12px; cursor: pointer; font-family: monospace; margin-left: 16px; border-radius: 4px; transition: none; pointer-events: auto; }
+    .ui-pause-btn:active { transform: translate(2px, 2px); }
+    #titleScreen, #gameOverScreen, #rulesModal, #leaderboardModal { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); padding: 20px; }
     #rulesModal, #leaderboardModal { display: none; }
-    .panel {
-      width: min(92vw, 520px);
-      background: #0f0f12;
-      border: 4px solid #ffd93b;
-      padding: 20px 24px 28px;
-      text-align: center;
-      color: white;
-      font-family: 'Courier New', monospace;
-      position: relative;
-      overflow: visible;
-      box-shadow: 6px 6px 0 #000000;
-    }
-    .scrollable-panel {
-      max-height: 85vh;
-      overflow-y: auto;
-      padding: 20px 24px 48px 24px;
-      scrollbar-width: thin;
-      scrollbar-color: #ffd93b #1a1a1a;
-    }
-    .scrollable-panel::-webkit-scrollbar { width: 8px; }
-    .scrollable-panel::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; }
-    .scrollable-panel::-webkit-scrollbar-thumb { background: #ffd93b; border-radius: 4px; border: 1px solid #000; }
-    .scroll-hint {
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      pointer-events: none;
-      z-index: 35;
-      animation: bounceHint 1.2s infinite ease;
-    }
-    .pixel-arrow {
-      width: 24px;
-      height: 24px;
-      position: relative;
-    }
-    .pixel-arrow::before {
-      content: "";
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #ffd93b;
-      left: 8px;
-      top: 0;
-      box-shadow: -4px 4px 0 #ffd93b, 0px 4px 0 #ffd93b, 4px 4px 0 #ffd93b, -8px 8px 0 #ffd93b, -4px 8px 0 #ffd93b, 0px 8px 0 #ffd93b, 4px 8px 0 #ffd93b, 8px 8px 0 #ffd93b, -4px 12px 0 #ffd93b, 0px 12px 0 #ffd93b, 4px 12px 0 #ffd93b;
-    }
-    .scroll-hint span {
-      font-size: 10px;
-      color: #ffd93b;
-      text-shadow: 1px 1px 0 #000;
-      background: #0a0a0a;
-      padding: 2px 6px;
-      border: 1px solid #ffd93b;
-    }
-    @keyframes bounceHint {
-      0%, 100% { transform: translateX(-50%) translateY(0px); opacity: 0.7; }
-      50% { transform: translateX(-50%) translateY(6px); opacity: 1; }
-    }
-    .rules-list { text-align: left; margin: 12px 0; font-size: 14px; line-height: 1.5; }
-    .rules-list li { margin: 10px 0; }
-    .rules-list strong { color: #ffd93b; }
-    .online-corner { position: absolute; top: 20px; left: 20px; z-index: 15; }
-    .online-pixel-box {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #1a1a1a;
-      padding: 4px 12px;
-      border: 2px solid #ffd93b;
-      font-size: 12px;
-      font-weight: bold;
-      color: #ffd93b;
-      box-shadow: 3px 3px 0 #000;
-    }
-    .user-name-corner {
-      position: absolute;
-      top: 52px;
-      left: 20px;
-      z-index: 15;
-      background: #0a0a0a;
-      padding: 4px 12px;
-      border: 2px solid #ffd93b;
-      font-size: 11px;
-      font-weight: bold;
-      color: #ffd93b;
-      box-shadow: 3px 3px 0 #000;
-      text-align: left;
-    }
-    .pixel-dot {
-      width: 10px;
-      height: 10px;
-      background: #4caf50;
-      box-shadow: 0 0 4px #4caf50;
-      animation: pixelPulse 1.2s infinite ease;
-    }
-    @keyframes pixelPulse {
-      0%, 100% { opacity: 0.6; transform: scale(0.9); }
-      50% { opacity: 1; transform: scale(1.1); }
-    }
-    .btn {
-      border: 3px solid #000;
-      background: #ffd93b;
-      color: #1a1a1a;
-      font-weight: bold;
-      font-size: 22px;
-      padding: 14px 32px;
-      cursor: pointer;
-      margin-top: 12px;
-      min-width: 160px;
-      box-shadow: 4px 4px 0 #000;
-      transition: none;
-    }
-    .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
-    .btn.small { padding: 10px 22px; font-size: 18px; min-width: 120px; }
-    .btn.daily { background: linear-gradient(135deg, #b04eff, #ff66cc); color: #fff; border-color: #fff3b0; }
-    .btn-icon {
-      width: 48px;
-      height: 48px;
-      border: 3px solid #000;
-      background: #ffd93b;
-      color: #1a1a1a;
-      font-weight: bold;
-      font-size: 20px;
-      cursor: pointer;
-      box-shadow: 4px 4px 0 #000;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: none;
-      flex-shrink: 0;
-    }
-    .btn-icon:active {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0 #000;
-    }
-    .btn-icon .pixel-note {
-      margin-right: 0;
-    }
-    #startBtn {
-      background: linear-gradient(135deg, #ffd93b, #ffaa1a);
-      box-shadow: 0 0 12px rgba(255, 217, 59, 0.6), 4px 4px 0 #000;
-      border-color: #ffea80;
-      transform: scale(1.02);
-    }
-    #startBtn:active {
-      transform: translate(2px, 2px) scale(1);
-      box-shadow: 2px 2px 0 #000;
-    }
-    .daily-bonus-area, .button-group { margin-top: 10px; text-align: center; }
-    .button-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
-    .small { font-size: 11px; opacity: 0.8; margin-top: 10px; }
-    .version { font-size: 9px; opacity: 0.6; margin-top: 14px; }
+    .panel { width: min(92vw, 520px); background: #0f0f12; border: 4px solid #ffd93b; padding: 20px 24px 28px; text-align: center; color: white; font-family: 'Courier New', monospace; position: relative; overflow: visible; box-shadow: 6px 6px 0 #000000; }
+    .scrollable-panel { max-height: 85vh; overflow-y: auto; padding: 20px 24px 48px 24px; scrollbar-width: thin; scrollbar-color: #ffd93b #1a1a1a; }
+    .scrollable-panel::-webkit-scrollbar { width: 8px; } .scrollable-panel::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 4px; } .scrollable-panel::-webkit-scrollbar-thumb { background: #ffd93b; border-radius: 4px; border: 1px solid #000; }
+    .scroll-hint { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none; z-index: 35; animation: bounceHint 1.2s infinite ease; }
+    .pixel-arrow { width: 24px; height: 24px; position: relative; }
+    .pixel-arrow::before { content: ""; position: absolute; width: 8px; height: 8px; background: #ffd93b; left: 8px; top: 0; box-shadow: -4px 4px 0 #ffd93b, 0px 4px 0 #ffd93b, 4px 4px 0 #ffd93b, -8px 8px 0 #ffd93b, -4px 8px 0 #ffd93b, 0px 8px 0 #ffd93b, 4px 8px 0 #ffd93b, 8px 8px 0 #ffd93b, -4px 12px 0 #ffd93b, 0px 12px 0 #ffd93b, 4px 12px 0 #ffd93b; }
+    .scroll-hint span { font-size: 10px; color: #ffd93b; text-shadow: 1px 1px 0 #000; background: #0a0a0a; padding: 2px 6px; border: 1px solid #ffd93b; }
+    @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0px); opacity: 0.7; } 50% { transform: translateX(-50%) translateY(6px); opacity: 1; } }
+    .rules-list { text-align: left; margin: 12px 0; font-size: 14px; line-height: 1.5; } .rules-list li { margin: 10px 0; } .rules-list strong { color: #ffd93b; }
+    .online-corner { position: absolute; top: 20px; left: 20px; z-index: 15; } .online-pixel-box { display: inline-flex; align-items: center; gap: 8px; background: #1a1a1a; padding: 4px 12px; border: 2px solid #ffd93b; font-size: 12px; font-weight: bold; color: #ffd93b; box-shadow: 3px 3px 0 #000; }
+    .user-name-corner { position: absolute; top: 52px; left: 20px; z-index: 15; background: #0a0a0a; padding: 4px 12px; border: 2px solid #ffd93b; font-size: 11px; font-weight: bold; color: #ffd93b; box-shadow: 3px 3px 0 #000; text-align: left; }
+    .pixel-dot { width: 10px; height: 10px; background: #4caf50; box-shadow: 0 0 4px #4caf50; animation: pixelPulse 1.2s infinite ease; } @keyframes pixelPulse { 0%, 100% { opacity: 0.6; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } }
+    .btn { border: 3px solid #000; background: #ffd93b; color: #1a1a1a; font-weight: bold; font-size: 22px; padding: 14px 32px; cursor: pointer; margin-top: 12px; min-width: 160px; box-shadow: 4px 4px 0 #000; transition: none; } .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
+    .btn.small { padding: 10px 22px; font-size: 18px; min-width: 120px; } .btn.daily { background: linear-gradient(135deg, #b04eff, #ff66cc); color: #fff; border-color: #fff3b0; }
+    .btn-icon { width: 48px; height: 48px; border: 3px solid #000; background: #ffd93b; color: #1a1a1a; font-weight: bold; font-size: 20px; cursor: pointer; box-shadow: 4px 4px 0 #000; display: inline-flex; align-items: center; justify-content: center; padding: 0; transition: none; flex-shrink: 0; } .btn-icon:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; } .btn-icon .pixel-note { margin-right: 0; }
+    #startBtn { background: linear-gradient(135deg, #ffd93b, #ffaa1a); box-shadow: 0 0 12px rgba(255, 217, 59, 0.6), 4px 4px 0 #000; border-color: #ffea80; transform: scale(1.02); } #startBtn:active { transform: translate(2px, 2px) scale(1); box-shadow: 2px 2px 0 #000; }
+    .daily-bonus-area, .button-group { margin-top: 10px; text-align: center; } .button-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+    .small { font-size: 11px; opacity: 0.8; margin-top: 10px; } .version { font-size: 9px; opacity: 0.6; margin-top: 14px; }
     .register-hint, .register-link-small, .register-link { font-size: 10px; color: #ffd93b; text-decoration: underline; cursor: pointer; }
-    .leaderboard-list { max-height: 180px; overflow-y: auto; margin: 12px 0; text-align: left; font-size: 11px; }
-    .leaderboard-item { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.2); }
-    .leaderboard-item.you { background: rgba(255,217,59,0.3); }
-    .rank { width: 30px; color: #ffd93b; }
-    .nick { flex: 1; }
-    .score { font-weight: bold; color: #ffd93b; }
-    .panel.small { padding: 16px; max-width: 400px; }
-    .hidden { display: none !important; }
+    .leaderboard-list { max-height: 180px; overflow-y: auto; margin: 12px 0; text-align: left; font-size: 11px; } .leaderboard-item { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.2); } .leaderboard-item.you { background: rgba(255,217,59,0.3); } .rank { width: 30px; color: #ffd93b; } .nick { flex: 1; } .score { font-weight: bold; color: #ffd93b; }
+    .panel.small { padding: 16px; max-width: 400px; } .hidden { display: none !important; }
     #flashOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 25; background: rgba(255,0,0,0); }
-    .achievement {
-      position: absolute; top: 40%; left: 50%; transform: translateX(-50%);
-      background: #0a0a0a; border: 3px solid #ffd93b; color: #ffd93b;
-      padding: 5px 12px; font-size: 13px; font-weight: bold;
-      white-space: nowrap; z-index: 30; pointer-events: none;
-      animation: achievementFade 2s forwards;
-    }
-    @keyframes achievementFade {
-      0% { opacity: 0; transform: translateX(-50%) translateY(15px); }
-      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-      85% { opacity: 1; transform: translateX(-50%) translateY(0); }
-      100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-    }
-    .firefly { position: absolute; width: 3px; height: 3px; background: #ffff80; border-radius: 50%; box-shadow: 0 0 4px #ffeb3b; pointer-events: none; z-index: 5; opacity: 0; animation: fireflyGlow 1.2s infinite alternate; }
-    @keyframes fireflyGlow { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+    .achievement { position: absolute; top: 40%; left: 50%; transform: translateX(-50%); background: #0a0a0a; border: 3px solid #ffd93b; color: #ffd93b; padding: 5px 12px; font-size: 13px; font-weight: bold; white-space: nowrap; z-index: 30; pointer-events: none; animation: achievementFade 2s forwards; } @keyframes achievementFade { 0% { opacity: 0; transform: translateX(-50%) translateY(15px); } 15% { opacity: 1; transform: translateX(-50%) translateY(0); } 85% { opacity: 1; transform: translateX(-50%) translateY(0); } 100% { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+    .firefly { position: absolute; width: 3px; height: 3px; background: #ffff80; border-radius: 50%; box-shadow: 0 0 4px #ffeb3b; pointer-events: none; z-index: 5; opacity: 0; animation: fireflyGlow 1.2s infinite alternate; } @keyframes fireflyGlow { 0% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
     .sponsor-line { margin-top: 12px; padding-top: 6px; border-top: 1px solid rgba(255,217,59,0.3); font-size: 9px; text-align: center; }
-    .menu-coins {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #1a1a1a;
-      padding: 6px 14px;
-      border: 2px solid #ffd93b;
-      margin-top: 10px;
-      font-size: 14px;
-      font-weight: bold;
-    }
-    .menu-coins .coin-icon {
-      width: 20px; height: 20px;
-      background: radial-gradient(circle at 35% 35%, #ffd966, #d4a017, #b8860b);
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,200,0.6);
-      border: 1px solid #b84eff;
-      display: inline-block;
-      position: relative;
-    }
-    .menu-coins .coin-icon::after { content: "🪙"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; opacity: 0.7; }
-    #countdownOverlay, #pauseOverlay, #shopModal {
-      position: absolute; inset: 0; z-index: 30;
-      display: none; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); padding: 20px;
-    }
-    #shopModal .panel {
-      width: min(92vw, 560px);
-      height: 600px;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      padding: 20px 24px 24px 24px;
-    }
-    #countdownText {
-      font-size: clamp(80px, 18vw, 180px); color: #ffd93b;
-      text-shadow: 6px 6px 0 #000; font-family: monospace;
-      font-weight: bold; animation: pulseCountdown 0.8s ease;
-    }
-    @keyframes pulseCountdown { 0% { transform: scale(0.65); opacity: 0; } 35% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-    .shop-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-      flex-shrink: 0;
-      margin-top: 16px;
-    }
-    .shop-tab {
-      background: #1a1a1a;
-      border: 2px solid #ffd93b;
-      color: #ffd93b;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      font-family: monospace;
-      transition: all 0.1s ease;
-    }
-    .shop-tab.active {
-      background: #ffd93b;
-      color: #1a1a1a;
-      box-shadow: inset 0 0 0 2px #000, 0 0 0 2px #ffd93b;
-    }
-    .shop-tab:active { transform: translate(1px, 1px); }
+    .menu-coins { display: inline-flex; align-items: center; gap: 8px; background: #1a1a1a; padding: 6px 14px; border: 2px solid #ffd93b; margin-top: 10px; font-size: 14px; font-weight: bold; } .menu-coins .coin-icon { width: 20px; height: 20px; background: radial-gradient(circle at 35% 35%, #ffd966, #d4a017, #b8860b); border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,200,0.6); border: 1px solid #b84eff; display: inline-block; position: relative; } .menu-coins .coin-icon::after { content: "🪙"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; opacity: 0.7; }
+    #countdownOverlay, #pauseOverlay, #shopModal { position: absolute; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); padding: 20px; }
+    #shopModal .panel { width: min(92vw, 560px); height: 600px; max-height: 85vh; display: flex; flex-direction: column; padding: 20px 24px 24px 24px; }
+    #countdownText { font-size: clamp(80px, 18vw, 180px); color: #ffd93b; text-shadow: 6px 6px 0 #000; font-family: monospace; font-weight: bold; animation: pulseCountdown 0.8s ease; } @keyframes pulseCountdown { 0% { transform: scale(0.65); opacity: 0; } 35% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    .shop-tabs { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; flex-shrink: 0; margin-top: 16px; } .shop-tab { background: #1a1a1a; border: 2px solid #ffd93b; color: #ffd93b; padding: 8px 16px; font-size: 14px; font-weight: bold; cursor: pointer; font-family: monospace; transition: all 0.1s ease; } .shop-tab.active { background: #ffd93b; color: #1a1a1a; box-shadow: inset 0 0 0 2px #000, 0 0 0 2px #ffd93b; } .shop-tab:active { transform: translate(1px, 1px); }
     .shop-section-hidden { display: none !important; }
-    .shop-grid-container {
-      flex: 1;
-      overflow-y: auto;
-      min-height: 280px;
-      height: 360px;
-      padding-right: 4px;
-      margin: 8px 0;
-      scrollbar-width: thin;
-      scrollbar-color: #ffd93b #1a1a1a;
-    }
-    .shop-grid-container::-webkit-scrollbar {
-      width: 6px;
-    }
-    .shop-grid-container::-webkit-scrollbar-track {
-      background: #1a1a1a;
-      border-radius: 3px;
-    }
-    .shop-grid-container::-webkit-scrollbar-thumb {
-      background: #ffd93b;
-      border-radius: 3px;
-    }
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      padding-bottom: 4px;
-    }
-    #shopModal .scroll-hint {
-      display: none;
-    }
-    .shop-card {
-      background: #151515;
-      border: 2px solid #ffd93b;
-      padding: 12px;
-      text-align: center;
-      box-shadow: 4px 4px 0 #000;
-      min-height: 180px;
-      position: relative;
-    }
-    .shop-card.active { border-color: #3cff8b; box-shadow: 0 0 0 2px #3cff8b inset, 4px 4px 0 #000; }
-    .shop-skin-preview { width: 72px; height: 72px; margin: 0 auto 10px; border: 2px solid #000; background: #2a2a2a; position: relative; }
-    .shop-skin-name { font-size: 12px; color: #ffd93b; margin-bottom: 6px; font-weight: bold; }
-    .shop-skin-price { font-size: 11px; margin-bottom: 8px; }
-    .shop-btn {
-      border: 2px solid #000; background: #ffd93b; color: #111;
-      font-weight: bold; font-size: 12px; padding: 8px 10px; cursor: pointer;
-      width: 100%; font-family: monospace; box-shadow: 3px 3px 0 #000;
-    }
-    .shop-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #000; }
-    .close-cross {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 36px;
-      height: 36px;
-      background: #cc2222;
-      border: 3px solid #000;
-      color: #ffffff;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 3px 3px 0 #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      line-height: 1;
-      z-index: 35;
-      transition: none;
-      font-family: monospace;
-    }
-    .close-cross:active {
-      transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0 #000;
-    }
-    .close-cross:hover {
-      background: #ee3333;
-    }
-    .coin-pop {
-      position: absolute; z-index: 40; color: #ffd93b; font-weight: bold;
-      font-size: 18px; text-shadow: 2px 2px 0 #000; pointer-events: none;
-      animation: coinPopAnim 1s forwards; font-family: monospace;
-    }
-    @keyframes coinPopAnim { 0% { opacity: 0; transform: translateY(10px) scale(0.7); } 20% { opacity: 1; transform: translateY(0px) scale(1); } 100% { opacity: 0; transform: translateY(-40px) scale(1.1); } }
-    .pollen { position: absolute; width: 2px; height: 2px; background: #ffeb99; border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0; animation: pollenFloat 6s infinite linear; }
-    @keyframes pollenFloat { 0% { transform: translateY(0px) translateX(0px); opacity: 0; } 20% { opacity: 0.5; } 80% { opacity: 0.4; } 100% { transform: translateY(-150px) translateX(30px); opacity: 0; } }
-    .pixel-note { display: inline-block; width: 20px; height: 20px; position: relative; vertical-align: middle; }
-    .pixel-note .note-head { position: absolute; width: 8px; height: 8px; background: #ffd93b; left: 4px; top: 4px; box-shadow: 2px 2px 0 #000; }
-    .pixel-note .note-stem { position: absolute; width: 3px; height: 14px; background: #ffd93b; left: 10px; top: -2px; box-shadow: 1px 1px 0 #000; }
-    .pixel-note.muted .note-head, .pixel-note.muted .note-stem { background: #ff6666; }
-    .pixel-note.muted::after { content: "✕"; position: absolute; left: 2px; top: -4px; font-size: 14px; font-weight: bold; color: #ff6666; text-shadow: 1px 1px 0 #000; }
-    .sound-toggle-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin: 16px 0;
-      width: 100%;
-    }
-    .sound-toggle-buttons .btn.small {
-      font-size: 16px;
-      padding: 10px 16px;
-      min-width: auto;
-    }
-    .shop-section-title {
-      font-size: 16px;
-      margin: 20px 0 8px;
-      color: #ffd93b;
-      border-top: 2px solid #ffd93b;
-      padding-top: 12px;
-    }
-    #loadingScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: #0a0a0a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease;
-    }
-    .loading-panel {
-      text-align: center;
-      max-width: 400px;
-      padding: 20px;
-    }
-    .loading-image {
-      max-width: 100%;
-      width: 300px;
-      image-rendering: pixelated;
-      margin-bottom: 24px;
-    }
-    .game-studio-container {
-      margin: 16px 0 8px 0;
-      font-family: 'Courier New', monospace;
-      font-size: 28px;
-      font-weight: bold;
-      letter-spacing: 4px;
-      text-shadow: 4px 4px 0 #000;
-      min-height: 50px;
-    }
-    .game-studio-letter {
-      display: inline-block;
-      color: #ffd93b;
-      opacity: 0;
-      transform: scale(0.5);
-      transition: opacity 0.15s ease, transform 0.2s ease;
-      text-shadow: 3px 3px 0 #000;
-    }
-    .game-studio-letter.visible {
-      opacity: 1;
-      transform: scale(1.2);
-    }
-    .game-studio-letter.visible-settled {
-      opacity: 1;
-      transform: scale(1);
-    }
-    .loading-bar-container {
-      width: 100%;
-      height: 20px;
-      background: #1a1a1a;
-      border: 3px solid #ffd93b;
-      box-shadow: 4px 4px 0 #000;
-      margin: 16px 0;
-    }
-    .loading-bar-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, #ffd93b, #ffaa1a);
-      transition: width 0.1s ease;
-    }
-    .loading-text {
-      color: #ffd93b;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      font-weight: bold;
-      text-shadow: 2px 2px 0 #000;
-      letter-spacing: 2px;
-    }
+    .shop-grid-container { flex: 1; overflow-y: auto; min-height: 280px; height: 360px; padding-right: 4px; margin: 8px 0; scrollbar-width: thin; scrollbar-color: #ffd93b #1a1a1a; } .shop-grid-container::-webkit-scrollbar { width: 6px; } .shop-grid-container::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px; } .shop-grid-container::-webkit-scrollbar-thumb { background: #ffd93b; border-radius: 3px; }
+    .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 4px; }
+    #shopModal .scroll-hint { display: none; }
+    .shop-card { background: #151515; border: 2px solid #ffd93b; padding: 12px; text-align: center; box-shadow: 4px 4px 0 #000; min-height: 180px; position: relative; } .shop-card.active { border-color: #3cff8b; box-shadow: 0 0 0 2px #3cff8b inset, 4px 4px 0 #000; }
+    .shop-skin-preview { width: 72px; height: 72px; margin: 0 auto 10px; border: 2px solid #000; background: #2a2a2a; position: relative; } .shop-skin-name { font-size: 12px; color: #ffd93b; margin-bottom: 6px; font-weight: bold; } .shop-skin-price { font-size: 11px; margin-bottom: 8px; }
+    .shop-btn { border: 2px solid #000; background: #ffd93b; color: #111; font-weight: bold; font-size: 12px; padding: 8px 10px; cursor: pointer; width: 100%; font-family: monospace; box-shadow: 3px 3px 0 #000; } .shop-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #000; }
+    .close-cross { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; background: #cc2222; border: 3px solid #000; color: #ffffff; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0 #000; display: flex; align-items: center; justify-content: center; padding: 0; line-height: 1; z-index: 35; transition: none; font-family: monospace; } .close-cross:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; } .close-cross:hover { background: #ee3333; }
+    .coin-pop { position: absolute; z-index: 40; color: #ffd93b; font-weight: bold; font-size: 18px; text-shadow: 2px 2px 0 #000; pointer-events: none; animation: coinPopAnim 1s forwards; font-family: monospace; } @keyframes coinPopAnim { 0% { opacity: 0; transform: translateY(10px) scale(0.7); } 20% { opacity: 1; transform: translateY(0px) scale(1); } 100% { opacity: 0; transform: translateY(-40px) scale(1.1); } }
+    .pollen { position: absolute; width: 2px; height: 2px; background: #ffeb99; border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0; animation: pollenFloat 6s infinite linear; } @keyframes pollenFloat { 0% { transform: translateY(0px) translateX(0px); opacity: 0; } 20% { opacity: 0.5; } 80% { opacity: 0.4; } 100% { transform: translateY(-150px) translateX(30px); opacity: 0; } }
+    .pixel-note { display: inline-block; width: 20px; height: 20px; position: relative; vertical-align: middle; } .pixel-note .note-head { position: absolute; width: 8px; height: 8px; background: #ffd93b; left: 4px; top: 4px; box-shadow: 2px 2px 0 #000; } .pixel-note .note-stem { position: absolute; width: 3px; height: 14px; background: #ffd93b; left: 10px; top: -2px; box-shadow: 1px 1px 0 #000; } .pixel-note.muted .note-head, .pixel-note.muted .note-stem { background: #ff6666; } .pixel-note.muted::after { content: "✕"; position: absolute; left: 2px; top: -4px; font-size: 14px; font-weight: bold; color: #ff6666; text-shadow: 1px 1px 0 #000; }
+    .sound-toggle-buttons { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; width: 100%; } .sound-toggle-buttons .btn.small { font-size: 16px; padding: 10px 16px; min-width: auto; }
+    .shop-section-title { font-size: 16px; margin: 20px 0 8px; color: #ffd93b; border-top: 2px solid #ffd93b; padding-top: 12px; }
+    #loadingScreen { position: fixed; inset: 0; z-index: 9999; background: #0a0a0a; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease; } .loading-panel { text-align: center; max-width: 400px; padding: 20px; } .loading-image { max-width: 100%; width: 300px; image-rendering: pixelated; margin-bottom: 24px; } .game-studio-container { margin: 16px 0 8px 0; font-family: 'Courier New', monospace; font-size: 28px; font-weight: bold; letter-spacing: 4px; text-shadow: 4px 4px 0 #000; min-height: 50px; } .game-studio-letter { display: inline-block; color: #ffd93b; opacity: 0; transform: scale(0.5); transition: opacity 0.15s ease, transform 0.2s ease; text-shadow: 3px 3px 0 #000; } .game-studio-letter.visible { opacity: 1; transform: scale(1.2); } .game-studio-letter.visible-settled { opacity: 1; transform: scale(1); } .loading-bar-container { width: 100%; height: 20px; background: #1a1a1a; border: 3px solid #ffd93b; box-shadow: 4px 4px 0 #000; margin: 16px 0; } .loading-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ffd93b, #ffaa1a); transition: width 0.1s ease; } .loading-text { color: #ffd93b; font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; text-shadow: 2px 2px 0 #000; letter-spacing: 2px; }
+    
+    /* ============================================================
+       НОВЫЕ СТИЛИ ДЛЯ МЕРЧА (ДОБАВЛЕНО, НИЧЕГО НЕ УДАЛЕНО)
+       ============================================================ */
+    .merch-modal { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .merch-modal-content { background: #0f0f12; border: 4px solid #ffd93b; padding: 30px 20px 20px; max-width: 400px; width: 90%; text-align: center; position: relative; box-shadow: 8px 8px 0 #000; }
+    .sweatshirt-coin { position: relative; width: 260px; height: 260px; margin: 20px auto; transform-style: preserve-3d; animation: spin 8s infinite linear; }
+    .sweatshirt-coin .side { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; background: #1a1a1a; border: 3px solid #ffd93b; }
+    .sweatshirt-coin .side img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+    .sweatshirt-coin .back { transform: rotateY(180deg); }
+    @keyframes spin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+    .merch-price { font-size: 22px; color: #ffd93b; text-shadow: 2px 2px 0 #000; margin: 10px 0; }
+    .merch-badge { position: absolute; top: -5px; left: -5px; background: #ff66cc; color: white; font-size: 16px; padding: 4px 8px; border: 2px solid #000; box-shadow: 2px 2px 0 #000; z-index: 5; }
+    .merch-description { font-size: 11px; color: #cccccc; margin: 5px 0; min-height: 30px; }
+
     @media (max-width: 640px) {
-      #ui { padding: 4px 12px; font-size: 12px; bottom: 65px; gap: 8px; }
-      #score { font-size: 28px; }
-      #best { font-size: 12px; margin-left: 10px; }
-      .ui-online-indicator { padding: 2px 6px; gap: 4px; }
-      .ui-online-dot { width: 8px; height: 8px; }
-      #uiOnlineCount { font-size: 10px; }
-      .ui-pause-btn { font-size: 14px; padding: 2px 8px; margin-left: 8px; }
-      .btn { font-size: 18px; padding: 10px 24px; min-width: 130px; }
-      .btn.small { font-size: 15px; padding: 8px 18px; }
-      .btn-icon { width: 40px; height: 40px; }
-      #startBtn { transform: scale(1); }
-      .achievement { font-size: 10px; padding: 3px 8px; top: 35%; }
-      .menu-coins { padding: 4px 10px; font-size: 12px; }
-      .coin-icon-real { width: 14px; height: 14px; }
-      .pixel-note { width: 16px; height: 16px; }
-      .pixel-note .note-head { width: 6px; height: 6px; left: 3px; top: 3px; }
-      .pixel-note .note-stem { width: 2px; height: 10px; left: 8px; top: -1px; }
-      .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .shop-skin-preview { width: 60px; height: 60px; }
-      .shop-skin-name { font-size: 10px; }
-      .scroll-hint span { font-size: 8px; }
-      .online-pixel-box { padding: 2px 8px; font-size: 10px; gap: 4px; }
-      .pixel-dot { width: 8px; height: 8px; }
-      .online-corner { top: 10px; left: 10px; }
-      .user-name-corner { top: 42px; left: 10px; padding: 2px 8px; font-size: 9px; }
-      .shop-section-title { font-size: 14px; margin: 15px 0 5px; }
-      .shop-tab { padding: 5px 10px; font-size: 11px; }
-      .close-cross {
-        width: 30px;
-        height: 30px;
-        font-size: 20px;
-        top: 8px;
-        right: 8px;
-      }
-      .sound-toggle-buttons .btn.small {
-        font-size: 14px;
-        padding: 8px 12px;
-        min-width: auto;
-      }
-      .game-studio-container {
-        font-size: 22px;
-        letter-spacing: 2px;
-      }
-      #shopModal .panel {
-        height: 520px;
-      }
-      .shop-grid-container {
-        height: 300px;
-      }
+      #ui { padding: 4px 12px; font-size: 12px; bottom: 65px; gap: 8px; } #score { font-size: 28px; } #best { font-size: 12px; margin-left: 10px; } .ui-online-indicator { padding: 2px 6px; gap: 4px; } .ui-online-dot { width: 8px; height: 8px; } #uiOnlineCount { font-size: 10px; } .ui-pause-btn { font-size: 14px; padding: 2px 8px; margin-left: 8px; } .btn { font-size: 18px; padding: 10px 24px; min-width: 130px; } .btn.small { font-size: 15px; padding: 8px 18px; } .btn-icon { width: 40px; height: 40px; } #startBtn { transform: scale(1); } .achievement { font-size: 10px; padding: 3px 8px; top: 35%; } .menu-coins { padding: 4px 10px; font-size: 12px; } .pixel-note { width: 16px; height: 16px; } .pixel-note .note-head { width: 6px; height: 6px; left: 3px; top: 3px; } .pixel-note .note-stem { width: 2px; height: 10px; left: 8px; top: -1px; } .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } .shop-skin-preview { width: 60px; height: 60px; } .shop-skin-name { font-size: 10px; } .scroll-hint span { font-size: 8px; } .online-pixel-box { padding: 2px 8px; font-size: 10px; gap: 4px; } .pixel-dot { width: 8px; height: 8px; } .online-corner { top: 10px; left: 10px; } .user-name-corner { top: 42px; left: 10px; padding: 2px 8px; font-size: 9px; } .shop-section-title { font-size: 14px; margin: 15px 0 5px; } .shop-tab { padding: 5px 10px; font-size: 11px; } .close-cross { width: 30px; height: 30px; font-size: 20px; top: 8px; right: 8px; } .sound-toggle-buttons .btn.small { font-size: 14px; padding: 8px 12px; min-width: auto; } .game-studio-container { font-size: 22px; letter-spacing: 2px; } #shopModal .panel { height: 520px; } .shop-grid-container { height: 300px; } .sweatshirt-coin { width: 220px; height: 220px; }
     }
   </style>
 </head>
@@ -599,31 +90,16 @@
   <div class="loading-panel">
     <img src="https://static.tildacdn.com/tild6535-3964-4065-b865-313733666163/IMG_6944.PNG" class="loading-image" alt="Loading" style="filter: drop-shadow(6px 6px 0 #000);">
     <div class="game-studio-container">
-      <span class="game-studio-letter" id="letter1">G</span>
-      <span class="game-studio-letter" id="letter2">A</span>
-      <span class="game-studio-letter" id="letter3">M</span>
-      <span class="game-studio-letter" id="letter4">E</span>
-      <span class="game-studio-letter" id="letter5"> </span>
-      <span class="game-studio-letter" id="letter6">S</span>
-      <span class="game-studio-letter" id="letter7">T</span>
-      <span class="game-studio-letter" id="letter8">U</span>
-      <span class="game-studio-letter" id="letter9">D</span>
-      <span class="game-studio-letter" id="letter10">I</span>
-      <span class="game-studio-letter" id="letter11">O</span>
+      <span class="game-studio-letter" id="letter1">G</span><span class="game-studio-letter" id="letter2">A</span><span class="game-studio-letter" id="letter3">M</span><span class="game-studio-letter" id="letter4">E</span><span class="game-studio-letter" id="letter5"> </span><span class="game-studio-letter" id="letter6">S</span><span class="game-studio-letter" id="letter7">T</span><span class="game-studio-letter" id="letter8">U</span><span class="game-studio-letter" id="letter9">D</span><span class="game-studio-letter" id="letter10">I</span><span class="game-studio-letter" id="letter11">O</span>
     </div>
-    <div class="loading-bar-container">
-      <div class="loading-bar-fill" id="loadingBarFill"></div>
-    </div>
+    <div class="loading-bar-container"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
     <div class="loading-text" id="loadingText">LOADING... 0%</div>
   </div>
 </div>
 
 <div id="gameWrapper">
   <div id="ui">
-    <div class="ui-online-indicator">
-      <div class="ui-online-dot"></div>
-      <span id="uiOnlineCount">0</span>
-    </div>
+    <div class="ui-online-indicator"><div class="ui-online-dot"></div><span id="uiOnlineCount">0</span></div>
     <span id="score">SCORE: 0</span>
     <span id="best">BEST: 0</span>
     <button id="pauseBtnUi" class="ui-pause-btn">⏸</button>
@@ -631,12 +107,8 @@
 
   <div id="titleScreen">
     <div class="panel" style="position: relative;">
-      <div class="online-corner">
-        <div id="menuOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="menuOnlineCount">0</span><span id="onlineLabel">online</span></div>
-      </div>
-      <div class="user-name-corner">
-        <span id="menuUserName">👤 Guest</span>
-      </div>
+      <div class="online-corner"><div id="menuOnlineIndicator" class="online-pixel-box"><div class="pixel-dot"></div><span id="menuOnlineCount">0</span><span id="onlineLabel">online</span></div></div>
+      <div class="user-name-corner"><span id="menuUserName">👤 Guest</span></div>
       <div class="menu-coins" id="menuCoinsDisplay"><div class="coin-icon"></div><span id="menuCoinsValue">0</span> BelkaCoins</div>
       <button class="btn" id="startBtn">START GAME</button>
       <div class="daily-bonus-area"><button class="btn daily small" id="dailyBonusBtn">✨ DAILY BONUS ✨</button><div id="dailyBonusInfo" class="small"></div></div>
@@ -644,16 +116,11 @@
         <button class="btn small" id="rulesBtnMain">📜 RULES</button>
         <button class="btn small" id="leaderboardBtnMain">🏆 LEADERBOARD</button>
         <button class="btn small" id="shopBtnMain">🛒 SHOP</button>
-        <button class="btn-icon" id="muteBtn" title="Toggle Sound">
-          <span class="pixel-note" id="muteIcon">
-            <span class="note-head"></span>
-            <span class="note-stem"></span>
-          </span>
-        </button>
+        <button class="btn-icon" id="muteBtn" title="Toggle Sound"><span class="pixel-note" id="muteIcon"><span class="note-head"></span><span class="note-stem"></span></span></button>
         <button class="btn small" id="exitBtn">🚪 EXIT</button>
       </div>
       <div id="userStatusMain" class="register-hint"></div>
-      <div class="version">✨ v.5.0 — Амбар, стога сена, Alisa-единорог ✨</div>
+      <div class="version">✨ v.5.0 — Амбар, стога сена, Alisa-единорог, MERCH ✨</div>
     </div>
   </div>
 
@@ -679,10 +146,7 @@
       <button id="toggleSfxBtn" class="btn small" style="background: #ffd93b; color: #1a1a1a;">🔊 SFX: ON</button>
       <button id="toggleAmbientBtn" class="btn small" style="background: #ffd93b; color: #1a1a1a;">🌾 AMBIENT: ON</button>
     </div>
-    <div class="button-group">
-      <button class="btn small" id="resumeBtn">▶ RESUME</button>
-      <button class="btn small" id="pauseMenuBtn">🏠 MENU</button>
-    </div>
+    <div class="button-group"><button class="btn small" id="resumeBtn">▶ RESUME</button><button class="btn small" id="pauseMenuBtn">🏠 MENU</button></div>
   </div></div>
   
   <div id="shopModal"><div class="panel">
@@ -693,19 +157,35 @@
       <button class="shop-tab active" data-tab="skins">🎨 SKINS</button>
       <button class="shop-tab" data-tab="maps">🗺️ MAPS</button>
       <button class="shop-tab" data-tab="backgrounds">🌄 BACKGROUNDS</button>
+      <button class="shop-tab" data-tab="merch">👕 MERCH</button>
     </div>
     <div class="shop-grid-container">
       <div id="shopSkinsGrid" class="shop-grid"></div>
       <div id="shopMapsGrid" class="shop-grid shop-section-hidden"></div>
       <div id="shopBackgroundsGrid" class="shop-grid shop-section-hidden"></div>
+      <div id="shopMerchGrid" class="shop-grid shop-section-hidden"></div>
     </div>
     <div class="button-group"><button class="btn small" id="closeShopBtn">CLOSE</button></div>
   </div></div>
 
+  <!-- МОДАЛЬНОЕ ОКНО МЕРЧА -->
+  <div id="merchModal" class="merch-modal">
+    <div class="merch-modal-content">
+      <button class="close-cross" onclick="closeMerchModal()">✕</button>
+      <div class="sweatshirt-coin">
+        <div class="side front"><img id="merchFrontImg" src="bellario_front.png" alt="Front"></div>
+        <div class="side back"><img id="merchBackImg" src="bellario_back.png" alt="Back"></div>
+      </div>
+      <h3 id="merchTitle">BELLARIO SWEATSHIRT</h3>
+      <p id="merchDesc">Pixel Bellario</p>
+      <p class="merch-price">1 🪙</p>
+      <button class="btn small" id="merchBuyBtn" onclick="buyMerchFromModal()" style="display:none;">🛒 КУПИТЬ</button>
+    </div>
+  </div>
+
   <canvas id="game"></canvas>
   <div id="flashOverlay"></div>
 </div>
-
 <script type="importmap">{ "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js" } }</script>
 <script type="module">
 import { initializeApp } from "firebase/app";
@@ -829,6 +309,21 @@ Object.keys(maps).forEach(id => { maps[id].owned = ownedMaps.includes(id); });
 function saveMaps() { localStorage.setItem('pixelFarmOwnedMaps', JSON.stringify(ownedMaps)); localStorage.setItem('pixelFarmSelectedMap', selectedMap); }
 function getCurrentMap() { return maps[selectedMap] || maps.farm; }
 
+// ============================================================
+// МЕРЧ (ДОБАВЛЕНО)
+// ============================================================
+const merchItems = {
+  bellario_sweatshirt: {
+    id: 'bellario_sweatshirt',
+    name: 'BELLARIO SWEATSHIRT',
+    price: 1,
+    frontImg: 'https://static.tildacdn.com/tild6233-6133-4466-b433-613331636237/IMG_6977.jpg',
+    backImg: 'https://static.tildacdn.com/tild6561-6464-4064-a134-356532366565/IMG_6978.jpg',
+    description: 'Pixel Bellario'
+  }
+};
+let ownedMerch = JSON.parse(localStorage.getItem('pixelFarmOwnedMerch') || '[]');
+
 function updateCoins() {
   const val = document.getElementById('coinsValue');
   const menu = document.getElementById('menuCoinsValue');
@@ -856,7 +351,7 @@ function addCoins(a, x = typeof W !== 'undefined' && W ? W/2 : window.innerWidth
 }
 function vibrate(duration = 50) { if (navigator.vibrate) navigator.vibrate(duration); }
 
-function renderShop() { renderSkinsGrid(); renderMapsGrid(); renderBackgroundsGrid(); updateCoins(); }
+function renderShop() { renderSkinsGrid(); renderMapsGrid(); renderBackgroundsGrid(); renderMerchGrid(); updateCoins(); }
 function renderSkinsGrid() {
   const grid = document.getElementById('shopSkinsGrid');
   if (!grid) return;
@@ -891,16 +386,78 @@ function renderBackgroundsGrid() {
   });
   grid.innerHTML = html;
 }
+function renderMerchGrid() {
+  const grid = document.getElementById('shopMerchGrid');
+  if (!grid) return;
+  let html = '';
+  Object.values(merchItems).forEach(merch => {
+    const owned = ownedMerch.includes(merch.id);
+    html += `
+      <div class="shop-card merch-card">
+        <div class="merch-badge">👕</div>
+        <div class="shop-skin-preview" style="background:#1a1a1a;">
+          <img src="${merch.frontImg}" style="width:100%; image-rendering:pixelated;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'72\' height=\'72\'%3E%3Crect width=\'72\' height=\'72\' fill=\'%231a1a1a\'/%3E%3Ctext x=\'36\' y=\'40\' text-anchor=\'middle\' fill=\'%23ffd93b\' font-size=\'12\' font-family=\'monospace\'%3EBELLARIO%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="shop-skin-name">${merch.name}</div>
+        <div class="merch-description">${merch.description}</div>
+        <div class="shop-skin-price">${owned ? 'OWNED' : `${merch.price} 🪙`}</div>
+        <button class="shop-btn" onclick="${owned ? `openMerchModal('${merch.id}')` : `buyMerch('${merch.id}')`}">
+          ${owned ? '👀 СМОТРЕТЬ' : '🛒 КУПИТЬ'}
+        </button>
+      </div>
+    `;
+  });
+  grid.innerHTML = html;
+}
+
+function buyMerch(merchId) {
+  const merch = merchItems[merchId];
+  if (!merch || ownedMerch.includes(merchId)) return;
+  if (coins < merch.price) {
+    showAchievementQueued(`❌ Not enough BelkaCoins`, true);
+    return;
+  }
+  coins -= merch.price;
+  ownedMerch.push(merchId);
+  localStorage.setItem('pixelFarmOwnedMerch', JSON.stringify(ownedMerch));
+  updateCoins();
+  renderMerchGrid();
+  showAchievementQueued(`🛒 Purchased: ${merch.name}!`, true);
+  playSound('skinPurchase', 0.3);
+}
+
+function openMerchModal(merchId) {
+  const merch = merchItems[merchId];
+  if (!merch) return;
+  document.getElementById('merchFrontImg').src = merch.frontImg;
+  document.getElementById('merchBackImg').src = merch.backImg;
+  document.getElementById('merchTitle').textContent = merch.name;
+  document.getElementById('merchDesc').textContent = merch.description;
+  document.getElementById('merchBuyBtn').style.display = 'none';
+  document.getElementById('merchModal').style.display = 'flex';
+}
+
+function closeMerchModal() {
+  document.getElementById('merchModal').style.display = 'none';
+}
+
+function buyMerchFromModal() {
+  // Не используется, кнопка скрыта после покупки
+}
+
 function switchShopTab(tab) {
   document.querySelectorAll('.shop-tab').forEach(btn => btn.classList.remove('active'));
   document.querySelector(`.shop-tab[data-tab="${tab}"]`).classList.add('active');
   document.getElementById('shopSkinsGrid').classList.add('shop-section-hidden');
   document.getElementById('shopMapsGrid').classList.add('shop-section-hidden');
   document.getElementById('shopBackgroundsGrid').classList.add('shop-section-hidden');
+  document.getElementById('shopMerchGrid').classList.add('shop-section-hidden');
   if (tab === 'skins') document.getElementById('shopSkinsGrid').classList.remove('shop-section-hidden');
   if (tab === 'maps') document.getElementById('shopMapsGrid').classList.remove('shop-section-hidden');
   if (tab === 'backgrounds') document.getElementById('shopBackgroundsGrid').classList.remove('shop-section-hidden');
+  if (tab === 'merch') document.getElementById('shopMerchGrid').classList.remove('shop-section-hidden');
 }
+
 window.handleSkinAction = function(skinId) {
   const skin = skins[skinId];
   if (!skin) return;
@@ -1313,7 +870,7 @@ function startGamePresence() {
   const presenceRef = doc(db, "presence", gameUserId);
   setInterval(() => {
     if ((gameRunning || titleScr.classList.contains('hidden') === false) && userNick) {
-      setDoc(presenceRef, { userId: gameUserId, nickname: userNick, lastSeen: serverTimestamp(), isActive: true, type: 'game' }, { merge: true }).catch(console.warn);
+      setDoc(presenceRef, { userId: gameUserId, nickname: userNick, lastSeen: serverTimestamp(), isActive: true }, { merge: true }).catch(console.warn);
     }
   }, 30000);
 }
@@ -1323,7 +880,7 @@ window.addEventListener('beforeunload', () => {
   if (gameUserId) setDoc(doc(db, "presence", gameUserId), { isActive: false, lastSeen: serverTimestamp() }, { merge: true });
 });
 
-async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
+async function ensureUser() { if (!userNick) return false; try { const q = query(collection(db, "userbellariofilms"), where("nickname", "==", userNick)); const snap = await getDocs(q); if (!snap.empty) { const docSnap = snap.docs[0]; userDocId = docSnap.id; userFirebaseScore = docSnap.data().bestScore || 0; isUserRegistered = true; startGamePresence(); return true; } else { const ref = doc(collection(db, "userbellariofilms")); await setDoc(ref, { nickname: userNick, bestScore: 0, time: new Date().toISOString(), lastPlayed: serverTimestamp() }); userDocId = ref.id; userFirebaseScore = 0; isUserRegistered = true; startGamePresence(); return true; } } catch (e) { return false; } }
 async function checkReg() { 
   const status = document.getElementById("userStatusMain"); 
   const menuUserName = document.getElementById('menuUserName');
@@ -1397,7 +954,7 @@ function applyTranslations() {
   const leaderTitleOver = document.querySelector('#gameOverScreen .leaderboard-title'); if (leaderTitleOver) leaderTitleOver.textContent = t.topPlayers;
   const shopBtn = document.getElementById('shopBtnMain'); if (shopBtn) shopBtn.textContent = t.shop;
   const rulesDiv = document.getElementById('rulesList');
-  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 4 backgrounds!</li></ul>`;
+  if (rulesDiv) rulesDiv.innerHTML = `<ul style="list-style:none; padding-left:0;"><li>🎮 <strong>Jump:</strong> SPACE / TAP</li><li>🦘 <strong>Double Jump:</strong> Tap TWICE in air</li><li>🏆 <strong>Horseshoe:</strong> Invincibility 5 sec + 🪙2 coins. Yellow bar above horse.</li><li>🪙 <strong>BelkaCoins:</strong> ${t.coinsInfo}</li><li>✨ <strong>Daily Bonus:</strong> +10 coins once per day!</li><li>🏅 <strong>Achievements:</strong> 10 obstacles → +3, 25 obstacles → +8, 3 horseshoes → +5, 10 horseshoes → +15</li><li>🌟 <strong>New:</strong> ${t.newObstacles}</li><li>🗺️ <strong>NEW MAPS:</strong> Wild West desert map! Different ground colors and atmosphere!</li><li>💾 <strong>Leaderboard:</strong> Register at bellariofilms.com to save best score!</li><li>🎵 <strong>Ambient:</strong> Birds, chicken, cow, pig, sheep, tractor, wind, crickets!</li><li>🎶 <strong>Music:</strong> Beautiful pixel melody in menu!</li><li>🛒 <strong>SHOP:</strong> 8 skins + 2 maps + 4 backgrounds!</li><li>👕 <strong>MERCH:</strong> Bellario Sweatshirt — 1 🪙!</li></ul>`;
   const sponsor = document.getElementById('sponsorLine');
   if (sponsor) sponsor.innerHTML = t.rulesSponsor.replace(/\n/g, '<br>').replace(/bellariofilms\.com/g, '<strong class="register-link">bellariofilms.com</strong>');
   makeLinks();
@@ -1425,8 +982,7 @@ let last100Reward = 0, last500Reward = 0;
 let worldObjects = [];
 let obsTimer = 0, powTimer = 0, goldTimer = 0;
 let isSunVisible = true, isMoonVisible = false;
-
-function drawEgyptianBlock(x, y, size = 1) {
+  function drawEgyptianBlock(x, y, size = 1) {
   px(x + 0, y + 0, 32 * size, 28 * size, '#c9b68b');
   px(x + 2*size, y + 2*size, 28*size, 24*size, '#b89f6a');
   px(x + 4*size, y + 4*size, 24*size, 20*size, '#a88952');
@@ -1655,7 +1211,7 @@ function updateWorldObjects() {
         if (!obj.lastSpawnX) obj.lastSpawnX = 0;
         const distanceSinceLastSpawn = Math.abs(obj.x - obj.lastSpawnX);
         if (distanceSinceLastSpawn >= 400 || obj.x < -200) {
-          obj.x = W + 400 + Math.random()*200;
+          obj.x = W + 600 + Math.random()*300;
           obj.y = ground.y - 120;
           obj.lastSpawnX = obj.x;
         }
@@ -1747,7 +1303,7 @@ function setupWorld() {
     // 2. АМБАР (только 1, редкий)
     worldObjects.push({ 
       type:'barn', 
-      x: W + 400 + Math.random()*200, 
+      x: W + 600 + Math.random()*300, 
       y: ground.y - 120,
       scale: 0.9 + Math.random()*0.2, 
       speedMul: 0.2,
